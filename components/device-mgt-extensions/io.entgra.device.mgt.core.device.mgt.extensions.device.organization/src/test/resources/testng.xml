@@ -23,13 +23,15 @@
 
     <test name="DAO Unit Tests" preserve-order="true">
         <classes>
-
+            <class name="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.DAONegativeTest"/>
+            <class name="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.DAOTest"/>
         </classes>
     </test>
 
     <test name="Service Unit Tests" preserve-order="true">
         <classes>
-
+            <class name="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.ServiceTest"/>
+            <class name="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.ServiceNegativeTest"/>
         </classes>
     </test>
 </suite>

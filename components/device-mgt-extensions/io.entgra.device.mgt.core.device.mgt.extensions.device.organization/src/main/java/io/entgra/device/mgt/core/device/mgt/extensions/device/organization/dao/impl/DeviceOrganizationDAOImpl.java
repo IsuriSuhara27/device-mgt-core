@@ -20,19 +20,17 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.
 import io.entgra.device.mgt.core.device.mgt.common.Device;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAO;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.generateParameterPlaceholders;
 import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.getDeviceFromResultSet;
 
 public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
@@ -44,11 +42,11 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         List<Device> childDevices = null;
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String sql = "SELECT d.ID, d.DEVICE_IDENTIFICATION, d.NAME, t.NAME AS DEVICE_TYPE " +
+            String sql = "SELECT d.ID, d.DESCRIPTION, d.DEVICE_IDENTIFICATION, d.NAME, t.NAME AS DEVICE_TYPE_NAME " +
                     "FROM DM_DEVICE d, DM_DEVICE_TYPE t " +
-                    "WHERE d.PARENT_DEVICE_ID = ? AND d.DEVICE_TYPE_ID = t.ID";
+                    "WHERE d.ID = ? AND d.DEVICE_TYPE_ID = t.ID";
 
-            try (PreparedStatement stmt = conn.prepareStatement(sql)){
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, parentId);
                 try (ResultSet rs = stmt.executeQuery()) {
                     childDevices = new ArrayList<>();
@@ -77,12 +75,12 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         List<Device> parentDevices = null;
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String sql = "SELECT d.ID, d.DEVICE_IDENTIFICATION, d.NAME, t.NAME AS DEVICE_TYPE " +
+            String sql = "SELECT d.ID, d.DESCRIPTION,d.DEVICE_IDENTIFICATION, d.NAME, t.NAME AS DEVICE_TYPE_NAME " +
                     "FROM DM_DEVICE d, DM_DEVICE_TYPE t " +
-                    "WHERE d.ID IN (SELECT PARENT_DEVICE_ID FROM DM_DEVICE WHERE ID = ?) " +
+                    "WHERE d.ID IN (SELECT ID FROM DM_DEVICE WHERE ID = ?) " +
                     "AND d.DEVICE_TYPE_ID = t.ID";
 
-            try (PreparedStatement stmt = conn.prepareStatement(sql)){
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, deviceID);
                 try (ResultSet rs = stmt.executeQuery()) {
                     parentDevices = new ArrayList<>();
@@ -106,18 +104,92 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
+    @Override
+    public boolean addDeviceOrganization(DeviceOrganization deviceOrganization) throws DeviceOrganizationMgtDAOException {
+        try {
+            String sql = "INSERT INTO DM_DEVICE_ORGANIZATION (DEVICE_ID, PARENT_DEVICE_ID, LAST_UPDATED_TIMESTAMP, STATUS)" +
+                    " VALUES (?, ?, ?, ?)";
 
-    // Simulated database storage
+            Connection conn = ConnectionManagerUtil.getDBConnection();
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, deviceOrganization.getDeviceId());
+                stmt.setInt(2, deviceOrganization.getParentDeviceId());
+                stmt.setDate(3, deviceOrganization.getUpdateTime());
+                stmt.setString(4, deviceOrganization.getStatus().toString());
+                return stmt.executeUpdate() > 0;
+            }
 
-//    public void addDevice(Device device) {
-//        devices.put(device.getId(), device);
-//    }
-//
-//    public void addChildDevice(int parentId, int childId) {
-//        deviceHierarchy.computeIfAbsent(parentId, k -> new ArrayList<>()).add(childId);
-//    }
-//
-//    public Device getDeviceById(int deviceId) {
-//        return devices.get(deviceId);
-//    }
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining DB connection to insert device organization for " +
+                    deviceOrganization.getDeviceId();
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        } catch (SQLException e) {
+            String msg = "Error occurred while processing SQL to insert device organization for " +
+                    deviceOrganization.getDeviceId();
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        }
+    }
+
+    @Override
+    public boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, String status, int organizationId)
+            throws DeviceOrganizationMgtDAOException {
+        try {
+            String sql = "UPDATE DM_DEVICE_ORGANIZATION SET DEVICE_ID = ? , PARENT_DEVICE_ID = ? , " +
+                    "LAST_UPDATED_TIMESTAMP = ? , STATUS = ? WHERE ID = ? ";
+
+            Connection conn = ConnectionManagerUtil.getDBConnection();
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, deviceID);
+                stmt.setInt(2, parentDeviceID);
+                stmt.setDate(3, timestamp);
+                stmt.setString(4, status);
+                stmt.setInt(5, organizationId);
+                return stmt.executeUpdate() > 0;
+            }
+
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining DB connection to update device organization for " +
+                    organizationId;
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        } catch (SQLException e) {
+            String msg = "Error occurred while processing SQL to update device organization for " +
+                    organizationId;
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        }
+    }
+
+    @Override
+    public DeviceOrganization getDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException {
+        try {
+            String sql = "SELECT do.ID,do.DEVICE_ID, do.PARENT_DEVICE_ID, do.LAST_UPDATED_TIMESTAMP, do.STATUS " +
+                    "FROM DM_DEVICE_ORGANIZATION do WHERE do.ID = ? ";
+
+            Connection conn = ConnectionManagerUtil.getDBConnection();
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, organizationId);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return DeviceOrganizationDaoUtil.loadDeviceOrganization(rs);
+                    }
+                    return null;
+                }
+            }
+
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining DB connection to get device organization details for " +
+                    organizationId;
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        } catch (SQLException e) {
+            String msg = "Error occurred while processing SQL to get device organization details for " +
+                    organizationId;
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        }
+    }
+
 }

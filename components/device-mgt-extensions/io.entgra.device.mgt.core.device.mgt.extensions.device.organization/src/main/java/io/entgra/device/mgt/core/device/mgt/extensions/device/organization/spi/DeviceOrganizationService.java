@@ -18,8 +18,10 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi;
 
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
 
+import java.sql.Date;
 import java.util.List;
 
 public interface DeviceOrganizationService {
@@ -27,4 +29,12 @@ public interface DeviceOrganizationService {
     List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtPluginException;
 
     List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtPluginException;
+
+    boolean addDeviceOrganization(DeviceOrganization deviceOrganization) throws DeviceOrganizationMgtPluginException;
+
+    boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, String status,
+                                     int organizationId) throws DeviceOrganizationMgtPluginException;
+
+    DeviceOrganization getDeviceOrganizationByID(int organizationId)
+            throws DeviceOrganizationMgtPluginException;
 }

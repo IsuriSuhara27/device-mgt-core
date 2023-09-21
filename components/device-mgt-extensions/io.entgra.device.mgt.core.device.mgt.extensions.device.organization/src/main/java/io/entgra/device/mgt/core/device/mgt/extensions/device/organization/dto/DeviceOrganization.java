@@ -18,7 +18,8 @@
 
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto;
 
-import java.util.Date;
+
+import java.sql.Date;
 
 public abstract class DeviceOrganization {
 
@@ -26,6 +27,7 @@ public abstract class DeviceOrganization {
     private int deviceId;
     private int parentDeviceId;
     private Date updateTime;
+    private DeviceOrganizationStatus status;
 
     public int getOrganizationId() {
         return organizationId;
@@ -57,5 +59,17 @@ public abstract class DeviceOrganization {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public DeviceOrganizationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(DeviceOrganizationStatus status) {
+        this.status = status;
+    }
+
+    public enum DeviceOrganizationStatus {
+        ACT, INA
     }
 }

@@ -18,8 +18,10 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao;
 
 import io.entgra.device.mgt.core.device.mgt.common.Device;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
 
+import java.sql.Date;
 import java.util.List;
 
 public interface DeviceOrganizationDAO {
@@ -27,4 +29,11 @@ public interface DeviceOrganizationDAO {
     List<Device> getChildDevices(int parentId) throws DeviceOrganizationMgtDAOException;
 
     List<Device> getParentDevices(Integer deviceID) throws DeviceOrganizationMgtDAOException;
+
+    boolean addDeviceOrganization(DeviceOrganization deviceOrganization) throws DeviceOrganizationMgtDAOException;
+
+    boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, String status, int organizationId)
+            throws DeviceOrganizationMgtDAOException;
+
+    DeviceOrganization getDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException;
 }
