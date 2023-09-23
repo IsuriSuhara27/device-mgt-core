@@ -17,9 +17,14 @@
  */
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto;
 
+import io.entgra.device.mgt.core.device.mgt.common.Device;
+
 import java.util.ArrayList;
 import java.util.List;
-import io.entgra.device.mgt.core.device.mgt.common.Device;
+
+/**
+ * This class is used in DeviceOrganizationService
+ */
 public class DeviceNode {
 
     private int deviceId;

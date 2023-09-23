@@ -2,6 +2,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.
 
 
 import io.entgra.device.mgt.core.device.mgt.common.Device;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -16,6 +17,12 @@ public class DeviceOrganizationDaoUtil {
 
     private static final Log log = LogFactory.getLog(DeviceOrganizationDaoUtil.class);
 
+    /**
+     * Helper method to create a Device Organization object from a ResultSet
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
     public static DeviceOrganization loadDeviceOrganization(ResultSet rs) throws SQLException {
         DeviceOrganization deviceOrganization = new DeviceOrganization() {
         };
@@ -23,19 +30,26 @@ public class DeviceOrganizationDaoUtil {
         deviceOrganization.setDeviceId(rs.getInt("DEVICE_ID"));
         deviceOrganization.setParentDeviceId(rs.getInt("PARENT_DEVICE_ID"));
         deviceOrganization.setUpdateTime(rs.getDate("LAST_UPDATED_TIMESTAMP"));
-        deviceOrganization.setStatus(DeviceOrganization.DeviceOrganizationStatus.valueOf(rs.getString("STATUS")));
         return deviceOrganization;
     }
 
-    // Helper method to create a Device object from a ResultSet
-    public static Device getDeviceFromResultSet(ResultSet rs) throws SQLException {
+    /**
+     * Helper method to create a Device object from a ResultSet
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    public static DeviceNode getDeviceFromResultSet(ResultSet rs) throws SQLException {
+        DeviceNode node = new DeviceNode();
+        node.setDeviceId(rs.getInt("ID"));
         Device device = new Device();
         device.setId(rs.getInt("ID"));
         device.setDescription(rs.getString("DESCRIPTION"));
         device.setName(rs.getString("NAME"));
         device.setType(rs.getString("DEVICE_TYPE_NAME"));
         device.setDeviceIdentifier(rs.getString("DEVICE_IDENTIFICATION"));
-        return device;
+        node.setDevice(device);
+        return node;
     }
 
 }

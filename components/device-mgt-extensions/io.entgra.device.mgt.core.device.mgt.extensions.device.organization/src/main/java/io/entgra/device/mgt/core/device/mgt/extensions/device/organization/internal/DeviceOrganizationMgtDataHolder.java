@@ -17,7 +17,6 @@
  */
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal;
 
-import io.entgra.device.mgt.core.device.mgt.core.service.DeviceManagementProviderService;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi.DeviceOrganizationService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
@@ -30,6 +29,7 @@ public class DeviceOrganizationMgtDataHolder {
 
     private DeviceOrganizationMgtDataHolder() {
     }
+
     public static DeviceOrganizationMgtDataHolder getInstance() {
         return thisInstance;
     }

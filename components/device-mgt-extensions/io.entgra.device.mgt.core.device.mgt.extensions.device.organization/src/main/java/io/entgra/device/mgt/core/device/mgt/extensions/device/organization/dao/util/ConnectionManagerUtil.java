@@ -17,12 +17,12 @@
  */
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util;
 
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import io.entgra.device.mgt.core.device.mgt.common.exceptions.IllegalTransactionStateException;
 import io.entgra.device.mgt.core.device.mgt.core.config.datasource.DataSourceConfig;
 import io.entgra.device.mgt.core.device.mgt.core.config.datasource.JNDILookupDefinition;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
@@ -37,6 +37,10 @@ public class ConnectionManagerUtil {
     private static final ThreadLocal<Connection> currentConnection = new ThreadLocal<>();
     private static DataSource dataSource;
 
+    /**
+     *
+     * @throws DBConnectionException
+     */
     public static void openDBConnection() throws DBConnectionException {
         Connection conn = currentConnection.get();
         if (conn != null) {
@@ -50,6 +54,11 @@ public class ConnectionManagerUtil {
         currentConnection.set(conn);
     }
 
+    /**
+     *
+     * @return
+     * @throws DBConnectionException
+     */
     public static Connection getDBConnection() throws DBConnectionException {
         Connection conn = currentConnection.get();
         if (conn == null) {
@@ -63,6 +72,10 @@ public class ConnectionManagerUtil {
         return conn;
     }
 
+    /**
+     *
+     * @throws DBConnectionException
+     */
     public static void beginDBTransaction() throws DBConnectionException {
         Connection conn = currentConnection.get();
         if (conn == null) {
@@ -78,6 +91,10 @@ public class ConnectionManagerUtil {
         }
     }
 
+    /**
+     *
+     * @throws DBConnectionException
+     */
     public static void endDBTransaction() throws DBConnectionException {
         Connection conn = currentConnection.get();
         if (conn == null) {
@@ -95,6 +112,9 @@ public class ConnectionManagerUtil {
         }
     }
 
+    /**
+     *
+     */
     public static void commitDBTransaction() {
         Connection conn = currentConnection.get();
         if (conn == null) {
@@ -112,6 +132,9 @@ public class ConnectionManagerUtil {
         }
     }
 
+    /**
+     *
+     */
     public static void rollbackDBTransaction() {
         Connection conn = currentConnection.get();
         if (conn == null) {
@@ -129,6 +152,9 @@ public class ConnectionManagerUtil {
         }
     }
 
+    /**
+     *
+     */
     public static void closeDBConnection() {
         Connection conn = currentConnection.get();
         if (conn == null) {
@@ -142,6 +168,11 @@ public class ConnectionManagerUtil {
         currentConnection.remove();
     }
 
+    /**
+     *
+     * @param conn
+     * @return
+     */
     private static boolean inTransaction(Connection conn) {
         boolean inTransaction = true;
         try {
@@ -154,6 +185,11 @@ public class ConnectionManagerUtil {
         return inTransaction;
     }
 
+    /**
+     *
+     * @return
+     * @throws DBConnectionException
+     */
     public static boolean isTransactionStarted() throws DBConnectionException {
         Connection connection = getDBConnection();
         return inTransaction(connection);
@@ -191,6 +227,12 @@ public class ConnectionManagerUtil {
         return dataSource;
     }
 
+    /**
+     *
+     * @param dataSourceName
+     * @param jndiProperties
+     * @return
+     */
     public static DataSource lookupDataSource(String dataSourceName,
                                               final Hashtable<Object, Object> jndiProperties) {
 
@@ -207,6 +249,10 @@ public class ConnectionManagerUtil {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public static String getDatabaseType() {
         try {
             return dataSource.getConnection().getMetaData().getDatabaseProductName();

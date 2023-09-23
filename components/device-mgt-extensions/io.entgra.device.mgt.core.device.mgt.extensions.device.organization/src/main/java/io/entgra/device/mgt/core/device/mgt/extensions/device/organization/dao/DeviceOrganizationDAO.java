@@ -18,22 +18,79 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao;
 
 import io.entgra.device.mgt.core.device.mgt.common.Device;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
 
 import java.sql.Date;
 import java.util.List;
 
+/**
+ * This is responsible for DeviceOrganization related DAO operations.
+ */
 public interface DeviceOrganizationDAO {
 
-    List<Device> getChildDevices(int parentId) throws DeviceOrganizationMgtDAOException;
+    /**
+     * retrieve child devices per particular device ID
+     * @param node
+     * @param maxDepth
+     * @param includeDevice
+     * @return
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
-    List<Device> getParentDevices(Integer deviceID) throws DeviceOrganizationMgtDAOException;
+    /**
+     * retrieve parent devices per particular device ID
+     * @param deviceID
+     * @return
+     * @throws DeviceOrganizationMgtDAOException
+     */
+//    List<Device> getParentDevices(DeviceNode node) throws DeviceOrganizationMgtDAOException;
 
+    /**
+     * add a new reocrd to device organization table
+     * @param deviceOrganization
+     * @return
+     * @throws DeviceOrganizationMgtDAOException
+     */
     boolean addDeviceOrganization(DeviceOrganization deviceOrganization) throws DeviceOrganizationMgtDAOException;
 
-    boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, String status, int organizationId)
+    /**
+     * update a record in device organization table
+     * @param deviceID
+     * @param parentDeviceID
+     * @param timestamp
+     * @param organizationId
+     * @return
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, int organizationId)
             throws DeviceOrganizationMgtDAOException;
 
+    /**
+     *
+     * @param organizationId
+     * @return
+     * @throws DeviceOrganizationMgtDAOException
+     */
     DeviceOrganization getDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException;
+
+    /**
+     * delete a record from device organization table
+     * @param organizationId
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    boolean deleteDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException;
+
+    /**
+     * delete a record associated with a particular device ID from device organization table
+     * delete a record if the param ID is either device_ID OR parent_device_ID in the device organization table
+     * @param deviceId
+     * @return
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    boolean deleteDeviceAssociations(int deviceId) throws DeviceOrganizationMgtDAOException;
+
+    boolean doesDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException;
 }

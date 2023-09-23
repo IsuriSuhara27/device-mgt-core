@@ -18,6 +18,9 @@
 
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception;
 
+/**
+ * Exception thrown during the DeviceOrganization Management operations.
+ */
 public class DeviceOrganizationMgtPluginException extends Exception {
 
     private static final long serialVersionUID = -7686100672332447443L;

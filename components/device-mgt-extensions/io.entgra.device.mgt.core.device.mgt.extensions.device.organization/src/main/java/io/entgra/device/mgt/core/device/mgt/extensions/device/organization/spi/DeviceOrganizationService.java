@@ -26,15 +26,28 @@ import java.util.List;
 
 public interface DeviceOrganizationService {
 
-    List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtPluginException;
+    boolean addDeviceOrganization(DeviceOrganization deviceOrganization)
+            throws DeviceOrganizationMgtPluginException;
 
-    List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtPluginException;
+    List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice)
+            throws DeviceOrganizationMgtPluginException;
 
-    boolean addDeviceOrganization(DeviceOrganization deviceOrganization) throws DeviceOrganizationMgtPluginException;
-
-    boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, String status,
-                                     int organizationId) throws DeviceOrganizationMgtPluginException;
+//    List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice)
+//            throws DeviceOrganizationMgtPluginException;
 
     DeviceOrganization getDeviceOrganizationByID(int organizationId)
             throws DeviceOrganizationMgtPluginException;
+
+    boolean doesDeviceIdExist(int deviceId)
+            throws DeviceOrganizationMgtPluginException;
+
+    boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, int organizationId)
+            throws DeviceOrganizationMgtPluginException;
+
+    boolean deleteDeviceOrganizationByID(int organizationId)
+            throws DeviceOrganizationMgtPluginException;
+
+    boolean deleteDeviceAssociations(int deviceId)
+            throws DeviceOrganizationMgtPluginException;
+
 }

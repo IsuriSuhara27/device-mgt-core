@@ -23,10 +23,20 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.u
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * This class intends to act as the primary entity that hides all DAO instantiation related complexities and logic so
+ * that the business objection handling layer doesn't need to be aware of the same providing seamless plug-ability of
+ * different data sources, connection acquisition mechanisms as well as different forms of DAO implementations to the
+ * high-level implementations that require Device Organization related metadata persistence.
+ */
 public class DeviceOrganizationDAOFactory {
     private static final Log log = LogFactory.getLog(DeviceOrganizationDAOFactory.class);
     private static String databaseEngine;
 
+    /**
+     *
+     * @param dataSourceConfiguration
+     */
     public static void init(DataSourceConfig dataSourceConfiguration) {
         if (log.isDebugEnabled()) {
             log.debug("Initializing Device Organization Data Source");
@@ -35,6 +45,10 @@ public class DeviceOrganizationDAOFactory {
         databaseEngine = ConnectionManagerUtil.getDatabaseType();
     }
 
+    /**
+     *
+     * @return
+     */
     public static DeviceOrganizationDAO getDeviceOrganizationDAO() {
         if (databaseEngine != null) {
             //noinspection SwitchStatementWithTooFewBranches

@@ -18,13 +18,20 @@
 
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception;
 
+/**
+ * Exception thrown during the DeviceOrganization Management DAO operations.
+ */
 public class DeviceOrganizationMgtDAOException extends Exception {
     private static final long serialVersionUID = 2412162605436684110L;
     private String errorMessage;
 
-    public DeviceOrganizationMgtDAOException() { super(); }
+    public DeviceOrganizationMgtDAOException() {
+        super();
+    }
 
-    public DeviceOrganizationMgtDAOException(Throwable cause) { super(cause); }
+    public DeviceOrganizationMgtDAOException(Throwable cause) {
+        super(cause);
+    }
 
     public DeviceOrganizationMgtDAOException(String msg, Exception nestedEx) {
         super(msg, nestedEx);

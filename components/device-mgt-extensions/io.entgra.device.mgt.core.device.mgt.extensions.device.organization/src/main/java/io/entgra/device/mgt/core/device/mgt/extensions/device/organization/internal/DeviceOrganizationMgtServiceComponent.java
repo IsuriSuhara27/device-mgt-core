@@ -32,7 +32,7 @@ import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
 /**
- * @scr.component name="io.entgra.device.mgt.core.subtype.mgt.internal.DeviceSubTypeMgtServiceComponent" immediate="true"
+ * @scr.component name="io.entgra.device.mgt.core.subtype.mgt.internal.DeviceOrganizationMgtServiceComponent" immediate="true"
  * @scr.reference name="org.wso2.carbon.device.manager"
  * interface="io.entgra.device.mgt.core.device.mgt.core.service.DeviceManagementProviderService"
  * cardinality="1..1"

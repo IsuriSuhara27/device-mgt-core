@@ -21,13 +21,15 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto;
 
 import java.sql.Date;
 
+/**
+ * This class is used in DeviceOrganizationService
+ */
 public abstract class DeviceOrganization {
 
     private int organizationId;
     private int deviceId;
     private int parentDeviceId;
     private Date updateTime;
-    private DeviceOrganizationStatus status;
 
     public int getOrganizationId() {
         return organizationId;
@@ -61,15 +63,4 @@ public abstract class DeviceOrganization {
         this.updateTime = updateTime;
     }
 
-    public DeviceOrganizationStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(DeviceOrganizationStatus status) {
-        this.status = status;
-    }
-
-    public enum DeviceOrganizationStatus {
-        ACT, INA
-    }
 }

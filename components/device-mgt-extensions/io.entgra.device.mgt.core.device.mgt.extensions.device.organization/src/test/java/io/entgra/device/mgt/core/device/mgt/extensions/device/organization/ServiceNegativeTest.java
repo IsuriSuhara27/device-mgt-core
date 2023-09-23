@@ -7,7 +7,6 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.mock.
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi.DeviceOrganizationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -30,7 +29,8 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
 
     public void testAddDeviceOrganization() throws DeviceOrganizationMgtPluginException {
 
-        DeviceOrganization deviceOrganization = new DeviceOrganization(){};
+        DeviceOrganization deviceOrganization = new DeviceOrganization() {
+        };
         boolean result = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
     }
 
@@ -40,7 +40,7 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
 
     public void testUpdateDeviceOrganization() throws DeviceOrganizationMgtPluginException {
 
-        boolean result = deviceOrganizationService.updateDeviceOrganization(2,3,
-                new Date(System.currentTimeMillis()), "INACTIVE", 5);
+        boolean result = deviceOrganizationService.updateDeviceOrganization(2, 3,
+                new Date(System.currentTimeMillis()), 5);
     }
 }
