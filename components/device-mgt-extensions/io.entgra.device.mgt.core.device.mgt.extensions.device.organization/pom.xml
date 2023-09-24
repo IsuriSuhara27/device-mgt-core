@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
   ~ Copyright (c) 2018 - 2023, Entgra (Pvt) Ltd. (http://www.entgra.io) All Rights Reserved.
   ~
@@ -19,12 +18,20 @@
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <parent>
         <artifactId>device-mgt-extensions</artifactId>
         <groupId>io.entgra.device.mgt.core</groupId>
         <version>5.0.31-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>io.entgra.device.mgt.core.device.mgt.extensions.device.organization</artifactId>
+    <packaging>bundle</packaging>
+    <name>Entgra IoT - Device Organization Module</name>
+    <description>Entgra IoT - Device Organization Module Implementation</description>
+    <url>http://entgra.io</url>
     <dependencies>
         <dependency>
             <groupId>io.entgra.device.mgt.core</groupId>
@@ -303,13 +310,6 @@
         </dependency>
     </dependencies>
 
-    <modelVersion>4.0.0</modelVersion>
-    <artifactId>io.entgra.device.mgt.core.device.mgt.extensions.device.organization</artifactId>
-    <packaging>bundle</packaging>
-    <name>Entgra IoT - Device Organization Module</name>
-    <description>Entgra IoT - Device Organization Module Implementation</description>
-    <url>http://entgra.io</url>
-
     <build>
         <plugins>
             <plugin>
@@ -330,17 +330,44 @@
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
                         <Bundle-Version>${io.entgra.device.mgt.core.version}</Bundle-Version>
                         <Bundle-Description>IoT Device Management Device Organization Bundle</Bundle-Description>
-                        <Import-Package>
-                            org.wso2.carbon.context,
-                            org.apache.commons.lang,
-                            org.wso2.carbon.user.api,
-                            org.apache.commons.logging,
-                            org.wso2.carbon.user.core.service,
-                            io.entgra.device.mgt.core.device.mgt.common.*
-                        </Import-Package>
                         <Export-Package>
-                            org.wso2.carbon.logging
+                            io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal,
+                            io.entgra.device.mgt.core.device.mgt.extensions.device.organization.*
                         </Export-Package>
+                        <Private-Package>io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal</Private-Package>
+                        <Import-Package>
+                            org.osgi.framework.*;version="${imp.package.version.osgi.framework}",
+                            org.osgi.service.*;version="${imp.package.version.osgi.service}",
+                            org.apache.commons.logging,
+                            org.apache.commons.lang,
+                            javax.xml,
+                            javax.xml.stream,
+                            javax.xml.bind.*,
+                            javax.sql,
+                            javax.xml.parsers; version=0.0.0,
+                            org.w3c.dom,
+                            javax.naming,
+                            org.wso2.carbon.context,
+                            org.wso2.carbon.base,
+                            org.wso2.carbon.utils.*,
+                            io.entgra.device.mgt.core.device.mgt.common.*,
+                            io.entgra.device.mgt.core.device.mgt.core.*,
+                            org.wso2.carbon.ndatasource.core,
+                            org.wso2.carbon.registry.core,
+                            org.wso2.carbon.registry.core.session,
+                            org.wso2.carbon.registry.core.service,
+                            org.wso2.carbon.registry.api,
+                            io.entgra.device.mgt.core.device.mgt.extensions.license.mgt.registry,
+                            javax.net.ssl,
+                            org.wso2.carbon.core.util,
+                            okhttp3,
+                            org.json.*,
+                            com.google.gson.*,
+                            com.fasterxml.jackson.core.*,
+                            com.fasterxml.jackson.databind.*,
+                            com.fasterxml.jackson.annotation.*,
+                            com.google.common.cache.*,
+                        </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -372,11 +399,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
 </project>

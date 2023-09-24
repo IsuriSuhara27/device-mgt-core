@@ -1,6 +1,5 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization;
 
-import io.entgra.device.mgt.core.device.mgt.common.Device;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAO;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAOFactory;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
@@ -15,7 +14,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 public class DAOTest extends BaseDeviceOrganizationTest {
@@ -57,7 +56,6 @@ public class DAOTest extends BaseDeviceOrganizationTest {
     }
 
 
-
     @Test
     public void testAddDeviceOrganization() throws DBConnectionException, DeviceOrganizationMgtDAOException {
 
@@ -96,7 +94,12 @@ public class DAOTest extends BaseDeviceOrganizationTest {
     @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testUpdateDeviceOrganization() throws DBConnectionException, DeviceOrganizationMgtDAOException {
         ConnectionManagerUtil.beginDBTransaction();
-        boolean result = deviceOrganizationDAO.updateDeviceOrganization(4, 2, new Date(System.currentTimeMillis()), 1);
+        DeviceOrganization deviceOrganization = new DeviceOrganization() {
+        };
+        deviceOrganization.setDeviceId(4);
+        deviceOrganization.setParentDeviceId(1);
+        deviceOrganization.setOrganizationId(1);
+        boolean result = deviceOrganizationDAO.updateDeviceOrganization(deviceOrganization);
         ConnectionManagerUtil.commitDBTransaction();
         ConnectionManagerUtil.closeDBConnection();
 
@@ -109,9 +112,9 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         DeviceOrganization deviceOrganization = deviceOrganizationDAO.getDeviceOrganizationByID(1);
         ConnectionManagerUtil.commitDBTransaction();
         ConnectionManagerUtil.closeDBConnection();
-        if(deviceOrganization != null){
-            log.info("Device Organization device ID : " + deviceOrganization.getDeviceId()+
-                    " ,Device Organization Parent Device ID : "  + deviceOrganization.getParentDeviceId());
+        if (deviceOrganization != null) {
+            log.info("Device Organization device ID : " + deviceOrganization.getDeviceId() +
+                    " ,Device Organization Parent Device ID : " + deviceOrganization.getParentDeviceId());
         }
     }
 

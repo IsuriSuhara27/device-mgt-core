@@ -24,9 +24,8 @@ public class DAONegativeTest extends BaseDeviceOrganizationTest {
         log.info("DAO test initialized");
     }
 
-    @Test(description = "This method tests the add device organization method under negative circumstances with null data",
-            expectedExceptions = {NullPointerException.class}
-    )
+    @Test(description = "This method tests the add device organization method under negative circumstances with null " +
+            "data")
     public void testAddDeviceOrganization() throws DeviceOrganizationMgtDAOException {
         DeviceOrganization deviceOrganization = new DeviceOrganization() {
         };

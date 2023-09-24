@@ -12,7 +12,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 public class ServiceTest extends BaseDeviceOrganizationTest {
@@ -77,7 +77,12 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testUpdateDeviceOrganization() throws DeviceOrganizationMgtPluginException {
 
-        boolean result = deviceOrganizationService.updateDeviceOrganization(4, 2, new Date(System.currentTimeMillis()), 1);
+        DeviceOrganization deviceOrganization = new DeviceOrganization() {
+        };
+        deviceOrganization.setDeviceId(4);
+        deviceOrganization.setParentDeviceId(3);
+        deviceOrganization.setOrganizationId(1);
+        boolean result = deviceOrganizationService.updateDeviceOrganization(deviceOrganization);
 
         Assert.assertNotNull(result, "Cannot be null");
     }

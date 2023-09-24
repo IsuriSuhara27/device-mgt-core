@@ -17,12 +17,10 @@
  */
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao;
 
-import io.entgra.device.mgt.core.device.mgt.common.Device;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
 
-import java.sql.Date;
 import java.util.List;
 
 /**
@@ -32,6 +30,7 @@ public interface DeviceOrganizationDAO {
 
     /**
      * retrieve child devices per particular device ID
+     *
      * @param node
      * @param maxDepth
      * @param includeDevice
@@ -41,7 +40,6 @@ public interface DeviceOrganizationDAO {
     List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
     /**
-     *
      * @param node
      * @param maxDepth
      * @param includeDevice
@@ -52,6 +50,7 @@ public interface DeviceOrganizationDAO {
 
     /**
      * add a new reocrd to device organization table
+     *
      * @param deviceOrganization
      * @return
      * @throws DeviceOrganizationMgtDAOException
@@ -60,18 +59,15 @@ public interface DeviceOrganizationDAO {
 
     /**
      * update a record in device organization table
-     * @param deviceID
-     * @param parentDeviceID
-     * @param timestamp
-     * @param organizationId
+     *
+     * @param deviceOrganization
      * @return
      * @throws DeviceOrganizationMgtDAOException
      */
-    boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, int organizationId)
+    boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException;
 
     /**
-     *
      * @param organizationId
      * @return
      * @throws DeviceOrganizationMgtDAOException
@@ -80,6 +76,7 @@ public interface DeviceOrganizationDAO {
 
     /**
      * delete a record from device organization table
+     *
      * @param organizationId
      * @throws DeviceOrganizationMgtDAOException
      */
@@ -88,6 +85,7 @@ public interface DeviceOrganizationDAO {
     /**
      * delete a record associated with a particular device ID from device organization table
      * delete a record if the param ID is either device_ID OR parent_device_ID in the device organization table
+     *
      * @param deviceId
      * @return
      * @throws DeviceOrganizationMgtDAOException

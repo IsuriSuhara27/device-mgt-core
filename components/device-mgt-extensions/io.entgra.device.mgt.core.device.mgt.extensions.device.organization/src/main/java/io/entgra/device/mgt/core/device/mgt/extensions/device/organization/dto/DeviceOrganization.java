@@ -19,7 +19,7 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto;
 
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  * This class is used in DeviceOrganizationService
@@ -62,5 +62,4 @@ public abstract class DeviceOrganization {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
-
 }

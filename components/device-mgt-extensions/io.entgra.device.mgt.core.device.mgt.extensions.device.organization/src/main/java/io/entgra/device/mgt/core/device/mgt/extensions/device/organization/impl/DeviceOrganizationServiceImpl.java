@@ -90,7 +90,13 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     public boolean addDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtPluginException {
         String msg = "";
+        if (deviceOrganization == null) {
+            return false;
+        }
 
+        if (deviceOrganization.getDeviceId() == 0 || deviceOrganization.getParentDeviceId() == 0) {
+            return false;
+        }
         try {
             ConnectionManagerUtil.beginDBTransaction();
             boolean result = deviceOrganizationDao.addDeviceOrganization(deviceOrganization);
@@ -123,44 +129,45 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     }
 
     @Override
-    public boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp,
-                                            int organizationId) throws DeviceOrganizationMgtPluginException {
+    public boolean updateDeviceOrganization(DeviceOrganization organization)
+            throws DeviceOrganizationMgtPluginException {
         String msg = "";
-        DeviceOrganization deviceOrganization = getDeviceOrganizationByID(organizationId);
+        DeviceOrganization deviceOrganization = getDeviceOrganizationByID(organization.getOrganizationId());
         if (deviceOrganization == null) {
-            String errorMsg = "Cannot find device organization for organization ID" + organizationId;
+            String errorMsg = "Cannot find device organization for organization ID " + organization.getOrganizationId();
             log.error(errorMsg);
+//            throw new DeviceOrganizationMgtPluginException();
             return false;
         }
 
         try {
             ConnectionManagerUtil.beginDBTransaction();
-            boolean result = deviceOrganizationDao.updateDeviceOrganization(deviceID, parentDeviceID, timestamp,
-                    organizationId);
+            boolean result = deviceOrganizationDao.updateDeviceOrganization(organization);
             if (result) {
-                msg = "Device organization updated successfully,for " + organizationId;
+                msg = "Device organization updated successfully,for " + organization.getOrganizationId();
                 if (log.isDebugEnabled()) {
                     log.debug(msg);
                 }
             } else {
                 ConnectionManagerUtil.rollbackDBTransaction();
-                msg = "Device organization failed to update,for " + organizationId;
+                msg = "Device organization failed to update,for " + organization.getOrganizationId();
                 throw new DeviceOrganizationMgtPluginException(msg);
             }
             ConnectionManagerUtil.commitDBTransaction();
             return true;
         } catch (DBConnectionException e) {
-            msg = "Error occurred while obtaining the database connection to update device organization for " + organizationId;
+            msg = "Error occurred while obtaining the database connection to update device organization for " +
+                    organization.getOrganizationId();
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);
         } catch (DeviceOrganizationMgtDAOException e) {
             ConnectionManagerUtil.rollbackDBTransaction();
-            msg = "Error occurred in the database level while updating device organization for " + organizationId;
+            msg = "Error occurred in the database level while updating device organization for " +
+                    organization.getOrganizationId();
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);
         } finally {
             ConnectionManagerUtil.closeDBConnection();
-
         }
     }
 

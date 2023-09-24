@@ -41,7 +41,7 @@ public interface DeviceOrganizationService {
     boolean doesDeviceIdExist(int deviceId)
             throws DeviceOrganizationMgtPluginException;
 
-    boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, int organizationId)
+    boolean updateDeviceOrganization(DeviceOrganization organization)
             throws DeviceOrganizationMgtPluginException;
 
     boolean deleteDeviceOrganizationByID(int organizationId)

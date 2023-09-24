@@ -28,7 +28,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -161,16 +163,26 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     }
 
     @Override
-    public boolean addDeviceOrganization(DeviceOrganization deviceOrganization) throws DeviceOrganizationMgtDAOException {
+    public boolean addDeviceOrganization(DeviceOrganization deviceOrganization)
+            throws DeviceOrganizationMgtDAOException {
+        if (deviceOrganization == null) {
+            return false;
+        }
+
+        if (deviceOrganization.getDeviceId() == 0 || deviceOrganization.getParentDeviceId() == 0) {
+            return false;
+        }
         try {
             String sql = "INSERT INTO DM_DEVICE_ORGANIZATION (DEVICE_ID, PARENT_DEVICE_ID, LAST_UPDATED_TIMESTAMP)" +
                     " VALUES (?, ?, ?)";
 
             Connection conn = ConnectionManagerUtil.getDBConnection();
+            Calendar calendar = Calendar.getInstance();
+            Timestamp timestamp = new Timestamp(calendar.getTime().getTime());
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, deviceOrganization.getDeviceId());
                 stmt.setInt(2, deviceOrganization.getParentDeviceId());
-                stmt.setDate(3, deviceOrganization.getUpdateTime());
+                stmt.setTimestamp(3, timestamp);
                 return stmt.executeUpdate() > 0;
             }
 
@@ -188,29 +200,39 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     }
 
     @Override
-    public boolean updateDeviceOrganization(int deviceID, int parentDeviceID, Date timestamp, int organizationId)
+    public boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException {
+        DeviceOrganization organization = getDeviceOrganizationByID(deviceOrganization.getOrganizationId());
+        if (deviceOrganization == null) {
+            return false;
+        }
+
+        if (deviceOrganization.getDeviceId() == 0 || deviceOrganization.getParentDeviceId() == 0) {
+            return false;
+        }
         try {
             String sql = "UPDATE DM_DEVICE_ORGANIZATION SET DEVICE_ID = ? , PARENT_DEVICE_ID = ? , " +
                     "LAST_UPDATED_TIMESTAMP = ? WHERE ID = ? ";
 
             Connection conn = ConnectionManagerUtil.getDBConnection();
+            Calendar calendar = Calendar.getInstance();
+            Timestamp timestamp = new Timestamp(calendar.getTime().getTime());
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, deviceID);
-                stmt.setInt(2, parentDeviceID);
-                stmt.setDate(3, timestamp);
-                stmt.setInt(4, organizationId);
+                stmt.setInt(1, deviceOrganization.getDeviceId());
+                stmt.setInt(2, deviceOrganization.getParentDeviceId());
+                stmt.setTimestamp(3, timestamp);
+                stmt.setInt(4, deviceOrganization.getOrganizationId());
                 return stmt.executeUpdate() > 0;
             }
 
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining DB connection to update device organization for " +
-                    organizationId;
+                    deviceOrganization.getOrganizationId();
             log.error(msg);
             throw new DeviceOrganizationMgtDAOException(msg, e);
         } catch (SQLException e) {
             String msg = "Error occurred while processing SQL to update device organization for " +
-                    organizationId;
+                    deviceOrganization.getOrganizationId();
             log.error(msg);
             throw new DeviceOrganizationMgtDAOException(msg, e);
         }

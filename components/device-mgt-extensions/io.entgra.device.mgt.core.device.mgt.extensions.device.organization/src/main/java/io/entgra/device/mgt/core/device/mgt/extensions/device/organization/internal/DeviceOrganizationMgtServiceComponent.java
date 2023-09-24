@@ -31,27 +31,27 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
-/**
- * @scr.component name="io.entgra.device.mgt.core.subtype.mgt.internal.DeviceOrganizationMgtServiceComponent" immediate="true"
- * @scr.reference name="org.wso2.carbon.device.manager"
- * interface="io.entgra.device.mgt.core.device.mgt.core.service.DeviceManagementProviderService"
- * cardinality="1..1"
- * policy="dynamic"
- * bind="setDeviceManagementService"
- * unbind="unsetDeviceManagementService"
- * @scr.reference name="org.wso2.carbon.ndatasource"
- * interface="org.wso2.carbon.ndatasource.core.DataSourceService"
- * cardinality="1..1"
- * policy="dynamic"
- * bind="setDataSourceService"
- * unbind="unsetDataSourceService"
- * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService"
- * cardinality="0..1"
- * policy="dynamic"
- * bind="setRegistryService"
- * unbind="unsetRegistryService"
- */
+///**
+// * @scr.component name="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal.DeviceOrganizationMgtServiceComponent" immediate="true"
+// * @scr.reference name="org.wso2.carbon.device.manager"
+// * interface="io.entgra.device.mgt.core.device.mgt.core.service.DeviceManagementProviderService"
+// * cardinality="1..1"
+// * policy="dynamic"
+// * bind="setDeviceManagementService"
+// * unbind="unsetDeviceManagementService"
+// * @scr.reference name="org.wso2.carbon.ndatasource"
+// * interface="org.wso2.carbon.ndatasource.core.DataSourceService"
+// * cardinality="1..1"
+// * policy="dynamic"
+// * bind="setDataSourceService"
+// * unbind="unsetDataSourceService"
+// * @scr.reference name="registry.service"
+// * interface="org.wso2.carbon.registry.core.service.RegistryService"
+// * cardinality="0..1"
+// * policy="dynamic"
+// * bind="setRegistryService"
+// * unbind="unsetRegistryService"
+// */
 public class DeviceOrganizationMgtServiceComponent {
 
     private static final Log log = LogFactory.getLog(DeviceOrganizationMgtServiceComponent.class);
