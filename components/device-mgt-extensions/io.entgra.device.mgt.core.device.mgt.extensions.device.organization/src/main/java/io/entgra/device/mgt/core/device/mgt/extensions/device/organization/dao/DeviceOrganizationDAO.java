@@ -41,12 +41,14 @@ public interface DeviceOrganizationDAO {
     List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
     /**
-     * retrieve parent devices per particular device ID
-     * @param deviceID
+     *
+     * @param node
+     * @param maxDepth
+     * @param includeDevice
      * @return
      * @throws DeviceOrganizationMgtDAOException
      */
-//    List<Device> getParentDevices(DeviceNode node) throws DeviceOrganizationMgtDAOException;
+    List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
     /**
      * add a new reocrd to device organization table

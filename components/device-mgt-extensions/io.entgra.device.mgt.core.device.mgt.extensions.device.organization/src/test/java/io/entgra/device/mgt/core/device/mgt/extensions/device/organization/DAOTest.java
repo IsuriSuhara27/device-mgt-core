@@ -43,13 +43,20 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         Assert.assertNotNull(childrenList, "Cannot be null");
     }
 
-//    @Test(dependsOnMethods = "testAddDeviceOrganization")
-//    public void testGetParentsOf() throws DBConnectionException, DeviceOrganizationMgtDAOException {
-//        ConnectionManagerUtil.openDBConnection();
-//        List<Device> parentList = deviceOrganizationDAO.getParentDevices(4);
-//        ConnectionManagerUtil.closeDBConnection();
-//        Assert.assertNotNull(parentList, "Cannot be null");
-//    }
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
+    public void testGetParentsOf() throws DBConnectionException, DeviceOrganizationMgtDAOException {
+        ConnectionManagerUtil.openDBConnection();
+        DeviceNode node = new DeviceNode();
+        node.setDeviceId(4);
+        int maxDepth = 4;
+        boolean includeDevice = true;
+        List<DeviceNode> childrenList = deviceOrganizationDAO.getParentsOf(node, maxDepth, includeDevice);
+        ConnectionManagerUtil.closeDBConnection();
+        log.info(childrenList.size());
+        Assert.assertNotNull(childrenList, "Cannot be null");
+    }
+
+
 
     @Test
     public void testAddDeviceOrganization() throws DBConnectionException, DeviceOrganizationMgtDAOException {
@@ -70,6 +77,15 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         deviceOrganization1.setUpdateTime(new Date(System.currentTimeMillis()));
         ConnectionManagerUtil.beginDBTransaction();
         boolean result1 = deviceOrganizationDAO.addDeviceOrganization(deviceOrganization1);
+        ConnectionManagerUtil.closeDBConnection();
+
+        DeviceOrganization deviceOrganization2 = new DeviceOrganization() {
+        };
+        deviceOrganization1.setDeviceId(4);
+        deviceOrganization1.setParentDeviceId(2);
+        deviceOrganization1.setUpdateTime(new Date(System.currentTimeMillis()));
+        ConnectionManagerUtil.beginDBTransaction();
+        boolean result2 = deviceOrganizationDAO.addDeviceOrganization(deviceOrganization1);
         ConnectionManagerUtil.closeDBConnection();
 
         Assert.assertNotNull(result, "Cannot be null");

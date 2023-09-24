@@ -50,13 +50,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-
-            List<DeviceNode> children = new ArrayList<>();
-            if (maxDepth <= 0) {
-                return children;
-            }
-            children = deviceOrganizationDao.getChildrenOf(node, maxDepth, includeDevice);
-            return children;
+            return deviceOrganizationDao.getChildrenOf(node, maxDepth, includeDevice);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve child devices";
             log.error(msg);
@@ -71,53 +65,26 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
-//    @Override
-//    public List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice)
-//            throws DeviceOrganizationMgtPluginException {
-//        try {
-//            // Open a database connection
-//            ConnectionManagerUtil.openDBConnection();
-//
-//            List<DeviceNode> parents = new ArrayList<>();
-//            if (includeDevice) {
-//                parents.add(node);
-//            }
-//            retrieveParents(node, parents, 1, maxDepth);
-//            return parents;
-//        } catch (DBConnectionException e) {
-//            String msg = "Error occurred while obtaining the database connection to retrieve parent devices";
-//            log.error(msg);
-//            throw new DeviceOrganizationMgtPluginException(msg, e);
-//        } catch (DeviceOrganizationMgtDAOException e) {
-//            String msg = "Error occurred in the database level while retrieving parent devices";
-//            log.error(msg);
-//            throw new DeviceOrganizationMgtPluginException(msg, e);
-//        } finally {
-//            // Close the database connection
-//            ConnectionManagerUtil.closeDBConnection();
-//        }
-//    }
-
-//    private void retrieveParents(DeviceNode node, List<DeviceNode> result, int currentDepth, int maxDepth)
-//            throws DeviceOrganizationMgtDAOException {
-//        if (currentDepth > maxDepth) {
-//            return;
-//        }
-//
-//        List<Device> parentDevices = deviceOrganizationDao.getParentDevices(node);
-//
-//        for (Device parentDevice : parentDevices) {
-//            DeviceNode parentNode = new DeviceNode();
-//            parentNode.setDeviceId(parentDevice.getId());
-//            parentNode.setDevice(parentDevice);
-//
-//            result.add(parentNode);
-//
-//            if (currentDepth < maxDepth) {
-//                retrieveParents(parentNode, result, currentDepth + 1, maxDepth);
-//            }
-//        }
-//    }
+    @Override
+    public List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice)
+            throws DeviceOrganizationMgtPluginException {
+        try {
+            // Open a database connection
+            ConnectionManagerUtil.openDBConnection();
+            return deviceOrganizationDao.getParentsOf(node, maxDepth, includeDevice);
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining the database connection to retrieve parent devices";
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } catch (DeviceOrganizationMgtDAOException e) {
+            String msg = "Error occurred in the database level while retrieving parent devices";
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } finally {
+            // Close the database connection
+            ConnectionManagerUtil.closeDBConnection();
+        }
+    }
 
     @Override
     public boolean addDeviceOrganization(DeviceOrganization deviceOrganization)

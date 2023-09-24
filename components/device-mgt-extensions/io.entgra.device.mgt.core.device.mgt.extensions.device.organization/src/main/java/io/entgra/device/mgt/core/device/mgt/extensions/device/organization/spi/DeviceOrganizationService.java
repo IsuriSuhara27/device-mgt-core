@@ -32,8 +32,8 @@ public interface DeviceOrganizationService {
     List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException;
 
-//    List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice)
-//            throws DeviceOrganizationMgtPluginException;
+    List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice)
+            throws DeviceOrganizationMgtPluginException;
 
     DeviceOrganization getDeviceOrganizationByID(int organizationId)
             throws DeviceOrganizationMgtPluginException;

@@ -50,30 +50,10 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
             getChildrenRecursive(node, maxDepth, visited, conn, childNodes, includeDevice);
+            if(!includeDevice){
+                childNodes.add(node);
+            }
             return childNodes;
-            // Prepare SQL query to retrieve children of the node using DM_DEVICE_ORGANIZATION
-//            String sql = "SELECT D.ID, D.NAME, D.DESCRIPTION, D.DEVICE_IDENTIFICATION, DT.NAME AS DEVICE_TYPE_NAME " +
-//                    "FROM DM_DEVICE D " +
-//                    "JOIN DM_DEVICE_ORGANIZATION DO ON D.ID = DO.DEVICE_ID " +
-//                    "JOIN DM_DEVICE_TYPE DT ON D.DEVICE_TYPE_ID = DT.ID " +
-//                    "WHERE DO.PARENT_DEVICE_ID = ?";
-//
-//            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-//                stmt.setInt(1, node.getDeviceId());
-//                try (ResultSet rs = stmt.executeQuery()) {
-//                    while (rs.next()) {
-//                        DeviceNode child = getDeviceFromResultSet(rs);
-//                        child.setChildren(childNodes);
-//                        childNodes.add(child);
-//
-//                        if (maxDepth > 0) {
-//                            List<DeviceNode> deviceChildren = getChildrenOf(child, maxDepth - 1, true);
-//                            childNodes.addAll(deviceChildren);
-//                        }
-//                    }
-//                    return childNodes;
-//                }
-//            }
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining DB connection to retrieve all child devices for " +
                     "parent device ID " +
@@ -108,11 +88,10 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     DeviceNode child = getDeviceFromResultSet(rs);
-                    child.setChildren(childNodes);
-//                    if (includeDevice) {
-//                        childNodes.add(node); // Add the parent device if includeDevice is true.
-//                    }
-                    childNodes.add(child);
+                    node.getChildren().add(child);
+                    if (includeDevice) {
+                        childNodes.add(node); // Add the parent device if includeDevice is true.
+                    }
 
                     getChildrenRecursive(child, maxDepth - 1, visited, conn, childNodes, includeDevice);
                 }
@@ -120,40 +99,66 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
-//    @Override
-//    public List<DeviceNode> getParentDevices(DeviceNode node) throws DeviceOrganizationMgtDAOException {
-//        List<DeviceNode> parentDevices = null;
-//        try {
-//            Connection conn = ConnectionManagerUtil.getDBConnection();
-//            String sql = "SELECT do.PARENT_DEVICE_ID,d.ID, d.DESCRIPTION,d.DEVICE_IDENTIFICATION, d.NAME, t.NAME AS DEVICE_TYPE_NAME " +
-//                    "FROM DM_DEVICE d, DM_DEVICE_TYPE t, DM_DEVICE_ORGANIZATION do " +
-//                    "WHERE d.ID IN (SELECT ID FROM DM_DEVICE WHERE ID = ?) " +
-//                    "AND d.ID = do.DEVICE_ID" +
-//                    "AND d.DEVICE_TYPE_ID = t.ID";
-//
-//            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-//                stmt.setInt(1, node.getDeviceId());
-//                try (ResultSet rs = stmt.executeQuery()) {
-//                    parentDevices = new ArrayList<>();
-//                    while (rs.next()) {
-//                        parentDevices.add(getDeviceFromResultSet(rs));
-//                    }
-//                    return parentDevices;
-//                }
-//            }
-//        } catch (DBConnectionException e) {
-//            String msg = "Error occurred while obtaining DB connection to retrieve all parent devices for " +
-//                    "child device ID " +
-//                    deviceID;
-//            log.error(msg);
-//            throw new DeviceOrganizationMgtDAOException(msg, e);
-//        } catch (SQLException e) {
-//            String msg = "Error occurred while processing SQL to retrieve all parent devices for " +
-//                    "child device ID" + deviceID;
-//            log.error(msg);
-//            throw new DeviceOrganizationMgtDAOException(msg, e);
-//        }
-//    }
+    @Override
+    public List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException {
+        List<DeviceNode> parentNodes = new ArrayList<>();
+        Set<Integer> visited = new HashSet<>();
+        try {
+            Connection conn = ConnectionManagerUtil.getDBConnection();
+            getParentsRecursive(node, maxDepth, visited, conn, parentNodes, includeDevice);
+            if (!includeDevice) {
+                parentNodes.add(node);
+            }
+            return parentNodes;
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining DB connection to retrieve parent devices for " +
+                    "device ID " + node.getDeviceId();
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        } catch (SQLException e) {
+            String msg = "Error occurred while processing SQL to retrieve parent devices for " +
+                    "device ID " + node.getDeviceId();
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        }
+    }
+
+    private void getParentsRecursive(DeviceNode node, int maxDepth, Set<Integer> visited, Connection conn,
+                                     List<DeviceNode> parentNodes, boolean includeDevice) throws SQLException {
+        if (maxDepth <= 0 || visited.contains(node.getDeviceId())) {
+            return;
+        }
+
+        visited.add(node.getDeviceId());
+
+        String sql = "SELECT D.ID, D.NAME, D.DESCRIPTION, D.DEVICE_IDENTIFICATION, DT.NAME AS DEVICE_TYPE_NAME " +
+                "FROM DM_DEVICE D " +
+                "JOIN DM_DEVICE_ORGANIZATION DO ON D.ID = DO.PARENT_DEVICE_ID " +
+                "JOIN DM_DEVICE_TYPE DT ON D.DEVICE_TYPE_ID = DT.ID " +
+                "WHERE DO.DEVICE_ID = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, node.getDeviceId());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    DeviceNode parent = getDeviceFromResultSet(rs);
+                    if (!includeDevice && parent.getDeviceId() == node.getDeviceId()) {
+                        // Skip adding the current node as a parent when includeDevice is false
+                        continue;
+                    }
+
+                    node.getParents().add(parent);
+
+                    if (!parentNodes.contains(parent)) {
+                        parentNodes.add(parent); // Add the parent device if it hasn't been added already.
+                    }
+
+                    getParentsRecursive(parent, maxDepth - 1, visited, conn, parentNodes, includeDevice);
+                }
+            }
+        }
+    }
 
     @Override
     public boolean addDeviceOrganization(DeviceOrganization deviceOrganization) throws DeviceOrganizationMgtDAOException {

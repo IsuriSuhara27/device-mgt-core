@@ -31,21 +31,21 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     public void testGetChildrenOf() throws DeviceOrganizationMgtPluginException {
 
         DeviceNode deviceNode = new DeviceNode();
-        deviceNode.setDeviceId(3);
+        deviceNode.setDeviceId(2);
         List<DeviceNode> childrenList = deviceOrganizationService.getChildrenOf(deviceNode, 2, true);
 
         Assert.assertNotNull(childrenList, "Cannot be null");
     }
 
-//    @Test(dependsOnMethods = "testAddDeviceOrganization")
-//    public void testGetParentsOf() throws DeviceOrganizationMgtPluginException {
-//
-//        DeviceNode deviceNode = new DeviceNode();
-//        deviceNode.setDeviceId(4);
-//        List<DeviceNode> parentList = deviceOrganizationService.getParentsOf(deviceNode, 2, false);
-//
-//        Assert.assertNotNull(parentList, "Cannot be null");
-//    }
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
+    public void testGetParentsOf() throws DeviceOrganizationMgtPluginException {
+
+        DeviceNode deviceNode = new DeviceNode();
+        deviceNode.setDeviceId(4);
+        List<DeviceNode> parentList = deviceOrganizationService.getParentsOf(deviceNode, 2, true);
+
+        Assert.assertNotNull(parentList, "Cannot be null");
+    }
 
     @Test
     public void testAddDeviceOrganization() throws DeviceOrganizationMgtPluginException {
@@ -57,6 +57,18 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         deviceOrganization.setParentDeviceId(3);
         deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
         boolean result = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+        DeviceOrganization deviceOrganization1 = new DeviceOrganization() {
+        };
+        deviceOrganization.setDeviceId(3);
+        deviceOrganization.setParentDeviceId(2);
+        deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
+        boolean result1 = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+        DeviceOrganization deviceOrganization2 = new DeviceOrganization() {
+        };
+        deviceOrganization.setDeviceId(4);
+        deviceOrganization.setParentDeviceId(2);
+        deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
+        boolean result2 = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
 
         Assert.assertNotNull(result, "Cannot be null");
 
