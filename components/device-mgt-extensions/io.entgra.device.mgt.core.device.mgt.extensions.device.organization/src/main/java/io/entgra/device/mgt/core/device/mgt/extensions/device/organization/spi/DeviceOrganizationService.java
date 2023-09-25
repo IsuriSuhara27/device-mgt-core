@@ -38,6 +38,9 @@ public interface DeviceOrganizationService {
     DeviceOrganization getDeviceOrganizationByID(int organizationId)
             throws DeviceOrganizationMgtPluginException;
 
+    boolean organizationExists(int deviceId, int parentDeviceId)
+            throws DeviceOrganizationMgtPluginException;
+
     boolean doesDeviceIdExist(int deviceId)
             throws DeviceOrganizationMgtPluginException;
 

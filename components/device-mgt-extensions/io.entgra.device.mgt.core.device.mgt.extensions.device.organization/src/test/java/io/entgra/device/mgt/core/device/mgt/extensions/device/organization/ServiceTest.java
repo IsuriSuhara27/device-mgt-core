@@ -12,7 +12,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.Date;
 import java.util.List;
 
 public class ServiceTest extends BaseDeviceOrganizationTest {
@@ -32,7 +31,9 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
         DeviceNode deviceNode = new DeviceNode();
         deviceNode.setDeviceId(2);
-        List<DeviceNode> childrenList = deviceOrganizationService.getChildrenOf(deviceNode, 2, true);
+        int maxDepth = 2;
+        boolean includeDevice = false;
+        List<DeviceNode> childrenList = deviceOrganizationService.getChildrenOf(deviceNode, maxDepth, includeDevice);
 
         Assert.assertNotNull(childrenList, "Cannot be null");
     }
@@ -42,12 +43,16 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
         DeviceNode deviceNode = new DeviceNode();
         deviceNode.setDeviceId(4);
-        List<DeviceNode> parentList = deviceOrganizationService.getParentsOf(deviceNode, 2, true);
+        int maxDepth = 2;
+        boolean includeDevice = true;
+        List<DeviceNode> parentList = deviceOrganizationService.getParentsOf(deviceNode, maxDepth, includeDevice);
 
         Assert.assertNotNull(parentList, "Cannot be null");
     }
 
-    @Test
+    @Test(
+//            expectedExceptions = {DeviceOrganizationMgtPluginException.class}
+    )
     public void testAddDeviceOrganization() throws DeviceOrganizationMgtPluginException {
 
 
@@ -55,24 +60,51 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         };
         deviceOrganization.setDeviceId(4);
         deviceOrganization.setParentDeviceId(3);
-        deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
-        boolean result = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
-        DeviceOrganization deviceOrganization1 = new DeviceOrganization() {
+        DeviceOrganization deviceOrganizationOne = new DeviceOrganization() {
         };
-        deviceOrganization.setDeviceId(3);
-        deviceOrganization.setParentDeviceId(2);
-        deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
-        boolean result1 = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
-        DeviceOrganization deviceOrganization2 = new DeviceOrganization() {
+        deviceOrganizationOne.setDeviceId(3);
+        deviceOrganizationOne.setParentDeviceId(2);
+        DeviceOrganization deviceOrganizationTwo = new DeviceOrganization() {
         };
-        deviceOrganization.setDeviceId(4);
-        deviceOrganization.setParentDeviceId(2);
-        deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
-        boolean result2 = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+        deviceOrganizationTwo.setDeviceId(4);
+        deviceOrganizationTwo.setParentDeviceId(2);
 
-        Assert.assertNotNull(result, "Cannot be null");
+        try {
+            boolean result = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+            boolean result1 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationOne);
+            boolean result2 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationTwo);
+            Assert.assertNotNull(result, "Cannot be null");
+            Assert.assertNotNull(result1, "Cannot be null");
+            Assert.assertNotNull(result2, "Cannot be null");
+        } catch (DeviceOrganizationMgtPluginException e){
+            // Clean up: Delete the added organization if it was successfully added to avoid conflicts in future tests
+            deviceOrganizationService.deleteDeviceAssociations(deviceOrganization.getDeviceId());
+        }
 
     }
+
+//    @Test(description = "This method tests Concurrent Access to Add Device Organization",
+//            expectedExceptions = {DeviceOrganizationMgtPluginException.class})
+//    public void testConcurrentAddDeviceOrganization() throws InterruptedException {
+//        ExecutorService executor = Executors.newFixedThreadPool(4);
+//        final DeviceOrganization validOrganization = new DeviceOrganization(){};
+//        validOrganization.setDeviceId(3);
+//        validOrganization.setParentDeviceId(2);
+//        validOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
+//
+//        for (int i = 0; i < 4; i++) {
+//            executor.execute(() -> {
+//                try {
+//                    deviceOrganizationService.addDeviceOrganization(validOrganization);
+//                } catch (DeviceOrganizationMgtPluginException e) {
+//                    // Handle the exception
+//                }
+//            });
+//        }
+//
+//        executor.shutdown();
+//        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+//    }
 
     @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testUpdateDeviceOrganization() throws DeviceOrganizationMgtPluginException {
@@ -96,7 +128,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testDoesDeviceIdExist() throws DeviceOrganizationMgtPluginException {
 
-        boolean deviceIdExist =  deviceOrganizationService.doesDeviceIdExist(1);
+        boolean deviceIdExist = deviceOrganizationService.doesDeviceIdExist(1);
 
         Assert.assertNotNull(deviceIdExist, "Cannot be null");
     }

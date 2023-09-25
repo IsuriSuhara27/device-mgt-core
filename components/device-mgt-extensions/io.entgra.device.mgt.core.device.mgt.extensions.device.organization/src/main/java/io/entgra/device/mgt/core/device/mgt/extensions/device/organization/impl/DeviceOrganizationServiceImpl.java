@@ -17,21 +17,20 @@
  */
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.impl;
 
-import io.entgra.device.mgt.core.device.mgt.common.Device;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAO;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAOFactory;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.BadRequestException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi.DeviceOrganizationService;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.util.LockManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DeviceOrganizationServiceImpl implements DeviceOrganizationService {
@@ -47,6 +46,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException {
+        if (node == null || node.getDeviceId() <= 0 || maxDepth < 0) {
+            throw new BadRequestException("Invalid input parameters.");
+        }
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
@@ -68,6 +70,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException {
+        if (node == null || node.getDeviceId() <= 0 || maxDepth < 0) {
+            throw new BadRequestException("Invalid input parameters.");
+        }
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
@@ -89,38 +94,73 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public boolean addDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtPluginException {
+        if (deviceOrganization == null || deviceOrganization.getDeviceId() == 0
+                || deviceOrganization.getParentDeviceId() == 0) {
+            throw new BadRequestException("Invalid input parameters.");
+        }
         String msg = "";
-        if (deviceOrganization == null) {
-            return false;
+        // Check if an organization with the same deviceId and parentDeviceId already exists
+        if (organizationExists(deviceOrganization.getDeviceId(), deviceOrganization.getParentDeviceId())) {
+            msg = "Device organization with the same deviceId and parentDeviceId already exists.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg);
         }
 
-        if (deviceOrganization.getDeviceId() == 0 || deviceOrganization.getParentDeviceId() == 0) {
-            return false;
-        }
-        try {
-            ConnectionManagerUtil.beginDBTransaction();
-            boolean result = deviceOrganizationDao.addDeviceOrganization(deviceOrganization);
-            if (result) {
-                msg = "Device organization added successfully,for " + deviceOrganization.getDeviceId();
-                if (log.isDebugEnabled()) {
-                    log.debug(msg);
+        // Use LockManager to get a lock object based on deviceId and parentDeviceId
+//        LockManager lockManager = LockManager.getInstance();
+//        Object lock = lockManager.getLock(deviceOrganization.getDeviceId(), deviceOrganization.getParentDeviceId());
+//
+//        synchronized (lock) {
+
+            try {
+                ConnectionManagerUtil.beginDBTransaction();
+                boolean result = deviceOrganizationDao.addDeviceOrganization(deviceOrganization);
+                if (result) {
+                    msg = "Device organization added successfully, for device ID " + deviceOrganization.getDeviceId() +
+                    " and parent device ID " + deviceOrganization.getParentDeviceId();
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg);
+                    }
+                } else {
+                    ConnectionManagerUtil.rollbackDBTransaction();
+                    msg = "Device organization failed to add, for device ID " + deviceOrganization.getDeviceId() +
+                            " and parent device ID " + deviceOrganization.getParentDeviceId();
+                    throw new DeviceOrganizationMgtPluginException(msg);
                 }
-            } else {
+                ConnectionManagerUtil.commitDBTransaction();
+                return true;
+            } catch (DBConnectionException e) {
+                msg = "Error occurred while obtaining the database connection to add device organization for device ID "
+                        + deviceOrganization.getDeviceId() + " and parent device ID"
+                        + deviceOrganization.getParentDeviceId();
+                log.error(msg);
+                throw new DeviceOrganizationMgtPluginException(msg, e);
+            } catch (DeviceOrganizationMgtDAOException e) {
                 ConnectionManagerUtil.rollbackDBTransaction();
-                msg = "Device organization failed to add,for " + deviceOrganization.getDeviceId();
-                throw new DeviceOrganizationMgtPluginException(msg);
+                msg = "Error occurred in the database level while adding device organization for device ID " +
+                        deviceOrganization.getDeviceId() + " and parent device ID"
+                        + deviceOrganization.getParentDeviceId();
+                log.error(msg);
+                throw new DeviceOrganizationMgtPluginException(msg, e);
+            } finally {
+                ConnectionManagerUtil.closeDBConnection();
             }
-            ConnectionManagerUtil.commitDBTransaction();
-            return true;
+//        }
+    }
+
+    // Helper method to check if an organization with the same deviceId and parentDeviceId already exists
+    @Override
+    public boolean organizationExists(int deviceId, int parentDeviceId) throws DeviceOrganizationMgtPluginException {
+        try {
+            ConnectionManagerUtil.openDBConnection();
+            boolean exists = deviceOrganizationDao.organizationExists(deviceId, parentDeviceId);
+            return exists;
         } catch (DBConnectionException e) {
-            msg = "Error occurred while obtaining the database connection to add device organization for " +
-                    deviceOrganization.getDeviceId();
+            String msg = "Error occurred while obtaining the database connection to check organization existence.";
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);
         } catch (DeviceOrganizationMgtDAOException e) {
-            ConnectionManagerUtil.rollbackDBTransaction();
-            msg = "Error occurred in the database level while adding device organization for " +
-                    deviceOrganization.getDeviceId();
+            String msg = "Error occurred in the database level while checking organization existence.";
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);
         } finally {
@@ -131,12 +171,14 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public boolean updateDeviceOrganization(DeviceOrganization organization)
             throws DeviceOrganizationMgtPluginException {
+        if (organization == null || organization.getOrganizationId() <= 0) {
+            throw new BadRequestException("Invalid input parameters.");
+        }
         String msg = "";
         DeviceOrganization deviceOrganization = getDeviceOrganizationByID(organization.getOrganizationId());
         if (deviceOrganization == null) {
             String errorMsg = "Cannot find device organization for organization ID " + organization.getOrganizationId();
             log.error(errorMsg);
-//            throw new DeviceOrganizationMgtPluginException();
             return false;
         }
 
@@ -174,6 +216,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public DeviceOrganization getDeviceOrganizationByID(int organizationId)
             throws DeviceOrganizationMgtPluginException {
+        if (organizationId <= 0) {
+            throw new BadRequestException("Invalid input parameters.");
+        }
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
@@ -196,6 +241,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public boolean deleteDeviceOrganizationByID(int organizationId)
             throws DeviceOrganizationMgtPluginException {
+        if (organizationId <= 0) {
+            throw new BadRequestException("Invalid input parameters.");
+        }
         String msg = "";
 
         DeviceOrganization deviceOrganization = getDeviceOrganizationByID(organizationId);
@@ -238,6 +286,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public boolean deleteDeviceAssociations(int deviceId)
             throws DeviceOrganizationMgtPluginException {
+        if (deviceId <= 0) {
+            throw new BadRequestException("Invalid input parameters.");
+        }
         String msg = "";
 
         boolean deviceIdExist = doesDeviceIdExist(deviceId);
@@ -280,6 +331,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public boolean doesDeviceIdExist(int deviceId)
             throws DeviceOrganizationMgtPluginException {
+        if (deviceId <= 0) {
+            throw new BadRequestException("Invalid input parameters.");
+        }
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();

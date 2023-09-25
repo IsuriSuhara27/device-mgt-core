@@ -58,12 +58,22 @@ public interface DeviceOrganizationDAO {
     boolean addDeviceOrganization(DeviceOrganization deviceOrganization) throws DeviceOrganizationMgtDAOException;
 
     /**
+     * check whether a record already exist with same deviceId and parentDeviceId
+     * @param deviceId
+     * @param parentDeviceId
+     * @return
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    boolean organizationExists(int deviceId, int parentDeviceId) throws DeviceOrganizationMgtDAOException;
+
+    /**
      * update a record in device organization table
      *
      * @param deviceOrganization
      * @return
      * @throws DeviceOrganizationMgtDAOException
      */
+
     boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException;
 
