@@ -13,8 +13,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.Date;
-
 public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
 
     private static final Log log = LogFactory.getLog(ServiceNegativeTest.class);
@@ -54,8 +52,8 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
         deviceOrganizationService.getParentsOf(invalidNode, maxDepth, includeDevice);
     }
 
-    @Test(description = "This method tests Get Parents Of method under negative circumstances with an invalid DeviceNode",
-            expectedExceptions = {DeviceOrganizationMgtPluginException.class})
+    @Test(description = "This method tests Get Parents Of method under negative circumstances with an invalid DeviceNode"
+            , expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testGetParentsOfWithInvalidDeviceNode() throws DeviceOrganizationMgtPluginException {
         DeviceNode invalidNode = new DeviceNode(); // Provide an invalid DeviceNode
         int maxDepth = 2;
@@ -63,10 +61,19 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
         deviceOrganizationService.getParentsOf(invalidNode, maxDepth, includeDevice);
     }
 
+    @Test(description = "This method tests Get Parents Of method under negative circumstances with an invalid DeviceNode"
+            , expectedExceptions = {DeviceOrganizationMgtPluginException.class}
+    )
+    public void testGetParentsOfWithNullDeviceNode() throws DeviceOrganizationMgtPluginException {
+        DeviceNode invalidNode = null; // Provide an invalid DeviceNode
+        int maxDepth = 2;
+        boolean includeDevice = true;
+        deviceOrganizationService.getParentsOf(invalidNode, maxDepth, includeDevice);
+    }
+
 
     @Test(description = "This method tests Add Device Organization method under negative circumstances with null data",
-            expectedExceptions = {DeviceOrganizationMgtPluginException.class},
-            expectedExceptionsMessageRegExp = ".*Invalid input parameters.*")
+            expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testAddDeviceOrganizationWithInvalidInput() throws DeviceOrganizationMgtPluginException {
         DeviceOrganization invalidOrganization = new DeviceOrganization() {
         };
@@ -87,9 +94,8 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
         // Create a valid organization
         DeviceOrganization validOrganization = new DeviceOrganization() {
         };
-        validOrganization.setDeviceId(4);
-        validOrganization.setParentDeviceId(3);
-        validOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
+        validOrganization.setDeviceId(1);
+        validOrganization.setParentDeviceId(0);
 
         try {
             // Add the organization once

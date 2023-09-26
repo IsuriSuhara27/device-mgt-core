@@ -28,7 +28,7 @@ public abstract class DeviceOrganization {
 
     private int organizationId;
     private int deviceId;
-    private int parentDeviceId;
+    private Integer parentDeviceId;
     private Date updateTime;
 
     public int getOrganizationId() {
@@ -47,11 +47,11 @@ public abstract class DeviceOrganization {
         this.deviceId = deviceId;
     }
 
-    public int getParentDeviceId() {
+    public Integer getParentDeviceId() {
         return parentDeviceId;
     }
 
-    public void setParentDeviceId(int parentDeviceId) {
+    public void setParentDeviceId(Integer parentDeviceId) {
         this.parentDeviceId = parentDeviceId;
     }
 

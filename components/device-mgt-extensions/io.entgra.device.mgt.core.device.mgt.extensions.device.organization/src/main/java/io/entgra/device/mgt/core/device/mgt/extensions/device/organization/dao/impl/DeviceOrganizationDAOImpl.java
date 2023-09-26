@@ -19,10 +19,8 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.
 
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAO;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.BadRequestDaoException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
 import org.apache.commons.logging.Log;
@@ -33,6 +31,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -40,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.getDeviceFromResultSet;
+import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.loadDeviceOrganization;
 
 public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
 
@@ -49,10 +49,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     public List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException {
         List<DeviceNode> childNodes = new ArrayList<>();
         Set<Integer> visited = new HashSet<>();
-        // Input validation
-        if (node == null || maxDepth < 0) {
-            throw new BadRequestDaoException("Invalid input parameters.");
-        }
+
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
             getChildrenRecursive(node, maxDepth, visited, conn, childNodes, includeDevice);
@@ -107,9 +104,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
 
     @Override
     public List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException {
-        if (node == null || maxDepth <= 0) {
-            throw new BadRequestDaoException("Invalid input parameters.");
-        }
+
         List<DeviceNode> parentNodes = new ArrayList<>();
         Set<Integer> visited = new HashSet<>();
         try {
@@ -170,11 +165,34 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     }
 
     @Override
+    public List<DeviceOrganization> getAllDeviceOrganizations() throws DeviceOrganizationMgtDAOException {
+        List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
+        try {
+            Connection conn = ConnectionManagerUtil.getDBConnection();
+            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        DeviceOrganization deviceOrganization = loadDeviceOrganization(rs);
+                        deviceOrganizations.add(deviceOrganization);
+                    }
+                }
+            }
+            return deviceOrganizations;
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining DB connection to retrieving all device organizations details.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        } catch (SQLException e) {
+            String msg = "Error occurred while processing SQL to retrieving all device organizations.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        }
+    }
+
+    @Override
     public boolean addDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException {
-        if (deviceOrganization == null || deviceOrganization.getDeviceId() <= 0 || deviceOrganization.getParentDeviceId() <= 0) {
-            throw new BadRequestDaoException("Invalid input parameters.");
-        }
 
         try {
             String sql = "INSERT INTO DM_DEVICE_ORGANIZATION (DEVICE_ID, PARENT_DEVICE_ID, LAST_UPDATED_TIMESTAMP)" +
@@ -185,11 +203,14 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             Timestamp timestamp = new Timestamp(calendar.getTime().getTime());
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, deviceOrganization.getDeviceId());
-                stmt.setInt(2, deviceOrganization.getParentDeviceId());
+                if (deviceOrganization.getParentDeviceId() != null) {
+                    stmt.setInt(2, deviceOrganization.getParentDeviceId());
+                } else {
+                    stmt.setNull(2, Types.INTEGER);
+                }
                 stmt.setTimestamp(3, timestamp);
                 return stmt.executeUpdate() > 0;
             }
-
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining DB connection to insert device organization for " +
                     deviceOrganization.getDeviceId();
@@ -238,11 +259,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     public boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException {
         DeviceOrganization organization = getDeviceOrganizationByID(deviceOrganization.getOrganizationId());
-        if (deviceOrganization == null) {
-            return false;
-        }
 
-        if (deviceOrganization.getDeviceId() == 0 || deviceOrganization.getParentDeviceId() == 0) {
+        if (organization == null || deviceOrganization.getDeviceId() <= 0 ||
+                !(deviceOrganization.getParentDeviceId() == null || deviceOrganization.getParentDeviceId() > 0)) {
             return false;
         }
         try {
@@ -254,7 +273,11 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             Timestamp timestamp = new Timestamp(calendar.getTime().getTime());
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, deviceOrganization.getDeviceId());
-                stmt.setInt(2, deviceOrganization.getParentDeviceId());
+                if (deviceOrganization.getParentDeviceId() != null) {
+                    stmt.setInt(2, deviceOrganization.getParentDeviceId());
+                } else {
+                    stmt.setNull(2, Types.INTEGER);
+                }
                 stmt.setTimestamp(3, timestamp);
                 stmt.setInt(4, deviceOrganization.getOrganizationId());
                 return stmt.executeUpdate() > 0;
@@ -284,21 +307,21 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 stmt.setInt(1, organizationId);
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
-                        return DeviceOrganizationDaoUtil.loadDeviceOrganization(rs);
+                        return loadDeviceOrganization(rs);
                     }
-                    log.info("No Device Organization found");
+                    log.info("No Device Organization found for retrieval for organizationID = " + organizationId);
                     return null;
                 }
             }
 
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining DB connection to get device organization details for " +
-                    organizationId;
+                    "organizationID = " + organizationId;
             log.error(msg);
             throw new DeviceOrganizationMgtDAOException(msg, e);
         } catch (SQLException e) {
             String msg = "Error occurred while processing SQL to get device organization details for " +
-                    organizationId;
+                    "organizationID = " + organizationId;
             log.error(msg);
             throw new DeviceOrganizationMgtDAOException(msg, e);
         }

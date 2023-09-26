@@ -28,7 +28,11 @@ public class DeviceOrganizationDaoUtil {
         };
         deviceOrganization.setOrganizationId(rs.getInt("ID"));
         deviceOrganization.setDeviceId(rs.getInt("DEVICE_ID"));
-        deviceOrganization.setParentDeviceId(rs.getInt("PARENT_DEVICE_ID"));
+        if (rs.getInt("PARENT_DEVICE_ID") != 0) {
+            deviceOrganization.setParentDeviceId(rs.getInt("PARENT_DEVICE_ID"));
+        } else {
+            deviceOrganization.setParentDeviceId(null);
+        }
         deviceOrganization.setUpdateTime(rs.getDate("LAST_UPDATED_TIMESTAMP"));
         return deviceOrganization;
     }

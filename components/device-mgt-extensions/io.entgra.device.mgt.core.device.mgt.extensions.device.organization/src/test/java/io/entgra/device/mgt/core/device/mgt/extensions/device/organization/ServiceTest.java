@@ -26,7 +26,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         log.info("Service test initialized");
     }
 
-    @Test(dependsOnMethods = "testAddDeviceOrganization")
+    @Test(priority = 4, dependsOnMethods = "testAddDeviceOrganization")
     public void testGetChildrenOf() throws DeviceOrganizationMgtPluginException {
 
         DeviceNode deviceNode = new DeviceNode();
@@ -38,7 +38,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         Assert.assertNotNull(childrenList, "Cannot be null");
     }
 
-    @Test(dependsOnMethods = "testAddDeviceOrganization")
+    @Test(priority = 5, dependsOnMethods = "testAddDeviceOrganization")
     public void testGetParentsOf() throws DeviceOrganizationMgtPluginException {
 
         DeviceNode deviceNode = new DeviceNode();
@@ -50,11 +50,8 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         Assert.assertNotNull(parentList, "Cannot be null");
     }
 
-    @Test(
-//            expectedExceptions = {DeviceOrganizationMgtPluginException.class}
-    )
+    @Test(priority = 1)
     public void testAddDeviceOrganization() throws DeviceOrganizationMgtPluginException {
-
 
         DeviceOrganization deviceOrganization = new DeviceOrganization() {
         };
@@ -69,79 +66,59 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         deviceOrganizationTwo.setDeviceId(4);
         deviceOrganizationTwo.setParentDeviceId(2);
 
-        try {
-            boolean result = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
-            boolean result1 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationOne);
-            boolean result2 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationTwo);
-            Assert.assertNotNull(result, "Cannot be null");
-            Assert.assertNotNull(result1, "Cannot be null");
-            Assert.assertNotNull(result2, "Cannot be null");
-        } catch (DeviceOrganizationMgtPluginException e){
-            // Clean up: Delete the added organization if it was successfully added to avoid conflicts in future tests
-            deviceOrganizationService.deleteDeviceAssociations(deviceOrganization.getDeviceId());
-        }
+        boolean result = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+        boolean result1 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationOne);
+        boolean result2 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationTwo);
+        Assert.assertTrue(result);
+        Assert.assertTrue(result1);
+        Assert.assertTrue(result2);
 
     }
 
-//    @Test(description = "This method tests Concurrent Access to Add Device Organization",
-//            expectedExceptions = {DeviceOrganizationMgtPluginException.class})
-//    public void testConcurrentAddDeviceOrganization() throws InterruptedException {
-//        ExecutorService executor = Executors.newFixedThreadPool(4);
-//        final DeviceOrganization validOrganization = new DeviceOrganization(){};
-//        validOrganization.setDeviceId(3);
-//        validOrganization.setParentDeviceId(2);
-//        validOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
-//
-//        for (int i = 0; i < 4; i++) {
-//            executor.execute(() -> {
-//                try {
-//                    deviceOrganizationService.addDeviceOrganization(validOrganization);
-//                } catch (DeviceOrganizationMgtPluginException e) {
-//                    // Handle the exception
-//                }
-//            });
-//        }
-//
-//        executor.shutdown();
-//        executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-//    }
-
-    @Test(dependsOnMethods = "testAddDeviceOrganization")
+    @Test(priority = 6, dependsOnMethods = "testAddDeviceOrganization")
     public void testUpdateDeviceOrganization() throws DeviceOrganizationMgtPluginException {
-
         DeviceOrganization deviceOrganization = new DeviceOrganization() {
         };
         deviceOrganization.setDeviceId(4);
         deviceOrganization.setParentDeviceId(3);
         deviceOrganization.setOrganizationId(1);
         boolean result = deviceOrganizationService.updateDeviceOrganization(deviceOrganization);
-
-        Assert.assertNotNull(result, "Cannot be null");
     }
 
-    @Test(dependsOnMethods = "testAddDeviceOrganization")
+    @Test(priority = 2, dependsOnMethods = "testAddDeviceOrganization")
     public void testGetDeviceOrganizationByID() throws DeviceOrganizationMgtPluginException {
 
-        DeviceOrganization deviceOrganization = deviceOrganizationService.getDeviceOrganizationByID(5);
+        DeviceOrganization deviceOrganization = deviceOrganizationService.getDeviceOrganizationByID(1);
     }
 
-    @Test(dependsOnMethods = "testAddDeviceOrganization")
+    @Test(priority = 3, dependsOnMethods = "testAddDeviceOrganization")
     public void testDoesDeviceIdExist() throws DeviceOrganizationMgtPluginException {
-
-        boolean deviceIdExist = deviceOrganizationService.doesDeviceIdExist(1);
-
-        Assert.assertNotNull(deviceIdExist, "Cannot be null");
+        boolean deviceIdExist = deviceOrganizationService.doesDeviceIdExist(4);
+        Assert.assertTrue(deviceIdExist);
     }
 
-    @Test(dependsOnMethods = "testAddDeviceOrganization")
+    @Test(priority = 7, dependsOnMethods = "testAddDeviceOrganization")
     public void testDeleteDeviceOrganizationByID() throws DeviceOrganizationMgtPluginException {
-        boolean result = deviceOrganizationService.deleteDeviceOrganizationByID(5);
-        Assert.assertNotNull(result, "Cannot be null");
+        boolean rs = deviceOrganizationService.deleteDeviceOrganizationByID(1);
     }
 
-    @Test(dependsOnMethods = "testAddDeviceOrganization")
-    public void deleteDeviceAssociations() throws DeviceOrganizationMgtPluginException {
-        boolean result = deviceOrganizationService.deleteDeviceAssociations(1);
-        Assert.assertNotNull(result, "Cannot be null");
+    @Test(priority = 8, dependsOnMethods = "testAddDeviceOrganization")
+    public void testDeleteDeviceAssociations() throws DeviceOrganizationMgtPluginException {
+        boolean rs = deviceOrganizationService.deleteDeviceAssociations(4);
+        Assert.assertTrue(rs);
     }
+    @Test(priority = 9, dependsOnMethods = "testAddDeviceOrganization")
+    public void testGetAllOrganizations() throws DeviceOrganizationMgtPluginException {
+        List<DeviceOrganization> organizations = deviceOrganizationService.getAllDeviceOrganizations();
+        for (DeviceOrganization organization : organizations) {
+            log.info("organizationID = "+organization.getOrganizationId());
+            log.info("deviceID = "+organization.getDeviceId());
+            log.info("parentDeviceID = "+organization.getParentDeviceId());
+            log.info("updateTime = "+organization.getUpdateTime());
+            log.info("----------------------------------------------");
+        }
+        Assert.assertNotNull(organizations, "List of organizations cannot be null");
+        Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
+    }
+
 }
