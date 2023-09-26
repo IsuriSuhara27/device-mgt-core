@@ -31,6 +31,9 @@ import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.List;
 
+/**
+ * Utility class for managing database connections.
+ */
 public class ConnectionManagerUtil {
 
     private static final Log log = LogFactory.getLog(ConnectionManagerUtil.class);
@@ -38,8 +41,9 @@ public class ConnectionManagerUtil {
     private static DataSource dataSource;
 
     /**
+     * Opens a database connection.
      *
-     * @throws DBConnectionException
+     * @throws DBConnectionException If an error occurs while opening the connection.
      */
     public static void openDBConnection() throws DBConnectionException {
         Connection conn = currentConnection.get();
@@ -55,9 +59,10 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Gets a database connection.
      *
-     * @return
-     * @throws DBConnectionException
+     * @return The database connection.
+     * @throws DBConnectionException If an error occurs while getting the connection.
      */
     public static Connection getDBConnection() throws DBConnectionException {
         Connection conn = currentConnection.get();
@@ -73,8 +78,9 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Begins a new database transaction.
      *
-     * @throws DBConnectionException
+     * @throws DBConnectionException If an error occurs while starting the transaction.
      */
     public static void beginDBTransaction() throws DBConnectionException {
         Connection conn = currentConnection.get();
@@ -92,8 +98,10 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Ends the current database transaction by setting auto-commit mode to true.
      *
-     * @throws DBConnectionException
+     * @throws DBConnectionException If an error occurs while ending the transaction.
+     * @throws IllegalTransactionStateException If there is no active transaction to end.
      */
     public static void endDBTransaction() throws DBConnectionException {
         Connection conn = currentConnection.get();
@@ -113,7 +121,9 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Commits the current database transaction.
      *
+     * @throws IllegalTransactionStateException If there is no active transaction to commit.
      */
     public static void commitDBTransaction() {
         Connection conn = currentConnection.get();
@@ -133,7 +143,9 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Rolls back the current database transaction.
      *
+     * @throws IllegalTransactionStateException If there is no active transaction to roll back.
      */
     public static void rollbackDBTransaction() {
         Connection conn = currentConnection.get();
@@ -153,7 +165,9 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Closes the current database connection and removes it from the thread-local context.
      *
+     * @throws IllegalTransactionStateException If there is no active database connection to close.
      */
     public static void closeDBConnection() {
         Connection conn = currentConnection.get();
@@ -169,9 +183,11 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Checks if the provided database connection is currently in a transaction.
      *
-     * @param conn
-     * @return
+     * @param conn The database connection to check.
+     * @return True if the connection is in a transaction, false otherwise.
+     * @throws IllegalTransactionStateException If there is an issue checking the transaction state.
      */
     private static boolean inTransaction(Connection conn) {
         boolean inTransaction = true;
@@ -186,9 +202,10 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Checks if a transaction has been started on the current database connection.
      *
-     * @return
-     * @throws DBConnectionException
+     * @return True if a transaction has been started, false otherwise.
+     * @throws DBConnectionException If there is an issue obtaining a database connection.
      */
     public static boolean isTransactionStarted() throws DBConnectionException {
         Connection connection = getDBConnection();
@@ -196,10 +213,11 @@ public class ConnectionManagerUtil {
     }
 
     /**
-     * Resolve data source from the data source definition.
+     * Resolve a data source from the given data source configuration.
      *
-     * @param config Data source configuration
-     * @return data source resolved from the data source definition
+     * @param config Data source configuration.
+     * @return A data source resolved based on the configuration.
+     * @throws RuntimeException If the data source configuration is null and not initialized.
      */
     public static DataSource resolveDataSource(DataSourceConfig config) {
         if (config == null) {
@@ -228,10 +246,12 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Lookup a data source using the given data source name and JNDI properties.
      *
-     * @param dataSourceName
-     * @param jndiProperties
-     * @return
+     * @param dataSourceName  The JNDI name of the data source to lookup.
+     * @param jndiProperties  Optional JNDI properties used for the lookup.
+     * @return A data source object representing the looked-up data source.
+     * @throws RuntimeException If an error occurs during the lookup process.
      */
     public static DataSource lookupDataSource(String dataSourceName,
                                               final Hashtable<Object, Object> jndiProperties) {
@@ -250,8 +270,10 @@ public class ConnectionManagerUtil {
     }
 
     /**
+     * Get the name of the database product to which the current connection belongs.
      *
-     * @return
+     * @return A string representing the name of the database product.
+     *         Returns null if an error occurs during the retrieval process.
      */
     public static String getDatabaseType() {
         try {

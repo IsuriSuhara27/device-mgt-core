@@ -20,14 +20,27 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exce
 
 /**
  * Exception thrown due to Database Connection issues.
+ * This exception is typically thrown when there are problems establishing or maintaining a
+ * database connection.
  */
 public class DBConnectionException extends Exception {
     private static final long serialVersionUID = 8485257804482934068L;
 
+    /**
+     * Constructs a new `DBConnectionException` with the specified detail message and a cause.
+     *
+     * @param message The detail message that describes the exception.
+     * @param cause   The cause of the exception.
+     */
     public DBConnectionException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Constructs a new `DBConnectionException` with the specified detail message.
+     *
+     * @param msg The detail message that describes the exception.
+     */
     public DBConnectionException(String msg) {
         super(msg);
     }

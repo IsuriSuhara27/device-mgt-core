@@ -20,6 +20,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exce
 
 /**
  * Exception thrown during the DeviceOrganization Management operations.
+ * This exception is typically used to handle errors related to DeviceOrganization management operations.
  */
 public class DeviceOrganizationMgtPluginException extends Exception {
 
@@ -27,33 +28,69 @@ public class DeviceOrganizationMgtPluginException extends Exception {
 
     private String errorMessage;
 
+    /**
+     * Constructs a new `DeviceOrganizationMgtPluginException` without a specified detail message.
+     */
     public DeviceOrganizationMgtPluginException() {
         super();
     }
 
+    /**
+     * Constructs a new `DeviceOrganizationMgtPluginException` with a specified cause.
+     *
+     * @param cause The cause of the exception.
+     */
     public DeviceOrganizationMgtPluginException(Throwable cause) {
         super(cause);
     }
 
+
+    /**
+     * Constructs a new `DeviceOrganizationMgtPluginException` with a specified detail message and a nested exception.
+     *
+     * @param msg       The detail message that describes the exception.
+     * @param nestedEx  The nested exception.
+     */
     public DeviceOrganizationMgtPluginException(String msg, Exception nestedEx) {
         super(msg, nestedEx);
         setErrorMessage(msg);
     }
 
+    /**
+     * Constructs a new `DeviceOrganizationMgtPluginException` with a specified detail message and a cause.
+     *
+     * @param message The detail message that describes the exception.
+     * @param cause   The cause of the exception.
+     */
     public DeviceOrganizationMgtPluginException(String message, Throwable cause) {
         super(message, cause);
         setErrorMessage(message);
     }
 
+    /**
+     * Constructs a new `DeviceOrganizationMgtPluginException` with a specified detail message.
+     *
+     * @param msg The detail message that describes the exception.
+     */
     public DeviceOrganizationMgtPluginException(String msg) {
         super(msg);
         setErrorMessage(msg);
     }
 
+    /**
+     * Get the error message associated with this exception.
+     *
+     * @return The error message.
+     */
     public String getErrorMessage() {
         return errorMessage;
     }
 
+    /**
+     * Set the error message for this exception.
+     *
+     * @param errorMessage The error message.
+     */
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }

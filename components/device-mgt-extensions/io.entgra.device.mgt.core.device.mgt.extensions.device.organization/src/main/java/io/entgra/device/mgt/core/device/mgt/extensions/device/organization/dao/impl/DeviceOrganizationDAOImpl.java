@@ -41,10 +41,16 @@ import java.util.Set;
 import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.getDeviceFromResultSet;
 import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.loadDeviceOrganization;
 
+/**
+ * Implementation of the DeviceOrganizationDAO interface.
+ */
 public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
 
     private static final Log log = LogFactory.getLog(DeviceOrganizationDAOImpl.class);
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException {
         List<DeviceNode> childNodes = new ArrayList<>();
@@ -102,6 +108,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException {
 
@@ -126,6 +135,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             throw new DeviceOrganizationMgtDAOException(msg, e);
         }
     }
+
 
     private void getParentsRecursive(DeviceNode node, int maxDepth, Set<Integer> visited, Connection conn,
                                      List<DeviceNode> parentNodes, boolean includeDevice) throws SQLException {
@@ -164,6 +174,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DeviceOrganization> getAllDeviceOrganizations() throws DeviceOrganizationMgtDAOException {
         List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
@@ -190,6 +203,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean addDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException {
@@ -224,6 +240,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean organizationExists(int deviceId, int parentDeviceId) throws DeviceOrganizationMgtDAOException {
         try {
@@ -254,7 +273,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException {
@@ -296,6 +317,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DeviceOrganization getDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException {
         try {
@@ -327,6 +351,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException {
         try {
@@ -353,6 +380,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteDeviceAssociations(int deviceId) throws DeviceOrganizationMgtDAOException {
         try {
@@ -385,6 +415,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean doesDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException {
         try {

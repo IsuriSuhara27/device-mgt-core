@@ -22,7 +22,8 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto;
 import java.util.Date;
 
 /**
- * This class is used in DeviceOrganizationService
+ * This abstract class represents a device organization entity used in DeviceOrganizationService.
+ * It serves as a base class for defining various organizational structures related to devices.
  */
 public abstract class DeviceOrganization {
 

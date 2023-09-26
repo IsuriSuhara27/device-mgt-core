@@ -34,8 +34,9 @@ public class DeviceOrganizationDAOFactory {
     private static String databaseEngine;
 
     /**
+     * Initialize the Device Organization Data Source.
      *
-     * @param dataSourceConfiguration
+     * @param dataSourceConfiguration The DataSourceConfig containing data source information.
      */
     public static void init(DataSourceConfig dataSourceConfiguration) {
         if (log.isDebugEnabled()) {
@@ -46,8 +47,9 @@ public class DeviceOrganizationDAOFactory {
     }
 
     /**
+     * Retrieves a DeviceOrganizationDAO implementation based on the configured database engine.
      *
-     * @return
+     * @return a DeviceOrganizationDAO implementation
      */
     public static DeviceOrganizationDAO getDeviceOrganizationDAO() {
         if (databaseEngine != null) {

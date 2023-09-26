@@ -19,9 +19,9 @@ public class DeviceOrganizationDaoUtil {
 
     /**
      * Helper method to create a Device Organization object from a ResultSet
-     * @param rs
-     * @return
-     * @throws SQLException
+     * @param rs The ResultSet containing the organization data.
+     * @return A DeviceOrganization object.
+     * @throws SQLException If there's an issue reading data from the ResultSet.
      */
     public static DeviceOrganization loadDeviceOrganization(ResultSet rs) throws SQLException {
         DeviceOrganization deviceOrganization = new DeviceOrganization() {
@@ -38,10 +38,10 @@ public class DeviceOrganizationDaoUtil {
     }
 
     /**
-     * Helper method to create a Device object from a ResultSet
-     * @param rs
-     * @return
-     * @throws SQLException
+     * Helper method to create a DeviceNode object from a ResultSet
+     * @param rs The ResultSet containing device data.
+     * @return A DeviceNode object.
+     * @throws SQLException If there's an issue reading data from the ResultSet.
      */
     public static DeviceNode getDeviceFromResultSet(ResultSet rs) throws SQLException {
         DeviceNode node = new DeviceNode();

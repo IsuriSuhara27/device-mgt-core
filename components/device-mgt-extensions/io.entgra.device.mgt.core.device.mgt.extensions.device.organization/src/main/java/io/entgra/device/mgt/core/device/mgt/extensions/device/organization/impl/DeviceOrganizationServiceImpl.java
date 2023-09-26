@@ -42,6 +42,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         this.deviceOrganizationDao = DeviceOrganizationDAOFactory.getDeviceOrganizationDAO();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException {
@@ -73,6 +76,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException {
@@ -104,8 +110,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
-
-    // In DeviceOrganizationServiceImpl.java (implementation)
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DeviceOrganization> getAllDeviceOrganizations() throws DeviceOrganizationMgtPluginException {
         try {
@@ -126,7 +133,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean addDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtPluginException {
@@ -174,7 +183,20 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
-    // Helper method to check if an organization with the same deviceID and parentDeviceID already exists
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addDeviceOrganizationList(List<DeviceOrganization> deviceOrganizationList)
+            throws DeviceOrganizationMgtPluginException {
+        for (DeviceOrganization deviceOrganization : deviceOrganizationList){
+            boolean result = addDeviceOrganization(deviceOrganization);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean organizationExists(int deviceID, int parentDeviceID) throws DeviceOrganizationMgtPluginException {
         try {
@@ -195,6 +217,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateDeviceOrganization(DeviceOrganization organization)
             throws DeviceOrganizationMgtPluginException {
@@ -247,6 +272,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DeviceOrganization getDeviceOrganizationByID(int organizationID)
             throws DeviceOrganizationMgtPluginException {
@@ -275,6 +303,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteDeviceOrganizationByID(int organizationID)
             throws DeviceOrganizationMgtPluginException {
@@ -324,6 +355,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteDeviceAssociations(int deviceID)
             throws DeviceOrganizationMgtPluginException {
@@ -372,6 +406,9 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean doesDeviceIdExist(int deviceID)
             throws DeviceOrganizationMgtPluginException {

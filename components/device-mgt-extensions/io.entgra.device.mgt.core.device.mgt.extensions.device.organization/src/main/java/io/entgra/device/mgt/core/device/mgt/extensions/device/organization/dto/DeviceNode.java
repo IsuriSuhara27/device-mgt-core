@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class is used in DeviceOrganizationService
+ * This class represents a node in a device hierarchy used in various organizational structures,
+ * including hierarchical organizations, sequential organizations, multiple root organizations,
+ * and multiple child organizations.
  */
 public class DeviceNode {
 

@@ -19,7 +19,9 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception;
 
 /**
- * Represents the exception thrown during validating the request.
+ * Represents an exception thrown during the validation of a request in the Device Organization
+ * Management Plugin. This exception is typically thrown when the request parameters or
+ * data are invalid or do not meet the required criteria.
  */
 public class BadRequestException extends DeviceOrganizationMgtPluginException {
     private static final long serialVersionUID = -2036794959420530981L;

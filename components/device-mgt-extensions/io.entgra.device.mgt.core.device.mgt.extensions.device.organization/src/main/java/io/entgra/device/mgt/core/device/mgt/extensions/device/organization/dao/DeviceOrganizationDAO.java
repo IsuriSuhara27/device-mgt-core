@@ -29,85 +29,100 @@ import java.util.List;
 public interface DeviceOrganizationDAO {
 
     /**
-     * retrieve child devices per particular device ID
+     * Retrieves child devices per particular device ID
      *
-     * @param node
-     * @param maxDepth
-     * @param includeDevice
-     * @return
-     * @throws DeviceOrganizationMgtDAOException
+     * @param node The device node for which child devices are retrieved.
+     * @param maxDepth The maximum depth to traverse when fetching child devices.
+     * @param includeDevice Flag to indicate whether to include the parent device in the result.
+     * @return A list of child device nodes.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving child devices.
      */
     List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
     /**
-     * @param node
-     * @param maxDepth
-     * @param includeDevice
-     * @return
-     * @throws DeviceOrganizationMgtDAOException
+     * Retrieves parent devices for a given device node.
+     *
+     * @param node The device node for which parent devices are retrieved.
+     * @param maxDepth The maximum depth to traverse when fetching parent devices.
+     * @param includeDevice Flag to indicate whether to include the current device node in the result.
+     * @return A list of parent device nodes.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving parent devices.
      */
     List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
     /**
-     * get All Device Organization records
-     * @return
-     * @throws DeviceOrganizationMgtDAOException
+     * Retrieves all device organization records.
+     *
+     * @return A list of device organization records.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving device organization records.
      */
     List<DeviceOrganization> getAllDeviceOrganizations() throws DeviceOrganizationMgtDAOException;
 
     /**
-     * add a new reocrd to device organization table
+     * Adds a new record to the device organization table.
      *
-     * @param deviceOrganization
-     * @return
-     * @throws DeviceOrganizationMgtDAOException
+     * @param deviceOrganization The device organization to be added.
+     * @return True if the device organization is successfully added, false otherwise.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while adding the device organization record.
      */
     boolean addDeviceOrganization(DeviceOrganization deviceOrganization) throws DeviceOrganizationMgtDAOException;
 
     /**
-     * check whether a record already exist with same deviceId and parentDeviceId
-     * @param deviceId
-     * @param parentDeviceId
-     * @return
-     * @throws DeviceOrganizationMgtDAOException
+     * Checks whether a record already exists with the same deviceId and parentDeviceId.
+     *
+     * @param deviceId       The ID of the device.
+     * @param parentDeviceId The ID of the parent device.
+     * @return True if a record with the specified deviceId and parentDeviceId exists, false otherwise.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while checking the existence of the record.
      */
     boolean organizationExists(int deviceId, int parentDeviceId) throws DeviceOrganizationMgtDAOException;
 
     /**
-     * update a record in device organization table
+     * Updates a record in the device organization table with the provided information.
      *
-     * @param deviceOrganization
-     * @return
-     * @throws DeviceOrganizationMgtDAOException
+     * @param deviceOrganization The DeviceOrganization object containing the updated information.
+     * @return True if the record was successfully updated, false otherwise.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while updating the record.
      */
-
     boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException;
 
     /**
-     * @param organizationId
-     * @return
-     * @throws DeviceOrganizationMgtDAOException
+     * Retrieves a device organization record from the database based on the provided organization ID.
+     *
+     * @param organizationId The unique identifier of the device organization record to retrieve.
+     * @return The DeviceOrganization object representing the retrieved organization, or null if not found.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving the organization record.
      */
     DeviceOrganization getDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException;
 
     /**
-     * delete a record from device organization table
+     * Deletes a device organization record from the database based on the provided organization ID.
      *
-     * @param organizationId
-     * @throws DeviceOrganizationMgtDAOException
+     * @param organizationId The unique identifier of the device organization record to delete.
+     * @return true if the organization record was successfully deleted, false otherwise.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while deleting the organization record.
      */
     boolean deleteDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException;
 
     /**
-     * delete a record associated with a particular device ID from device organization table
-     * delete a record if the param ID is either device_ID OR parent_device_ID in the device organization table
+     * Deletes records associated with a particular device ID from the device organization table.
+     * This method deletes records where the provided device ID matches either the deviceID column or
+     * parentDeviceID column in the device organization table.
      *
-     * @param deviceId
-     * @return
-     * @throws DeviceOrganizationMgtDAOException
+     * @param deviceId The unique identifier of the device for which associated records should be deleted.
+     * @return true if associated records were successfully deleted, false otherwise.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while deleting the associated records.
      */
     boolean deleteDeviceAssociations(int deviceId) throws DeviceOrganizationMgtDAOException;
 
+    /**
+     * Checks whether a record with the specified device ID exists either in the deviceID column or
+     * parentDeviceID column in the device organization table.
+     *
+     * @param deviceId The unique identifier of the device to check for existence.
+     * @return true if a record with the given device ID exists, false otherwise.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while querying the database.
+     */
     boolean doesDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException;
 }

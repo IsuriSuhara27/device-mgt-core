@@ -55,7 +55,6 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         Assert.assertNotNull(parentList, "Cannot be null");
     }
 
-
     @Test
     public void testAddDeviceOrganizationDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
 
