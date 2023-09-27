@@ -276,6 +276,40 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     /**
      * {@inheritDoc}
      */
+    public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, int parentDeviceId)
+            throws DeviceOrganizationMgtDAOException {
+        try {
+            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
+
+            Connection conn = ConnectionManagerUtil.getDBConnection();
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, deviceId);
+                stmt.setInt(2, parentDeviceId);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        return loadDeviceOrganization(rs);
+                    }
+                }
+            }
+            return null; // No matching device organization found.
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining DB connection to get device organization for DEVICE_ID " +
+                    deviceId + " and PARENT_DEVICE_ID " + parentDeviceId;
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        } catch (SQLException e) {
+            String msg = "Error occurred while processing SQL to get device organization for DEVICE_ID " +
+                    deviceId + " and PARENT_DEVICE_ID " + parentDeviceId;
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException {

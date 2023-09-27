@@ -58,6 +58,14 @@ public class DAOTest extends BaseDeviceOrganizationTest {
     @Test
     public void testAddDeviceOrganizationDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
 
+        ConnectionManagerUtil.beginDBTransaction();
+        deviceOrganizationDAO.deleteDeviceAssociations(1);
+        ConnectionManagerUtil.commitDBTransaction();
+        ConnectionManagerUtil.closeDBConnection();
+        ConnectionManagerUtil.beginDBTransaction();
+        deviceOrganizationDAO.deleteDeviceAssociations(2);
+        ConnectionManagerUtil.commitDBTransaction();
+        ConnectionManagerUtil.closeDBConnection();
         DeviceOrganization deviceOrganization = new DeviceOrganization() {
         };
         deviceOrganization.setDeviceId(2);

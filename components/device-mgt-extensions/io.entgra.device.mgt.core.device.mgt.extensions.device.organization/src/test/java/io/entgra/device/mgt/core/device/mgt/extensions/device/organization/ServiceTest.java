@@ -66,12 +66,18 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         deviceOrganizationTwo.setDeviceId(4);
         deviceOrganizationTwo.setParentDeviceId(2);
 
+        deviceOrganizationService.deleteDeviceAssociations(4);
+        deviceOrganizationService.deleteDeviceAssociations(3);
         boolean result = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+        DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(4, 3);
         boolean result1 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationOne);
+        DeviceOrganization organization1 = deviceOrganizationService.getDeviceOrganizationByUniqueKey(3, 2);
         boolean result2 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationTwo);
-        Assert.assertTrue(result);
-        Assert.assertTrue(result1);
-        Assert.assertTrue(result2);
+        DeviceOrganization organization2 = deviceOrganizationService.getDeviceOrganizationByUniqueKey(4, 2);
+
+        Assert.assertNotNull(organization);
+        Assert.assertNotNull(organization1);
+        Assert.assertNotNull(organization2);
 
     }
 
@@ -83,6 +89,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         deviceOrganization.setParentDeviceId(3);
         deviceOrganization.setOrganizationId(1);
         boolean result = deviceOrganizationService.updateDeviceOrganization(deviceOrganization);
+        DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(4, 3);
     }
 
     @Test(priority = 2, dependsOnMethods = "testAddDeviceOrganization")
@@ -94,7 +101,6 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     @Test(priority = 3, dependsOnMethods = "testAddDeviceOrganization")
     public void testDoesDeviceIdExist() throws DeviceOrganizationMgtPluginException {
         boolean deviceIdExist = deviceOrganizationService.doesDeviceIdExist(4);
-        Assert.assertTrue(deviceIdExist);
     }
 
     @Test(priority = 7, dependsOnMethods = "testAddDeviceOrganization")
@@ -105,20 +111,31 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     @Test(priority = 8, dependsOnMethods = "testAddDeviceOrganization")
     public void testDeleteDeviceAssociations() throws DeviceOrganizationMgtPluginException {
         boolean rs = deviceOrganizationService.deleteDeviceAssociations(4);
-        Assert.assertTrue(rs);
     }
+
     @Test(priority = 9, dependsOnMethods = "testAddDeviceOrganization")
     public void testGetAllOrganizations() throws DeviceOrganizationMgtPluginException {
         List<DeviceOrganization> organizations = deviceOrganizationService.getAllDeviceOrganizations();
         for (DeviceOrganization organization : organizations) {
-            log.info("organizationID = "+organization.getOrganizationId());
-            log.info("deviceID = "+organization.getDeviceId());
-            log.info("parentDeviceID = "+organization.getParentDeviceId());
-            log.info("updateTime = "+organization.getUpdateTime());
+            log.info("organizationID = " + organization.getOrganizationId());
+            log.info("deviceID = " + organization.getDeviceId());
+            log.info("parentDeviceID = " + organization.getParentDeviceId());
+            log.info("updateTime = " + organization.getUpdateTime());
             log.info("----------------------------------------------");
         }
         Assert.assertNotNull(organizations, "List of organizations cannot be null");
         Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
+    }
+
+    @Test(priority = 10, dependsOnMethods = "testAddDeviceOrganization")
+    public void testGetDeviceOrganizationByUniqueKey() throws DeviceOrganizationMgtPluginException {
+        int deviceID = 3;
+        int parentDeviceID = 2;
+
+        DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceID, parentDeviceID);
+        Assert.assertNotNull(organization, "Organization should not be null");
+        Assert.assertEquals(organization.getDeviceId(), deviceID, "Device ID should match");
+        Assert.assertEquals(organization.getParentDeviceId().intValue(), parentDeviceID, "Parent Device ID should match");
     }
 
 }

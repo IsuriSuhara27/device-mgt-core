@@ -101,6 +101,17 @@ public interface DeviceOrganizationService {
             throws DeviceOrganizationMgtPluginException;
 
     /**
+     * Retrieve a device organization by its unique key (deviceId and parentDeviceId).
+     *
+     * @param deviceId       The ID of the device.
+     * @param parentDeviceId The ID of the parent device.
+     * @return The retrieved DeviceOrganization object, or null if not found.
+     * @throws DeviceOrganizationMgtPluginException If an error occurs.
+     */
+    DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, int parentDeviceId)
+            throws DeviceOrganizationMgtPluginException;
+
+    /**
      * Checks whether a record with the specified device ID exists either in the deviceID column or
      * parentDeviceID column in the device organization table.
      *

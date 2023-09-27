@@ -189,7 +189,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public void addDeviceOrganizationList(List<DeviceOrganization> deviceOrganizationList)
             throws DeviceOrganizationMgtPluginException {
-        for (DeviceOrganization deviceOrganization : deviceOrganizationList){
+        for (DeviceOrganization deviceOrganization : deviceOrganizationList) {
             boolean result = addDeviceOrganization(deviceOrganization);
         }
     }
@@ -210,6 +210,30 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         } catch (DeviceOrganizationMgtDAOException e) {
             String msg = "Error occurred in the database level while checking organization existence. " +
                     "Params : deviceID = " + deviceID + ", parentDeviceID = " + parentDeviceID;
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } finally {
+            ConnectionManagerUtil.closeDBConnection();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceID, int parentDeviceID)
+            throws DeviceOrganizationMgtPluginException {
+        try {
+            ConnectionManagerUtil.openDBConnection();
+            return deviceOrganizationDao.getDeviceOrganizationByUniqueKey(deviceID, parentDeviceID);
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining the database connection to retrieve organization. " +
+                    "Params : deviceID = " + deviceID + ", parentDeviceID = " + parentDeviceID;
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } catch (DeviceOrganizationMgtDAOException e) {
+            String msg = "Error occurred while retrieving device organization for deviceID " +
+                    deviceID + " and parentDeviceID " + parentDeviceID;
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);
         } finally {

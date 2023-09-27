@@ -78,6 +78,17 @@ public interface DeviceOrganizationDAO {
     boolean organizationExists(int deviceId, int parentDeviceId) throws DeviceOrganizationMgtDAOException;
 
     /**
+     * Get a device organization by the CHILD_PARENT_COMP_KEY unique key.
+     *
+     * @param deviceId      The ID of the child device.
+     * @param parentDeviceId The ID of the parent device.
+     * @return The DeviceOrganization object if found, null otherwise.
+     * @throws DeviceOrganizationMgtDAOException if an error occurs while accessing the database.
+     */
+    DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, int parentDeviceId)
+            throws DeviceOrganizationMgtDAOException;
+
+    /**
      * Updates a record in the device organization table with the provided information.
      *
      * @param deviceOrganization The DeviceOrganization object containing the updated information.
