@@ -154,4 +154,7 @@ public interface DeviceOrganizationService {
     boolean deleteDeviceAssociations(int deviceId)
             throws DeviceOrganizationMgtPluginException;
 
+
+    //In case we need to remove the device organization with enrollment removal,we need to implement a callback to
+    //remove the device organization mapping whenever the device removal happening in enrollment level.
 }

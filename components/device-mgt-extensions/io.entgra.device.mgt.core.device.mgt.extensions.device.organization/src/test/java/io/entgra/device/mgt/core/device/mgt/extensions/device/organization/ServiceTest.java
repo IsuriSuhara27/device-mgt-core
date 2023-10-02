@@ -32,7 +32,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         DeviceNode deviceNode = new DeviceNode();
         deviceNode.setDeviceId(2);
         int maxDepth = 2;
-        boolean includeDevice = false;
+        boolean includeDevice = true;
         List<DeviceNode> childrenList = deviceOrganizationService.getChildrenOf(deviceNode, maxDepth, includeDevice);
 
         Assert.assertNotNull(childrenList, "Cannot be null");
@@ -44,7 +44,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         DeviceNode deviceNode = new DeviceNode();
         deviceNode.setDeviceId(4);
         int maxDepth = 2;
-        boolean includeDevice = true;
+        boolean includeDevice = false;
         List<DeviceNode> parentList = deviceOrganizationService.getParentsOf(deviceNode, maxDepth, includeDevice);
 
         Assert.assertNotNull(parentList, "Cannot be null");
