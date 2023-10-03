@@ -24,8 +24,7 @@ public class DeviceOrganizationDaoUtil {
      * @throws SQLException If there's an issue reading data from the ResultSet.
      */
     public static DeviceOrganization loadDeviceOrganization(ResultSet rs) throws SQLException {
-        DeviceOrganization deviceOrganization = new DeviceOrganization() {
-        };
+        DeviceOrganization deviceOrganization = new DeviceOrganization();
         deviceOrganization.setOrganizationId(rs.getInt("ID"));
         deviceOrganization.setDeviceId(rs.getInt("DEVICE_ID"));
         if (rs.getInt("PARENT_DEVICE_ID") != 0) {

@@ -75,7 +75,7 @@ public interface DeviceOrganizationDAO {
      * @return True if a record with the specified deviceId and parentDeviceId exists, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while checking the existence of the record.
      */
-    boolean organizationExists(int deviceId, int parentDeviceId) throws DeviceOrganizationMgtDAOException;
+    boolean isDeviceOrganizationExist(int deviceId, Integer parentDeviceId) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Get a device organization by the CHILD_PARENT_COMP_KEY unique key.
@@ -85,7 +85,7 @@ public interface DeviceOrganizationDAO {
      * @return The DeviceOrganization object if found, null otherwise.
      * @throws DeviceOrganizationMgtDAOException if an error occurs while accessing the database.
      */
-    DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, int parentDeviceId)
+    DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId)
             throws DeviceOrganizationMgtDAOException;
 
     /**
@@ -135,5 +135,5 @@ public interface DeviceOrganizationDAO {
      * @return true if a record with the given device ID exists, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while querying the database.
      */
-    boolean doesDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException;
+    boolean isDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException;
 }

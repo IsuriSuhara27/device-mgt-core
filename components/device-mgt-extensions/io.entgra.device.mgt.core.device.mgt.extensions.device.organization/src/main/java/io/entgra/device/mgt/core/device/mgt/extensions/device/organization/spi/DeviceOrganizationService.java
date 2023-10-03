@@ -63,15 +63,6 @@ public interface DeviceOrganizationService {
             throws DeviceOrganizationMgtPluginException;
 
     /**
-     * Adds a list of device organizations.
-     *
-     * @param deviceOrganizations The list of device organizations to add.
-     * @throws DeviceOrganizationMgtPluginException If an error occurs during the operation.
-     */
-    void addDeviceOrganizationList(List<DeviceOrganization> deviceOrganizations)
-            throws DeviceOrganizationMgtPluginException;
-
-    /**
      * Retrieves a list of all device organizations.
      *
      * @return A list of all device organizations.
@@ -97,7 +88,7 @@ public interface DeviceOrganizationService {
      * @return True if the organization exists, false otherwise.
      * @throws DeviceOrganizationMgtPluginException If an error occurs during the operation.
      */
-    boolean organizationExists(int deviceId, int parentDeviceId)
+    boolean isDeviceOrganizationExist(int deviceId, Integer parentDeviceId)
             throws DeviceOrganizationMgtPluginException;
 
     /**
@@ -108,7 +99,7 @@ public interface DeviceOrganizationService {
      * @return The retrieved DeviceOrganization object, or null if not found.
      * @throws DeviceOrganizationMgtPluginException If an error occurs.
      */
-    DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, int parentDeviceId)
+    DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId)
             throws DeviceOrganizationMgtPluginException;
 
     /**
@@ -119,7 +110,7 @@ public interface DeviceOrganizationService {
      * @return True if the device exists, false otherwise.
      * @throws DeviceOrganizationMgtPluginException If an error occurs during the operation.
      */
-    boolean doesDeviceIdExist(int deviceId)
+    boolean isDeviceIdExist(int deviceId)
             throws DeviceOrganizationMgtPluginException;
 
     /**

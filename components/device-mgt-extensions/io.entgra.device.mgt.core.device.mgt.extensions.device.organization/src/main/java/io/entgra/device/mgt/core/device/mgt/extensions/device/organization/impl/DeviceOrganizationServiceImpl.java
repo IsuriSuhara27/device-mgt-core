@@ -148,7 +148,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
         String msg;
         int deviceID = deviceOrganization.getDeviceId();
-        int parentDeviceID = deviceOrganization.getParentDeviceId();
+        Integer parentDeviceID = deviceOrganization.getParentDeviceId();
 
         try {
             ConnectionManagerUtil.beginDBTransaction();
@@ -187,21 +187,15 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
      * {@inheritDoc}
      */
     @Override
-    public void addDeviceOrganizationList(List<DeviceOrganization> deviceOrganizationList)
-            throws DeviceOrganizationMgtPluginException {
-        for (DeviceOrganization deviceOrganization : deviceOrganizationList) {
-            boolean result = addDeviceOrganization(deviceOrganization);
+    public boolean isDeviceOrganizationExist(int deviceID, Integer parentDeviceID) throws DeviceOrganizationMgtPluginException {
+        if (deviceID <= 0 || !(parentDeviceID == null || parentDeviceID > 0)) {
+            throw new BadRequestException("Invalid input parameters for deviceOrganization update. : "
+                    + ", deviceID = " + deviceID
+                    + ", parentDeviceID = " + parentDeviceID);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean organizationExists(int deviceID, int parentDeviceID) throws DeviceOrganizationMgtPluginException {
         try {
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.organizationExists(deviceID, parentDeviceID);
+            return deviceOrganizationDao.isDeviceOrganizationExist(deviceID, parentDeviceID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to check organization existence. " +
                     "Params : deviceID = " + deviceID + ", parentDeviceID = " + parentDeviceID;
@@ -221,8 +215,13 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
      * {@inheritDoc}
      */
     @Override
-    public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceID, int parentDeviceID)
+    public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceID, Integer parentDeviceID)
             throws DeviceOrganizationMgtPluginException {
+        if (deviceID <= 0 || !(parentDeviceID == null || parentDeviceID > 0)) {
+            throw new BadRequestException("Invalid input parameters for deviceOrganization update. : "
+                    + ", deviceID = " + deviceID
+                    + ", parentDeviceID = " + parentDeviceID);
+        }
         try {
             ConnectionManagerUtil.openDBConnection();
             return deviceOrganizationDao.getDeviceOrganizationByUniqueKey(deviceID, parentDeviceID);
@@ -391,7 +390,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
         String msg;
 
-        boolean deviceIdExist = doesDeviceIdExist(deviceID);
+        boolean deviceIdExist = isDeviceIdExist(deviceID);
         if (!deviceIdExist) {
             msg = "Cannot find device organizations associated with deviceID = " + deviceID;
             log.error(msg);
@@ -434,7 +433,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
      * {@inheritDoc}
      */
     @Override
-    public boolean doesDeviceIdExist(int deviceID)
+    public boolean isDeviceIdExist(int deviceID)
             throws DeviceOrganizationMgtPluginException {
         if (deviceID <= 0) {
             throw new BadRequestException("deviceID must be a positive number." +
@@ -444,7 +443,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.doesDeviceIdExist(deviceID);
+            return deviceOrganizationDao.isDeviceIdExist(deviceID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to check deviceID existence " +
                     "in deviceOrganization : deviceID = " + deviceID;

@@ -219,7 +219,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 if (deviceOrganization.getParentDeviceId() != null) {
                     stmt.setInt(2, deviceOrganization.getParentDeviceId());
                 } else {
-                    stmt.setNull(2, Types.INTEGER);
+                    stmt.setInt(2, Types.NULL);
                 }
                 stmt.setTimestamp(3, timestamp);
                 return stmt.executeUpdate() > 0;
@@ -241,7 +241,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public boolean organizationExists(int deviceId, int parentDeviceId) throws DeviceOrganizationMgtDAOException {
+    public boolean isDeviceOrganizationExist(int deviceId, Integer parentDeviceId) throws DeviceOrganizationMgtDAOException {
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
             String sql = "SELECT 1 " +
@@ -251,7 +251,11 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, deviceId);
-                stmt.setInt(2, parentDeviceId);
+                if (parentDeviceId != null) {
+                    stmt.setInt(2, parentDeviceId);
+                } else {
+                    stmt.setInt(2,Types.NULL);
+                }
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     return rs.next(); // Returns true if a match is found, false otherwise
@@ -273,7 +277,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     /**
      * {@inheritDoc}
      */
-    public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, int parentDeviceId)
+    public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId)
             throws DeviceOrganizationMgtDAOException {
         try {
             String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
@@ -281,7 +285,11 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             Connection conn = ConnectionManagerUtil.getDBConnection();
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, deviceId);
-                stmt.setInt(2, parentDeviceId);
+                if (parentDeviceId != null) {
+                    stmt.setInt(2, parentDeviceId);
+                } else {
+                    stmt.setInt(2,Types.NULL);
+                }
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
@@ -450,7 +458,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public boolean doesDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException {
+    public boolean isDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException {
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
             String sql = "SELECT 1 " +

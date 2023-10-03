@@ -53,16 +53,13 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     @Test(priority = 1)
     public void testAddDeviceOrganization() throws DeviceOrganizationMgtPluginException {
 
-        DeviceOrganization deviceOrganization = new DeviceOrganization() {
-        };
+        DeviceOrganization deviceOrganization = new DeviceOrganization();
         deviceOrganization.setDeviceId(4);
         deviceOrganization.setParentDeviceId(3);
-        DeviceOrganization deviceOrganizationOne = new DeviceOrganization() {
-        };
+        DeviceOrganization deviceOrganizationOne = new DeviceOrganization();
         deviceOrganizationOne.setDeviceId(3);
         deviceOrganizationOne.setParentDeviceId(2);
-        DeviceOrganization deviceOrganizationTwo = new DeviceOrganization() {
-        };
+        DeviceOrganization deviceOrganizationTwo = new DeviceOrganization();
         deviceOrganizationTwo.setDeviceId(4);
         deviceOrganizationTwo.setParentDeviceId(2);
 
@@ -83,8 +80,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
     @Test(priority = 6, dependsOnMethods = "testAddDeviceOrganization")
     public void testUpdateDeviceOrganization() throws DeviceOrganizationMgtPluginException {
-        DeviceOrganization deviceOrganization = new DeviceOrganization() {
-        };
+        DeviceOrganization deviceOrganization = new DeviceOrganization();
         deviceOrganization.setDeviceId(4);
         deviceOrganization.setParentDeviceId(3);
         deviceOrganization.setOrganizationId(1);
@@ -100,7 +96,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
     @Test(priority = 3, dependsOnMethods = "testAddDeviceOrganization")
     public void testDoesDeviceIdExist() throws DeviceOrganizationMgtPluginException {
-        boolean deviceIdExist = deviceOrganizationService.doesDeviceIdExist(4);
+        boolean deviceIdExist = deviceOrganizationService.isDeviceIdExist(4);
     }
 
     @Test(priority = 7, dependsOnMethods = "testAddDeviceOrganization")

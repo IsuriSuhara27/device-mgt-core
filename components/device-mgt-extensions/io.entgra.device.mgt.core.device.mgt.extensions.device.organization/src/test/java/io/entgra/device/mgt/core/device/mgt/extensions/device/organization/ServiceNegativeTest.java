@@ -75,16 +75,15 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
     @Test(description = "This method tests Add Device Organization method under negative circumstances with null data",
             expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testAddDeviceOrganizationWithInvalidInput() throws DeviceOrganizationMgtPluginException {
-        DeviceOrganization invalidOrganization = new DeviceOrganization() {
-        };
+        DeviceOrganization invalidOrganization = new DeviceOrganization();
         deviceOrganizationService.addDeviceOrganization(invalidOrganization);
     }
 
-    @Test(description = "This method tests organizationExists method under negative circumstances with an organization that doesn't exist")
+    @Test(description = "This method tests isDeviceOrganizationExist method under negative circumstances with an organization that doesn't exist")
     public void testOrganizationDoesNotExist() throws DeviceOrganizationMgtPluginException {
         int nonExistentDeviceId = 9999; // An ID that doesn't exist
         int nonExistentParentDeviceId = 8888; // An ID that doesn't exist
-        boolean exists = deviceOrganizationService.organizationExists(nonExistentDeviceId, nonExistentParentDeviceId);
+        boolean exists = deviceOrganizationService.isDeviceOrganizationExist(nonExistentDeviceId, nonExistentParentDeviceId);
         Assert.assertFalse(exists, "Organization should not exist for non-existent IDs.");
     }
 
@@ -92,8 +91,7 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
             expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testAddDuplicateDeviceOrganization() throws DeviceOrganizationMgtPluginException {
         // Create a valid organization
-        DeviceOrganization validOrganization = new DeviceOrganization() {
-        };
+        DeviceOrganization validOrganization = new DeviceOrganization();
         validOrganization.setDeviceId(1);
         validOrganization.setParentDeviceId(0);
 
@@ -112,16 +110,14 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
     @Test(description = "This method tests Update Device Organization method under negative circumstances with null " +
             "data", expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testUpdateDeviceOrganizationWithInvalidInput() throws DeviceOrganizationMgtPluginException {
-        DeviceOrganization invalidOrganization = new DeviceOrganization() {
-        };
+        DeviceOrganization invalidOrganization = new DeviceOrganization();
         deviceOrganizationService.updateDeviceOrganization(invalidOrganization);
     }
 
     @Test(description = "This method tests Update Device Organization method under negative circumstances with an invalid organization ID",
             expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testUpdateDeviceOrganizationWithInvalidID() throws DeviceOrganizationMgtPluginException {
-        DeviceOrganization invalidOrganization = new DeviceOrganization() {
-        };
+        DeviceOrganization invalidOrganization = new DeviceOrganization();
         invalidOrganization.setOrganizationId(-1); // Provide an invalid organization ID
         deviceOrganizationService.updateDeviceOrganization(invalidOrganization);
     }
@@ -146,7 +142,7 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
             expectedExceptions = {BadRequestException.class})
     public void testDoesDeviceIdExistWithInvalidInput() throws DeviceOrganizationMgtPluginException {
         int invalidDeviceId = 0;
-        deviceOrganizationService.doesDeviceIdExist(invalidDeviceId);
+        deviceOrganizationService.isDeviceIdExist(invalidDeviceId);
     }
 
     @Test(description = "This method tests Delete Device Associations method under negative circumstances with invalid " +

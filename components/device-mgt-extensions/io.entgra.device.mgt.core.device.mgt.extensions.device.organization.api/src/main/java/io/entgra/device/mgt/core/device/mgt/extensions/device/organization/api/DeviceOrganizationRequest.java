@@ -16,20 +16,29 @@
  * under the License.
  */
 
-package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto;
+package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
-/**
- * This abstract class represents a device organization entity used in DeviceOrganizationService.
- * It serves as a base class for defining various organizational structures related to devices.
- */
-public class DeviceOrganization {
+@XmlRootElement
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class DeviceOrganizationRequest {
+
+    @XmlElement
     private int organizationId;
+
+    @XmlElement
     private int deviceId;
+
+    @XmlElement
     private Integer parentDeviceId;
+
+    @XmlElement
     private Date updateTime;
 
     public int getOrganizationId() {
