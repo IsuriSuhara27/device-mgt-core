@@ -40,5 +40,22 @@ INSERT INTO DM_DEVICE (DESCRIPTION,NAME,DEVICE_TYPE_ID,DEVICE_IDENTIFICATION,LAS
 ('test device 1','Meter_01',1,'0001',CURRENT_TIMESTAMP(),1),
 ('test device 2','Meter_02',1,'0002',CURRENT_TIMESTAMP(),1),
 ('test device 3','Meter_03',1,'0003',CURRENT_TIMESTAMP(),1),
-('test device 4','Meter_04',1,'0004',CURRENT_TIMESTAMP(),1);
+('test device 4','Meter_04',1,'0004',CURRENT_TIMESTAMP(),1),
+('test device 5','Meter_05',1,'0005',CURRENT_TIMESTAMP(),1),
+('test device 6','Meter_06',1,'0006',CURRENT_TIMESTAMP(),1),
+('test device 7','Meter_07',1,'0007',CURRENT_TIMESTAMP(),1),
+('test device 8','Meter_08',1,'0008',CURRENT_TIMESTAMP(),1),
+('test device 9','Meter_09',1,'0009',CURRENT_TIMESTAMP(),1),
+('test device 10','Meter_10',1,'0010',CURRENT_TIMESTAMP(),1),
+('test device 11','Meter_11',1,'0011',CURRENT_TIMESTAMP(),1),
+('test device 12','Meter_12',1,'0012',CURRENT_TIMESTAMP(),1),
+('test device 13','Meter_13',1,'0013',CURRENT_TIMESTAMP(),1),
+('test device 14','Meter_14',1,'0014',CURRENT_TIMESTAMP(),1),
+('test device 15','Meter_15',1,'0015',CURRENT_TIMESTAMP(),1),
+('test device 16','Meter_16',1,'0016',CURRENT_TIMESTAMP(),1),
+('test device 17','Meter_17',1,'0017',CURRENT_TIMESTAMP(),1),
+('test device 18','Meter_18',1,'0018',CURRENT_TIMESTAMP(),1),
+('test device 19','Meter_19',1,'0019',CURRENT_TIMESTAMP(),1),
+('test device 20','Meter_20',1,'0020',CURRENT_TIMESTAMP(),1)
+;
 

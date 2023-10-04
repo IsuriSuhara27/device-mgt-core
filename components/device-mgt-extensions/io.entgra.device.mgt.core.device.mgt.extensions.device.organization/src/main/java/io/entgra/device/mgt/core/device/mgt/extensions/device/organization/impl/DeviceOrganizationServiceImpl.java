@@ -46,7 +46,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice)
+    public List<DeviceNode> getChildrenOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException {
         if (node == null || node.getDeviceId() <= 0 || maxDepth < 0) {
             String msg = "Invalid input parameters for retrieving child devices : " +
@@ -57,7 +57,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.getChildrenOf(node, maxDepth, includeDevice);
+            return deviceOrganizationDao.getChildrenOfDeviceNode(node, maxDepth, includeDevice);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve child devices : " +
                     "deviceID = " + node.getDeviceId() + ", maxDepth = " + maxDepth + ", includeDevice = " +
@@ -80,7 +80,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice)
+    public List<DeviceNode> getParentsOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException {
         if (node == null || node.getDeviceId() <= 0 || maxDepth <= 0) {
             String msg = "Invalid input parameters for retrieving parent devices. Params : " +
@@ -91,7 +91,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.getParentsOf(node, maxDepth, includeDevice);
+            return deviceOrganizationDao.getParentsOfDeviceNode(node, maxDepth, includeDevice);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve parent devices for : " +
                     "device ID = " + node.getDeviceId() + ", maxDepth = " + maxDepth + ", includeDevice = " +
@@ -149,7 +149,10 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         String msg;
         int deviceID = deviceOrganization.getDeviceId();
         Integer parentDeviceID = deviceOrganization.getParentDeviceId();
-
+        boolean exists = isDeviceOrganizationExist(deviceID,parentDeviceID);
+        if (exists){
+            return false;
+        }
         try {
             ConnectionManagerUtil.beginDBTransaction();
             boolean result = deviceOrganizationDao.addDeviceOrganization(deviceOrganization);
@@ -460,4 +463,34 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isChildDeviceIdExist(int deviceID)
+            throws DeviceOrganizationMgtPluginException {
+        if (deviceID <= 0) {
+            throw new BadRequestException("deviceID must be a positive number." +
+                    "Invalid input parameters for checking deviceID existence " +
+                    "in deviceOrganization : deviceID = " + deviceID);
+        }
+        try {
+            // Open a database connection
+            ConnectionManagerUtil.openDBConnection();
+            return deviceOrganizationDao.isChildDeviceIdExist(deviceID);
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining the database connection to check child deviceID existence " +
+                    "in deviceOrganization : deviceID = " + deviceID;
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } catch (DeviceOrganizationMgtDAOException e) {
+            String msg = "Error occurred in the database level while checking the child deviceID existence " +
+                    "in deviceOrganization : deviceID = " + deviceID;
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } finally {
+            // Close the database connection
+            ConnectionManagerUtil.closeDBConnection();
+        }
+    }
 }

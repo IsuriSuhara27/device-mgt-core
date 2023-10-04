@@ -31,7 +31,7 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
         DeviceNode invalidNode = null;
         int maxDepth = -1;
         boolean includeDevice = true;
-        deviceOrganizationService.getChildrenOf(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getChildrenOfDeviceNode(invalidNode, maxDepth, includeDevice);
     }
 
     @Test(description = "This method tests Get Children Of method under negative circumstances with an invalid DeviceNode",
@@ -40,7 +40,7 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
         DeviceNode invalidNode = new DeviceNode(); // Provide an invalid DeviceNode
         int maxDepth = 2;
         boolean includeDevice = true;
-        deviceOrganizationService.getChildrenOf(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getChildrenOfDeviceNode(invalidNode, maxDepth, includeDevice);
     }
 
     @Test(description = "This method tests Get Parents Of method under negative circumstances with null data",
@@ -49,7 +49,7 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
         DeviceNode invalidNode = null;
         int maxDepth = -1;
         boolean includeDevice = true;
-        deviceOrganizationService.getParentsOf(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getParentsOfDeviceNode(invalidNode, maxDepth, includeDevice);
     }
 
     @Test(description = "This method tests Get Parents Of method under negative circumstances with an invalid DeviceNode"
@@ -58,7 +58,7 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
         DeviceNode invalidNode = new DeviceNode(); // Provide an invalid DeviceNode
         int maxDepth = 2;
         boolean includeDevice = true;
-        deviceOrganizationService.getParentsOf(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getParentsOfDeviceNode(invalidNode, maxDepth, includeDevice);
     }
 
     @Test(description = "This method tests Get Parents Of method under negative circumstances with an invalid DeviceNode"
@@ -68,7 +68,7 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
         DeviceNode invalidNode = null; // Provide an invalid DeviceNode
         int maxDepth = 2;
         boolean includeDevice = true;
-        deviceOrganizationService.getParentsOf(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getParentsOfDeviceNode(invalidNode, maxDepth, includeDevice);
     }
 
 

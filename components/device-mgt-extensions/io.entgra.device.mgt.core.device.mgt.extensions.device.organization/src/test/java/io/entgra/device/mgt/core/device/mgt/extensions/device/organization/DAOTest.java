@@ -36,7 +36,7 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         node.setDeviceId(2);
         int maxDepth = 4;
         boolean includeDevice = true;
-        List<DeviceNode> childrenList = deviceOrganizationDAO.getChildrenOf(node, maxDepth, includeDevice);
+        List<DeviceNode> childrenList = deviceOrganizationDAO.getChildrenOfDeviceNode(node, maxDepth, includeDevice);
         ConnectionManagerUtil.closeDBConnection();
         log.info(childrenList.size());
         Assert.assertNotNull(childrenList, "Cannot be null");
@@ -49,7 +49,7 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         node.setDeviceId(4);
         int maxDepth = 4;
         boolean includeDevice = false;
-        List<DeviceNode> parentList = deviceOrganizationDAO.getParentsOf(node, maxDepth, includeDevice);
+        List<DeviceNode> parentList = deviceOrganizationDAO.getParentsOfDeviceNode(node, maxDepth, includeDevice);
         ConnectionManagerUtil.closeDBConnection();
         log.info(parentList.size());
         Assert.assertNotNull(parentList, "Cannot be null");

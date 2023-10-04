@@ -71,7 +71,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             DeviceNode deviceNode = new DeviceNode();
             deviceNode.setDeviceId(deviceId);
-            List<DeviceNode> children = deviceOrganizationService.getChildrenOf(deviceNode, maxDepth, includeDevice);
+            List<DeviceNode> children = deviceOrganizationService.getChildrenOfDeviceNode(deviceNode, maxDepth, includeDevice);
             return Response.status(Response.Status.OK).entity(gson.toJson(children)).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -90,7 +90,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             DeviceNode deviceNode = new DeviceNode();
             deviceNode.setDeviceId(deviceId);
-            List<DeviceNode> parents = deviceOrganizationService.getParentsOf(deviceNode, maxDepth, includeDevice);
+            List<DeviceNode> parents = deviceOrganizationService.getParentsOfDeviceNode(deviceNode, maxDepth, includeDevice);
             return Response.status(Response.Status.OK).entity(gson.toJson(parents)).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();

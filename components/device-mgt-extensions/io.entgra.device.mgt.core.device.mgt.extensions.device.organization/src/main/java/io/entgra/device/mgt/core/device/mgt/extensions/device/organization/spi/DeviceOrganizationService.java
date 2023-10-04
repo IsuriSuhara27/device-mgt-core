@@ -47,7 +47,7 @@ public interface DeviceOrganizationService {
      * @return A list of child device nodes.
      * @throws DeviceOrganizationMgtPluginException If an error occurs during the operation.
      */
-    List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice)
+    List<DeviceNode> getChildrenOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException;
 
     /**
@@ -59,7 +59,7 @@ public interface DeviceOrganizationService {
      * @return A list of parent device nodes.
      * @throws DeviceOrganizationMgtPluginException If an error occurs during the operation.
      */
-    List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice)
+    List<DeviceNode> getParentsOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException;
 
     /**
@@ -111,6 +111,16 @@ public interface DeviceOrganizationService {
      * @throws DeviceOrganizationMgtPluginException If an error occurs during the operation.
      */
     boolean isDeviceIdExist(int deviceId)
+            throws DeviceOrganizationMgtPluginException;
+
+    /**
+     * Checks if a child device with the given `deviceID` exists.
+     *
+     * @param deviceID The ID of the child device to check.
+     * @return `true` if the child device exists, `false` otherwise.
+     * @throws DeviceOrganizationMgtPluginException If an error occurs while checking the existence.
+     */
+    boolean isChildDeviceIdExist(int deviceID)
             throws DeviceOrganizationMgtPluginException;
 
     /**

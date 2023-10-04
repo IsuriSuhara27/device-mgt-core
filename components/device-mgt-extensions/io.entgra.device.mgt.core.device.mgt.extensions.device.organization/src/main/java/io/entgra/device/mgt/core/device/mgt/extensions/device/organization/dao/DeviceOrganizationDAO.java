@@ -37,7 +37,7 @@ public interface DeviceOrganizationDAO {
      * @return A list of child device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving child devices.
      */
-    List<DeviceNode> getChildrenOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
+    List<DeviceNode> getChildrenOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Retrieves parent devices for a given device node.
@@ -48,7 +48,7 @@ public interface DeviceOrganizationDAO {
      * @return A list of parent device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving parent devices.
      */
-    List<DeviceNode> getParentsOf(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
+    List<DeviceNode> getParentsOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Retrieves all device organization records.
@@ -136,4 +136,13 @@ public interface DeviceOrganizationDAO {
      * @throws DeviceOrganizationMgtDAOException If an error occurs while querying the database.
      */
     boolean isDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException;
+
+    /**
+     * Checks if a child device with the given `deviceId` exists in the database.
+     *
+     * @param deviceId The ID of the child device to check.
+     * @return `true` if the child device exists, `false` otherwise.
+     * @throws DeviceOrganizationMgtDAOException If an error occurs while checking the existence.
+     */
+    boolean isChildDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException;
 }
