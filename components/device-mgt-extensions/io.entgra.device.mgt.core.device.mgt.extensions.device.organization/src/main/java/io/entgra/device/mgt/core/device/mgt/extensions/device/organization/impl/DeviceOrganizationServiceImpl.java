@@ -151,6 +151,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         Integer parentDeviceID = deviceOrganization.getParentDeviceId();
         boolean exists = isDeviceOrganizationExist(deviceID,parentDeviceID);
         if (exists){
+            log.error("Device Organization already exists");
             return false;
         }
         try {
@@ -249,21 +250,18 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
     @Override
     public boolean updateDeviceOrganization(DeviceOrganization organization)
             throws DeviceOrganizationMgtPluginException {
-        if (organization == null || organization.getOrganizationId() <= 0 || organization.getDeviceId() <= 0
-                || !(organization.getParentDeviceId() == null || organization.getParentDeviceId() > 0)) {
-            throw new BadRequestException("Invalid input parameters for deviceOrganization update. : "
-                    + "deviceOrganization = " + organization
-                    + ", deviceID = " + (organization != null ? organization.getDeviceId() :
-                    "deviceID should be a positive number")
-                    + ", parentDeviceID = parentDeviceID should be a positive number or null"
-                    + ", organizationID = " + (organization != null ? organization.getOrganizationId() : null)
-            );
-        }
+
         String msg;
         DeviceOrganization deviceOrganization = getDeviceOrganizationByID(organization.getOrganizationId());
         if (deviceOrganization == null) {
             msg = "Cannot find device organization for organizationID = " + organization.getOrganizationId();
             log.error(msg);
+            return false;
+        }
+        if (organization.getDeviceId() == deviceOrganization.getDeviceId() &&
+                organization.getParentDeviceId().equals(deviceOrganization.getParentDeviceId()) &&
+                organization.getDeviceOrganizationMeta().equals(deviceOrganization.getDeviceOrganizationMeta())){
+            log.error("No data to update in device organization. All the provided details already exists.");
             return false;
         }
 

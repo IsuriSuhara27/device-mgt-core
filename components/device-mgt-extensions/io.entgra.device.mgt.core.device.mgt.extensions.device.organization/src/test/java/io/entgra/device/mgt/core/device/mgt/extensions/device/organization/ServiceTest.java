@@ -27,7 +27,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         log.info("Service test initialized");
     }
 
-    @Test(priority = 4, dependsOnMethods = "testAddMultipleDeviceOrganizations")
+    @Test(dependsOnMethods = "testAddMultipleDeviceOrganizations")
     public void testGetChildrenOf() throws DeviceOrganizationMgtPluginException {
         boolean exists = deviceOrganizationService.isDeviceIdExist(17);
         if (exists){
@@ -41,49 +41,50 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         }
     }
 
-    @Test(priority = 5, dependsOnMethods = "testAddMultipleDeviceOrganizations")
+    @Test(dependsOnMethods = "testAddMultipleDeviceOrganizations")
     public void testGetParentsOf() throws DeviceOrganizationMgtPluginException {
         boolean exists = deviceOrganizationService.isChildDeviceIdExist(20);
         if (exists) {
             DeviceNode deviceNode = new DeviceNode();
             deviceNode.setDeviceId(20);
-            int maxDepth = 2;
-            boolean includeDevice = true;
+            int maxDepth = 3;
+            boolean includeDevice = false;
             List<DeviceNode> parentList = deviceOrganizationService.getParentsOfDeviceNode(deviceNode, maxDepth, includeDevice);
 
             Assert.assertNotNull(parentList, "Cannot be null");
         }
     }
 
-    @Test(priority = 1)
-    public void testAddDeviceOrganization() throws DeviceOrganizationMgtPluginException {
+    @Test()
+    public void testAddDeviceOrganizationWithNullParent() throws DeviceOrganizationMgtPluginException {
 
-//        DeviceOrganization deviceOrganization = new DeviceOrganization();
-//        deviceOrganization.setDeviceId(4);
-//        deviceOrganization.setParentDeviceId(3);
         DeviceOrganization deviceOrganizationOne = new DeviceOrganization();
         deviceOrganizationOne.setDeviceId(3);
         deviceOrganizationOne.setParentDeviceId(null);
-//        DeviceOrganization deviceOrganizationTwo = new DeviceOrganization();
-//        deviceOrganizationTwo.setDeviceId(4);
-//        deviceOrganizationTwo.setParentDeviceId(2);
+        deviceOrganizationOne.setDeviceOrganizationMeta("Physical Relationship");
 
-//        deviceOrganizationService.deleteDeviceAssociations(4);
-//        deviceOrganizationService.deleteDeviceAssociations(3);
-//        boolean result = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
-//        DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(4, 3);
         boolean result1 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationOne);
         DeviceOrganization organization1 = deviceOrganizationService.getDeviceOrganizationByUniqueKey(3, null);
-//        boolean result2 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationTwo);
-//        DeviceOrganization organization2 = deviceOrganizationService.getDeviceOrganizationByUniqueKey(4, 2);
 
-//        Assert.assertNotNull(organization);
         Assert.assertNotNull(organization1);
-//        Assert.assertNotNull(organization2);
+
+    }
+    @Test()
+    public void testAddDeviceOrganization() throws DeviceOrganizationMgtPluginException {
+
+        DeviceOrganization deviceOrganizationOne = new DeviceOrganization();
+        deviceOrganizationOne.setDeviceId(3);
+        deviceOrganizationOne.setParentDeviceId(4);
+        deviceOrganizationOne.setDeviceOrganizationMeta("Physical Relationship");
+
+        boolean result1 = deviceOrganizationService.addDeviceOrganization(deviceOrganizationOne);
+        DeviceOrganization organization1 = deviceOrganizationService.getDeviceOrganizationByUniqueKey(3, 4);
+
+        Assert.assertNotNull(organization1);
 
     }
 
-    @Test(priority = 11)
+    @Test()
     public void testAddMultipleRandomDeviceOrganizations() throws DeviceOrganizationMgtPluginException {
         DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
 
@@ -118,7 +119,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         Assert.assertEquals(organizationCount, 100, "Inserted 100 organizations");
     }
 
-    @Test(priority = 11)
+    @Test()
     public void testAddMultipleDeviceOrganizations() throws DeviceOrganizationMgtPluginException {
         DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
 
@@ -157,41 +158,40 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         Assert.assertEquals(organizationCount, combinations.length, "Inserted organizations count mismatch");
     }
 
-
-
-
-    @Test(priority = 6, dependsOnMethods = "testAddDeviceOrganization")
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testUpdateDeviceOrganization() throws DeviceOrganizationMgtPluginException {
         DeviceOrganization deviceOrganization = new DeviceOrganization();
         deviceOrganization.setDeviceId(4);
         deviceOrganization.setParentDeviceId(3);
         deviceOrganization.setOrganizationId(1);
+
         boolean result = deviceOrganizationService.updateDeviceOrganization(deviceOrganization);
-        DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(4, 3);
+//        DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(4, 3);
+//        Assert.assertNotNull(organization);
     }
 
-    @Test(priority = 2, dependsOnMethods = "testAddDeviceOrganization")
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testGetDeviceOrganizationByID() throws DeviceOrganizationMgtPluginException {
 
         DeviceOrganization deviceOrganization = deviceOrganizationService.getDeviceOrganizationByID(1);
     }
 
-    @Test(priority = 3, dependsOnMethods = "testAddDeviceOrganization")
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testDoesDeviceIdExist() throws DeviceOrganizationMgtPluginException {
         boolean deviceIdExist = deviceOrganizationService.isDeviceIdExist(4);
     }
 
-    @Test(priority = 7, dependsOnMethods = "testAddDeviceOrganization")
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testDeleteDeviceOrganizationByID() throws DeviceOrganizationMgtPluginException {
         boolean rs = deviceOrganizationService.deleteDeviceOrganizationByID(1);
     }
 
-    @Test(priority = 8, dependsOnMethods = "testAddDeviceOrganization")
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testDeleteDeviceAssociations() throws DeviceOrganizationMgtPluginException {
         boolean rs = deviceOrganizationService.deleteDeviceAssociations(4);
     }
 
-    @Test(priority = 9, dependsOnMethods = "testAddDeviceOrganization")
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testGetAllOrganizations() throws DeviceOrganizationMgtPluginException {
         List<DeviceOrganization> organizations = deviceOrganizationService.getAllDeviceOrganizations();
         for (DeviceOrganization organization : organizations) {
@@ -205,7 +205,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 //        Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
     }
 
-    @Test(priority = 10, dependsOnMethods = "testAddDeviceOrganization")
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testGetDeviceOrganizationByUniqueKey() throws DeviceOrganizationMgtPluginException {
         int deviceID = 20;
         int parentDeviceID = 19;

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.getDeviceFromResultSet;
@@ -122,7 +123,13 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         Set<Integer> visited = new HashSet<>();
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            getParentsRecursive(node, maxDepth, visited, conn, parentNodes, includeDevice);
+            boolean childAdded = false;
+            getParentsRecursive(node, maxDepth,
+//                    visited,
+                    conn, parentNodes, includeDevice, childAdded);
+            if (!includeDevice && !childAdded) {
+                parentNodes.add(node);
+            }
             return parentNodes;
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining DB connection to retrieve parent devices for " +
@@ -137,13 +144,17 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
-    private void getParentsRecursive(DeviceNode node, int maxDepth, Set<Integer> visited, Connection conn,
-                                     List<DeviceNode> parentNodes, boolean includeDevice) throws SQLException {
-        if (maxDepth <= 0 || visited.contains(node.getDeviceId())) {
+    private void getParentsRecursive(DeviceNode node, int maxDepth,
+//                                     Set<Integer> visited,
+                                     Connection conn,
+                                     List<DeviceNode> parentNodes, boolean includeDevice, boolean childAdded) throws SQLException {
+        if (maxDepth <= 0
+//                || visited.contains(node.getDeviceId())
+        ) {
             return;
         }
 
-        visited.add(node.getDeviceId());
+//        visited.add(node.getDeviceId());
 
         String sql = "SELECT D.ID, D.NAME, D.DESCRIPTION, D.DEVICE_IDENTIFICATION, DT.NAME AS DEVICE_TYPE_NAME " +
                 "FROM DM_DEVICE D " +
@@ -156,10 +167,14 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     DeviceNode parent = getDeviceFromResultSet(rs);
-                    if (includeDevice) {
-                        parentNodes.add(parent); // Add the parent device if includeDevice is true.
+                    node.getParents().add(parent);
+                    if (includeDevice && !childAdded) {
+                        parentNodes.add(node);
+                        childAdded = true;
                     }
-                    getParentsRecursive(parent, maxDepth - 1, visited, conn, parentNodes, includeDevice);
+                    getParentsRecursive(parent, maxDepth - 1,
+//                            visited,
+                            conn, parentNodes, includeDevice, childAdded);
                 }
             }
         }
@@ -202,8 +217,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             throws DeviceOrganizationMgtDAOException {
 
         try {
-            String sql = "INSERT INTO DM_DEVICE_ORGANIZATION (DEVICE_ID, PARENT_DEVICE_ID, LAST_UPDATED_TIMESTAMP)" +
-                    " VALUES (?, ?, ?)";
+            String sql = "INSERT INTO DM_DEVICE_ORGANIZATION (DEVICE_ID, PARENT_DEVICE_ID, " +
+                    "DEVICE_ORGANIZATION_META,LAST_UPDATED_TIMESTAMP)" +
+                    " VALUES (?, ?, ?, ?)";
 
             Connection conn = ConnectionManagerUtil.getDBConnection();
             Calendar calendar = Calendar.getInstance();
@@ -213,9 +229,10 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 if (deviceOrganization.getParentDeviceId() != null) {
                     stmt.setInt(2, deviceOrganization.getParentDeviceId());
                 } else {
-                    stmt.setInt(2, Types.NULL);
+                    stmt.setNull(2, Types.INTEGER);
                 }
-                stmt.setTimestamp(3, timestamp);
+                stmt.setString(3,deviceOrganization.getDeviceOrganizationMeta());
+                stmt.setTimestamp(4, timestamp);
                 return stmt.executeUpdate() > 0;
             }
         } catch (DBConnectionException e) {
@@ -275,15 +292,21 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId)
             throws DeviceOrganizationMgtDAOException {
         try {
-            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
-
+            String sql;
             Connection conn = ConnectionManagerUtil.getDBConnection();
+
+            if (parentDeviceId != null) {
+                // If parentDeviceId is not null, use it in the query.
+                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
+            } else {
+                // If parentDeviceId is null, use a query that checks for null values.
+                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID IS NULL";
+            }
+
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, deviceId);
                 if (parentDeviceId != null) {
                     stmt.setInt(2, parentDeviceId);
-                } else {
-                    stmt.setInt(2, Types.NULL);
                 }
 
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -315,26 +338,47 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             throws DeviceOrganizationMgtDAOException {
         DeviceOrganization organization = getDeviceOrganizationByID(deviceOrganization.getOrganizationId());
 
-        if (organization == null || deviceOrganization.getDeviceId() <= 0 ||
-                !(deviceOrganization.getParentDeviceId() == null || deviceOrganization.getParentDeviceId() > 0)) {
+        if (organization == null) {
+            return false;
+        }
+        if (!((organization.getDeviceId() != deviceOrganization.getDeviceId()) && deviceOrganization.getDeviceId() > 0) &&
+                !((deviceOrganization.getParentDeviceId() > 0 || deviceOrganization.getParentDeviceId() == null)
+                        && !Objects.equals(organization.getParentDeviceId(), deviceOrganization.getParentDeviceId())) &&
+                (Objects.equals(organization.getDeviceOrganizationMeta(), deviceOrganization.getDeviceOrganizationMeta()))) {
+            log.error("No data to update in device organization. All the provided details already exists.");
             return false;
         }
         try {
-            String sql = "UPDATE DM_DEVICE_ORGANIZATION SET DEVICE_ID = ? , PARENT_DEVICE_ID = ? , " +
-                    "LAST_UPDATED_TIMESTAMP = ? WHERE ID = ? ";
+            String sql = "UPDATE DM_DEVICE_ORGANIZATION SET ";
+            if((organization.getDeviceId() != deviceOrganization.getDeviceId()) && deviceOrganization.getDeviceId() > 0){
+                sql += "DEVICE_ID = ? , ";
+            }
+            if((deviceOrganization.getParentDeviceId() > 0 || deviceOrganization.getParentDeviceId() == null) &&
+                    !Objects.equals(organization.getParentDeviceId(), deviceOrganization.getParentDeviceId())){
+                sql += "PARENT_DEVICE_ID = ? ,";
+            }
+            if(!Objects.equals(organization.getDeviceOrganizationMeta(), deviceOrganization.getDeviceOrganizationMeta())){
+                sql += "DEVICE_ORGANIZATION_META = ? ,";
+            }
+            sql += "LAST_UPDATED_TIMESTAMP = ? WHERE ID = ? ";
 
             Connection conn = ConnectionManagerUtil.getDBConnection();
             Calendar calendar = Calendar.getInstance();
             Timestamp timestamp = new Timestamp(calendar.getTime().getTime());
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, deviceOrganization.getDeviceId());
-                if (deviceOrganization.getParentDeviceId() != null) {
-                    stmt.setInt(2, deviceOrganization.getParentDeviceId());
-                } else {
-                    stmt.setNull(2, Types.INTEGER);
+                int x = 0;
+
+                if((organization.getDeviceId() != deviceOrganization.getDeviceId()) && deviceOrganization.getDeviceId() > 0){
+                    stmt.setInt(++x, deviceOrganization.getDeviceId());
                 }
-                stmt.setTimestamp(3, timestamp);
-                stmt.setInt(4, deviceOrganization.getOrganizationId());
+                if (!Objects.equals(organization.getParentDeviceId(), deviceOrganization.getParentDeviceId())) {
+                    stmt.setInt(++x, deviceOrganization.getParentDeviceId());
+                }
+                if (!Objects.equals(organization.getDeviceOrganizationMeta(), deviceOrganization.getDeviceOrganizationMeta())){
+                    stmt.setString(++x, deviceOrganization.getDeviceOrganizationMeta());
+                }
+                stmt.setTimestamp(++x, timestamp);
+                stmt.setInt(++x, deviceOrganization.getOrganizationId());
                 return stmt.executeUpdate() > 0;
             }
 

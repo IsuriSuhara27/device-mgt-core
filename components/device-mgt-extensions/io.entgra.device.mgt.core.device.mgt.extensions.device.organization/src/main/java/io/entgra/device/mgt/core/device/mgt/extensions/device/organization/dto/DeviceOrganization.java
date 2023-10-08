@@ -30,6 +30,7 @@ public class DeviceOrganization {
     private int organizationId;
     private int deviceId;
     private Integer parentDeviceId;
+    private String deviceOrganizationMeta;
     private Date updateTime;
 
     public int getOrganizationId() {
@@ -54,6 +55,14 @@ public class DeviceOrganization {
 
     public void setParentDeviceId(Integer parentDeviceId) {
         this.parentDeviceId = parentDeviceId;
+    }
+
+    public String getDeviceOrganizationMeta() {
+        return deviceOrganizationMeta;
+    }
+
+    public void setDeviceOrganizationMeta(String deviceOrganizationMeta) {
+        this.deviceOrganizationMeta = deviceOrganizationMeta;
     }
 
     public Date getUpdateTime() {
