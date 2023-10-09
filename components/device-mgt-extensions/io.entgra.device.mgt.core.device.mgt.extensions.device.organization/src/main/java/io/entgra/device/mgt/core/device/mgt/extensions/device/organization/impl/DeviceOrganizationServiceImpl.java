@@ -30,6 +30,7 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi.D
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -155,6 +156,7 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
             log.error("Device Organization already exists");
             return false;
         }
+
         try {
             ConnectionManagerUtil.beginDBTransaction();
             boolean result = deviceOrganizationDao.addDeviceOrganization(deviceOrganization);
@@ -187,6 +189,38 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
             ConnectionManagerUtil.closeDBConnection();
         }
     }
+
+    private boolean isChildDevice(int parentDeviceID, Integer childDeviceID) {
+        // Base case: If childDeviceID is null or equal to parentDeviceID, it's not a child.
+        if (childDeviceID == null || childDeviceID == parentDeviceID) {
+            return false;
+        }
+
+        // Query your data source to find all devices that have parentDeviceID as their parent.
+        List<Integer> childDevices = getChildDevices(parentDeviceID);
+
+        // Check if childDeviceID is directly a child of parentDeviceID.
+        if (childDevices.contains(childDeviceID)) {
+            return true;
+        }
+
+        // Check if childDeviceID is indirectly a child by recursively checking its descendants.
+        for (Integer device : childDevices) {
+            if (isChildDevice(device, childDeviceID)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private List<Integer> getChildDevices(int parentDeviceID) {
+
+        List<Integer> childDevicesList = new ArrayList<>();  // Replace with actual data source query
+        // Add code here to populate childDevices based on your data source.
+        return childDevicesList;
+    }
+
 
     /**
      * {@inheritDoc}
