@@ -95,19 +95,6 @@ public class DAOTest extends BaseDeviceOrganizationTest {
     }
 
     @Test(dependsOnMethods = "testAddDeviceOrganizationDAO")
-    public void testUpdateDeviceOrganizationDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
-        ConnectionManagerUtil.beginDBTransaction();
-        DeviceOrganization deviceOrganization = new DeviceOrganization();
-        deviceOrganization.setDeviceId(2);
-        deviceOrganization.setParentDeviceId(1);
-        deviceOrganization.setOrganizationId(1);
-        boolean result = deviceOrganizationDAO.updateDeviceOrganization(deviceOrganization);
-        ConnectionManagerUtil.commitDBTransaction();
-        ConnectionManagerUtil.closeDBConnection();
-
-    }
-
-    @Test(dependsOnMethods = "testAddDeviceOrganizationDAO")
     public void testGetDeviceOrganizationByIDDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
         ConnectionManagerUtil.beginDBTransaction();
         DeviceOrganization deviceOrganization = deviceOrganizationDAO.getDeviceOrganizationByID(1);

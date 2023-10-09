@@ -32,6 +32,7 @@ public class DeviceOrganizationDaoUtil {
         } else {
             deviceOrganization.setParentDeviceId(null);
         }
+        deviceOrganization.setDeviceOrganizationMeta(rs.getString("DEVICE_ORGANIZATION_META"));
         deviceOrganization.setUpdateTime(rs.getDate("LAST_UPDATED_TIMESTAMP"));
         return deviceOrganization;
     }

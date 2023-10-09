@@ -56,12 +56,14 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     public List<DeviceNode> getChildrenOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtDAOException {
         List<DeviceNode> childNodes = new ArrayList<>();
-        Set<Integer> visited = new HashSet<>();
+//        Set<Integer> visited = new HashSet<>();
 
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
             boolean parentAdded = false; // Flag to track whether the parent device has been added
-            getChildrenRecursive(node, maxDepth, visited, conn, childNodes, includeDevice, parentAdded);
+            getChildrenRecursive(node, maxDepth,
+//                    visited,
+                    conn, childNodes, includeDevice, parentAdded);
             if (!includeDevice && !parentAdded) {
                 childNodes.add(node); // Add the parent device if it hasn't been added and includeDevice is false.
             }
@@ -79,14 +81,18 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
-    private void getChildrenRecursive(DeviceNode node, int maxDepth, Set<Integer> visited, Connection conn,
+    private void getChildrenRecursive(DeviceNode node, int maxDepth,
+//                                      Set<Integer> visited,
+                                      Connection conn,
                                       List<DeviceNode> childNodes, boolean includeDevice, boolean parentAdded)
             throws SQLException {
-        if (maxDepth <= 0 || visited.contains(node.getDeviceId())) {
+        if (maxDepth <= 0
+//                || visited.contains(node.getDeviceId())
+        ) {
             return;
         }
 
-        visited.add(node.getDeviceId());
+//        visited.add(node.getDeviceId());
 
         String sql = "SELECT D.ID, D.NAME, D.DESCRIPTION, D.DEVICE_IDENTIFICATION, DT.NAME AS DEVICE_TYPE_NAME " +
                 "FROM DM_DEVICE D " +
@@ -106,7 +112,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                         parentAdded = true; // Set the flag to true after adding the parent device.
                     }
 
-                    getChildrenRecursive(child, maxDepth - 1, visited, conn, childNodes, includeDevice, parentAdded);
+                    getChildrenRecursive(child, maxDepth - 1,
+//                            visited,
+                            conn, childNodes, includeDevice, parentAdded);
                 }
             }
         }
@@ -231,7 +239,12 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 } else {
                     stmt.setNull(2, Types.INTEGER);
                 }
-                stmt.setString(3,deviceOrganization.getDeviceOrganizationMeta());
+                if (deviceOrganization.getDeviceOrganizationMeta() != null) {
+                    stmt.setString(3,deviceOrganization.getDeviceOrganizationMeta());
+                } else {
+                    stmt.setString(3,"");
+                }
+
                 stmt.setTimestamp(4, timestamp);
                 return stmt.executeUpdate() > 0;
             }
@@ -336,24 +349,20 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     @Override
     public boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException {
+        String msg;
         DeviceOrganization organization = getDeviceOrganizationByID(deviceOrganization.getOrganizationId());
 
         if (organization == null) {
-            return false;
+            msg = "Device Organization does not exist for organization ID = " + deviceOrganization.getOrganizationId();
+            throw new DeviceOrganizationMgtDAOException(msg);
         }
-        if (!((organization.getDeviceId() != deviceOrganization.getDeviceId()) && deviceOrganization.getDeviceId() > 0) &&
-                !((deviceOrganization.getParentDeviceId() > 0 || deviceOrganization.getParentDeviceId() == null)
-                        && !Objects.equals(organization.getParentDeviceId(), deviceOrganization.getParentDeviceId())) &&
-                (Objects.equals(organization.getDeviceOrganizationMeta(), deviceOrganization.getDeviceOrganizationMeta()))) {
-            log.error("No data to update in device organization. All the provided details already exists.");
-            return false;
-        }
+
         try {
             String sql = "UPDATE DM_DEVICE_ORGANIZATION SET ";
             if((organization.getDeviceId() != deviceOrganization.getDeviceId()) && deviceOrganization.getDeviceId() > 0){
                 sql += "DEVICE_ID = ? , ";
             }
-            if((deviceOrganization.getParentDeviceId() > 0 || deviceOrganization.getParentDeviceId() == null) &&
+            if((deviceOrganization.getParentDeviceId() == null || deviceOrganization.getParentDeviceId() > 0) &&
                     !Objects.equals(organization.getParentDeviceId(), deviceOrganization.getParentDeviceId())){
                 sql += "PARENT_DEVICE_ID = ? ,";
             }
@@ -383,12 +392,12 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             }
 
         } catch (DBConnectionException e) {
-            String msg = "Error occurred while obtaining DB connection to update device organization for " +
+            msg = "Error occurred while obtaining DB connection to update device organization for " +
                     deviceOrganization.getOrganizationId();
             log.error(msg);
             throw new DeviceOrganizationMgtDAOException(msg, e);
         } catch (SQLException e) {
-            String msg = "Error occurred while processing SQL to update device organization for " +
+            msg = "Error occurred while processing SQL to update device organization for " +
                     deviceOrganization.getOrganizationId();
             log.error(msg);
             throw new DeviceOrganizationMgtDAOException(msg, e);
@@ -401,8 +410,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     @Override
     public DeviceOrganization getDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException {
         try {
-            String sql = "SELECT do.ID,do.DEVICE_ID, do.PARENT_DEVICE_ID, do.LAST_UPDATED_TIMESTAMP " +
-                    "FROM DM_DEVICE_ORGANIZATION do WHERE do.ID = ? ";
+            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION do WHERE do.ID = ? ";
 
             Connection conn = ConnectionManagerUtil.getDBConnection();
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {

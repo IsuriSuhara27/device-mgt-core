@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 public class DeviceOrganizationServiceImpl implements DeviceOrganizationService {
 
@@ -248,21 +249,15 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
      * {@inheritDoc}
      */
     @Override
-    public boolean updateDeviceOrganization(DeviceOrganization organization)
+    public boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtPluginException {
 
         String msg;
-        DeviceOrganization deviceOrganization = getDeviceOrganizationByID(organization.getOrganizationId());
-        if (deviceOrganization == null) {
-            msg = "Cannot find device organization for organizationID = " + organization.getOrganizationId();
+        DeviceOrganization organization = getDeviceOrganizationByID(deviceOrganization.getOrganizationId());
+        if (organization == null) {
+            msg = "Cannot find device organization for organizationID = " + deviceOrganization.getOrganizationId();
             log.error(msg);
-            return false;
-        }
-        if (organization.getDeviceId() == deviceOrganization.getDeviceId() &&
-                organization.getParentDeviceId().equals(deviceOrganization.getParentDeviceId()) &&
-                organization.getDeviceOrganizationMeta().equals(deviceOrganization.getDeviceOrganizationMeta())){
-            log.error("No data to update in device organization. All the provided details already exists.");
-            return false;
+            throw new DeviceOrganizationMgtPluginException(msg);
         }
 
         try {
