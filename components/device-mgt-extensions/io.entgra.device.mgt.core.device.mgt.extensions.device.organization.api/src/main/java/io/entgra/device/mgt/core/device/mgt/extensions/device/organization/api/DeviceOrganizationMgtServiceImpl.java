@@ -129,7 +129,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/exists")
-    public Response organizationExists(
+    public Response isDeviceOrganizationExist(
             @QueryParam("deviceId") int deviceId,
             @QueryParam("parentDeviceId") int parentDeviceId) {
         try {
@@ -140,6 +140,20 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/child-exists")
+    public Response isChildDeviceIdExist(@QueryParam("deviceId") int deviceID) {
+        try {
+            DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
+            boolean exists = deviceOrganizationService.isChildDeviceIdExist(deviceID);
+            return Response.status(Response.Status.OK).entity(gson.toJson(exists)).build();
+        } catch (DeviceOrganizationMgtPluginException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)

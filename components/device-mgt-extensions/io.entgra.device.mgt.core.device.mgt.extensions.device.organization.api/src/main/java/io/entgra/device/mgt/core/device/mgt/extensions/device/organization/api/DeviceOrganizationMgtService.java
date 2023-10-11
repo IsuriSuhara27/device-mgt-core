@@ -19,16 +19,18 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api;
 
 import io.entgra.device.mgt.core.apimgt.annotations.Scope;
 import io.entgra.device.mgt.core.apimgt.annotations.Scopes;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.beans.ErrorResponse;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
-import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.SwaggerDefinition;
+import io.swagger.annotations.Info;
 import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.Extension;
 import io.swagger.annotations.ExtensionProperty;
-import io.swagger.annotations.Info;
-import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
+import io.swagger.annotations.ApiResponses;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -96,8 +98,8 @@ public interface DeviceOrganizationMgtService {
             produces = MediaType.TEXT_PLAIN,
             httpMethod = "POST",
             value = "Add a new device Organization.",
-            notes = "This will return a response to indicate when a new device organization is created.",
-            tags = "Device Management",
+            notes = "This endpoint allows you to add a new device organization.",
+            tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
                             @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
@@ -108,8 +110,20 @@ public interface DeviceOrganizationMgtService {
             value = {
                     @ApiResponse(
                             code = 200,
-                            message = "OK. \n Successfully fetched the device location.",
+                            message = "OK. \n Successfully created the device organization.",
                             response = String.class),
+                    @ApiResponse(
+                            code = 201,
+                            message = "Created. Successfully created a new resource.",
+                            response = Response.class),
+                    @ApiResponse(
+                            code = 400,
+                            message = "Bad Request. Invalid input data.",
+                            response = Response.class),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. An error occurred while processing the request.",
+                            response = Response.class)
             })
     Response addDeviceOrganization(DeviceOrganizationRequest request);
 
@@ -124,10 +138,39 @@ public interface DeviceOrganizationMgtService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/children")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Get Child Nodes of a Device Node",
+            notes = "This endpoint allows you to retrieve a list of child nodes of a given device node up to a specified depth.",
+            tags = "Device Organization Management"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. Successfully retrieved the list of child nodes."
+            ),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request. Invalid input data.",
+                    response = ErrorResponse.class
+            ),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = ErrorResponse.class
+            )
+    })
     Response getChildrenOfDeviceNode(
+            @ApiParam(value = "The ID of the parent device node.", required = true)
             @QueryParam("deviceId") int deviceId,
+            @ApiParam(value = "The maximum depth of child nodes to retrieve.", required = true)
             @QueryParam("maxDepth") int maxDepth,
-            @QueryParam("includeDevice") boolean includeDevice);
+            @ApiParam(value = "Indicates whether to include device information in the retrieved nodes.", required = true)
+            @QueryParam("includeDevice") boolean includeDevice
+    );
+
 
     /**
      * Retrieves a list of parent nodes of a given device node, up to a specified depth.
@@ -140,10 +183,40 @@ public interface DeviceOrganizationMgtService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/parents")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Retrieve Parent Nodes of a Device Node",
+            notes = "Get a list of parent nodes of a specified child device node, up to a specified depth.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. Successfully retrieved the list of parent nodes."),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request. Invalid input data.",
+                    response = ErrorResponse.class),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = ErrorResponse.class)
+    })
     Response getParentsOfDeviceNode(
+            @ApiParam(value = "The ID of the child device node.", required = true)
             @QueryParam("deviceId") int deviceId,
+            @ApiParam(value = "The maximum depth of parent nodes to retrieve.", required = true)
             @QueryParam("maxDepth") int maxDepth,
+            @ApiParam(value = "Indicates whether to include device information in the retrieved nodes.", required = true)
             @QueryParam("includeDevice") boolean includeDevice);
+
 
     /**
      * Retrieves a list of all device organizations.
@@ -153,7 +226,30 @@ public interface DeviceOrganizationMgtService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/all")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Retrieve All Device Organizations",
+            notes = "Get a list of all device organizations.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. Successfully retrieved the list of all device organizations."),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = ErrorResponse.class)
+    })
     Response getAllDeviceOrganizations();
+
 
     /**
      * Retrieves a specific device organization by its organization ID.
@@ -164,7 +260,34 @@ public interface DeviceOrganizationMgtService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{organizationId}")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Retrieve Device Organization by ID",
+            notes = "Get a specific device organization by its ID.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. Successfully retrieved the device organization by ID."),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found. The specified organization does not exist.",
+                    response = ErrorResponse.class),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = ErrorResponse.class)
+    })
     Response getDeviceOrganizationById(@PathParam("organizationId") int organizationId);
+
 
     /**
      * Checks if a device organization with the specified device and parent device IDs already exists.
@@ -176,9 +299,37 @@ public interface DeviceOrganizationMgtService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/exists")
-    Response organizationExists(
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Check Device Organization Existence",
+            notes = "Check if a device organization with the specified device and parent device IDs exists.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. The organization exists.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found. The organization does not exist.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = ErrorResponse.class)
+    })
+    Response isDeviceOrganizationExist(
             @QueryParam("deviceId") int deviceId,
             @QueryParam("parentDeviceId") int parentDeviceId);
+
 
     /**
      * Retrieve a device organization by its unique key (deviceId and parentDeviceId).
@@ -190,6 +341,32 @@ public interface DeviceOrganizationMgtService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/unique")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Get Device Organization by Unique Key",
+            notes = "Retrieve a device organization by its unique key, which is a combination of deviceId and parentDeviceId.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. The organization exists.",
+                    response = DeviceOrganization.class),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found. The specified organization does not exist."),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = ErrorResponse.class)
+    })
     Response getDeviceOrganizationByUniqueKey(
             @QueryParam("deviceId") int deviceId,
             @QueryParam("parentDeviceId") int parentDeviceId);
@@ -204,7 +381,73 @@ public interface DeviceOrganizationMgtService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/device-exists")
-    Response doesDeviceIdExist(@QueryParam("deviceId") int deviceId);
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Check if Device ID Exists in Device Organization",
+            notes = "Checks whether a record with the specified device ID exists in the device organization table.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. The device exists in the device organization."),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found. The device does not exist in the device organization."),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = ErrorResponse.class)
+    })
+    Response doesDeviceIdExist(
+            @ApiParam(value = "The ID of the device to check.", required = true)
+            @QueryParam("deviceId") int deviceId);
+
+    /**
+     * Checks if a child device with the specified device ID already exists.
+     *
+     * @param deviceID The ID of the child device to check.
+     * @return A response indicating whether the child device exists or not.
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/child-exists")
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "GET",
+            value = "Check if Child Device ID Exists in Device Organization",
+            notes = "Checks whether a child device with the specified device ID exists in the device organization.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. The child device exists in the device organization."),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found. The child device does not exist in the device organization."),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = ErrorResponse.class)
+    })
+    Response isChildDeviceIdExist(
+            @ApiParam(value = "The ID of the child device to check.", required = true)
+            @QueryParam("deviceID") int deviceID);
+
 
     /**
      * Updates a device organization.
@@ -216,7 +459,41 @@ public interface DeviceOrganizationMgtService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/update")
-    Response updateDeviceOrganization(DeviceOrganization deviceOrganization);
+    @ApiOperation(
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
+            httpMethod = "PUT",
+            value = "Update a Device Organization",
+            notes = "This endpoint allows you to update a device organization.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:update")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. Successfully updated the device organization.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 400,
+                    message = "Bad Request. Invalid input data.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found. The specified device organization does not exist.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = Response.class)
+    })
+    Response updateDeviceOrganization(
+            @ApiParam(value = "The updated device organization.", required = true)
+            DeviceOrganization deviceOrganization);
+
 
     /**
      * Deletes a device organization by its organization ID.
@@ -226,7 +503,34 @@ public interface DeviceOrganizationMgtService {
      */
     @DELETE
     @Path("/delete/{organizationId}")
-    Response deleteDeviceOrganizationById(@PathParam("organizationId") int organizationId);
+    @ApiOperation(
+            httpMethod = "DELETE",
+            value = "Delete a Device Organization",
+            notes = "This endpoint allows you to delete a device organization by its organization ID.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:delete")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. Successfully deleted the device organization.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found. The specified device organization does not exist.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = Response.class)
+    })
+    Response deleteDeviceOrganizationById(
+            @ApiParam(value = "The organization ID of the device organization to delete.", required = true)
+            @PathParam("organizationId") int organizationId);
 
     /**
      * Deletes records associated with a particular device ID from the device organization table.
@@ -238,6 +542,34 @@ public interface DeviceOrganizationMgtService {
      */
     @DELETE
     @Path("/delete-associations/{deviceId}")
-    Response deleteDeviceAssociations(@PathParam("deviceId") int deviceId);
+    @ApiOperation(
+            httpMethod = "DELETE",
+            value = "Delete Device Associations",
+            notes = "This endpoint allows you to delete records associated with a particular device ID from the device organization table.",
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "perm:devices:delete-associations")
+                    })
+            }
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    code = 200,
+                    message = "OK. Successfully deleted the device associations.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 404,
+                    message = "Not Found. No associations found for the specified device ID.",
+                    response = Response.class),
+            @ApiResponse(
+                    code = 500,
+                    message = "Internal Server Error. An error occurred while processing the request.",
+                    response = Response.class)
+    })
+    Response deleteDeviceAssociations(
+            @ApiParam(value = "The ID of the device for which associations should be deleted.", required = true)
+            @PathParam("deviceId") int deviceId);
+
 
 }
