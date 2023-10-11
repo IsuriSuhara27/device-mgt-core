@@ -331,7 +331,7 @@
                         <Bundle-Version>${io.entgra.device.mgt.core.version}</Bundle-Version>
                         <Bundle-Description>IoT Device Management Device Organization Bundle</Bundle-Description>
                         <Export-Package>
-                            io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal,
+                            !io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal,
                             io.entgra.device.mgt.core.device.mgt.extensions.device.organization.*
                         </Export-Package>
                         <Private-Package>io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal</Private-Package>
