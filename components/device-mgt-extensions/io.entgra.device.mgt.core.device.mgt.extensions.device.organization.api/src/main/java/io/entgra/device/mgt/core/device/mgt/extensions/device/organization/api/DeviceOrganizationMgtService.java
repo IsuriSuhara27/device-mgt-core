@@ -244,6 +244,10 @@ public interface DeviceOrganizationMgtService {
                     code = 200,
                     message = "OK. Successfully retrieved the list of all device organizations."),
             @ApiResponse(
+                    code = 404,
+                    message = "Not Found. \n No organizations found.",
+                    response = ErrorResponse.class),
+            @ApiResponse(
                     code = 500,
                     message = "Internal Server Error. An error occurred while processing the request.",
                     response = ErrorResponse.class)
