@@ -16,24 +16,23 @@
  * under the License.
  */
 
-package io.entgra.device.mgt.core.apimgt.webapp.publisher.exception;
+package io.entgra.device.mgt.core.device.mgt.core.config.permission;
 
-/**
- * Handles the exceptions related to API management.
- */
-public class APIManagerPublisherException extends Exception {
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
-    private static final long serialVersionUID = -8933142342423122660L;
+@XmlRootElement(name = "DefaultPermissions")
+public class DefaultPermissions {
 
-    public APIManagerPublisherException(Throwable cause) {
-        super(cause);
+    private List<DefaultPermission> defaultPermissions;
+
+    @XmlElement(name = "DefaultPermission", required = true)
+    public List<DefaultPermission> getDefaultPermissions() {
+        return defaultPermissions;
     }
 
-    public APIManagerPublisherException(String errorMessage) {
-        super(errorMessage);
-    }
-
-    public APIManagerPublisherException(String errorMessage, Throwable cause) {
-        super(errorMessage, cause);
+    public void setDefaultPermissions(List<DefaultPermission> defaultPermissions) {
+        this.defaultPermissions = defaultPermissions;
     }
 }

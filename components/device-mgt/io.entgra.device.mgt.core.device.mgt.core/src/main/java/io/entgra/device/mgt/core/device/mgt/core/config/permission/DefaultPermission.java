@@ -16,24 +16,32 @@
  * under the License.
  */
 
-package io.entgra.device.mgt.core.apimgt.webapp.publisher.exception;
+package io.entgra.device.mgt.core.device.mgt.core.config.permission;
 
-/**
- * Handles the exceptions related to API management.
- */
-public class APIManagerPublisherException extends Exception {
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-    private static final long serialVersionUID = -8933142342423122660L;
+@XmlRootElement(name = "DefaultPermission")
+public class DefaultPermission {
 
-    public APIManagerPublisherException(Throwable cause) {
-        super(cause);
+    private String name;
+    private ScopeMapping scopeMapping;
+
+    @XmlElement(name = "Name", required = true)
+    public String getName() {
+        return name;
     }
 
-    public APIManagerPublisherException(String errorMessage) {
-        super(errorMessage);
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public APIManagerPublisherException(String errorMessage, Throwable cause) {
-        super(errorMessage, cause);
+    @XmlElement(name = "MappedScopeDetails", required = true)
+    public ScopeMapping getScopeMapping() {
+        return scopeMapping;
+    }
+
+    public void setScopeMapping(ScopeMapping scopeMapping) {
+        this.scopeMapping = scopeMapping;
     }
 }

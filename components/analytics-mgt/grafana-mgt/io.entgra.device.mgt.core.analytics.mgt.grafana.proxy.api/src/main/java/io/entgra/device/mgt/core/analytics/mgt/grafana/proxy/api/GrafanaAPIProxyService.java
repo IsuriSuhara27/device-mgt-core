@@ -58,9 +58,9 @@ import javax.ws.rs.core.UriInfo;
                 @Scope(
                         name = "Using Grafana APIs required for Grafana iframes",
                         description = "Grafana API proxy to validate requests.",
-                        key = "perm:grafana:api:view",
-                        roles = {"Internal/grafanamgt-user"},
-                        permissions = {"/analytics-mgt/grafana-mgt/api/view"}
+                        key = "grafana:api:view",
+                        roles = {"Internal/devicemgt-user"},
+                        permissions = {"/device-mgt/grafana/view"}
                 )
         }
 )
@@ -84,7 +84,7 @@ public interface GrafanaAPIProxyService {
             tags = "Analytics",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:grafana:api:view")
+                            @ExtensionProperty(name = SCOPE, value = "grafana:api:view")
                     })
             }
     )
@@ -101,7 +101,7 @@ public interface GrafanaAPIProxyService {
             tags = "Analytics",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:grafana:api:view")
+                            @ExtensionProperty(name = SCOPE, value = "grafana:api:view")
                     })
             }
     )
@@ -117,7 +117,7 @@ public interface GrafanaAPIProxyService {
             tags = "Analytics",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:grafana:api:view")
+                            @ExtensionProperty(name = SCOPE, value = "grafana:api:view")
                     })
             }
     )
@@ -134,7 +134,7 @@ public interface GrafanaAPIProxyService {
             tags = "Analytics",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:grafana:api:view")
+                            @ExtensionProperty(name = SCOPE, value = "grafana:api:view")
                     })
             }
     )
@@ -150,7 +150,7 @@ public interface GrafanaAPIProxyService {
             tags = "Analytics",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:grafana:api:view")
+                            @ExtensionProperty(name = SCOPE, value = "grafana:api:view")
                     })
             }
     )
