@@ -23,6 +23,8 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.D
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.impl.DeviceOrganizationServiceImpl;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi.DeviceOrganizationService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -37,31 +39,32 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtService{
+@Path("/deviceOrganization")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
+public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtService {
 
+    private static final Log log = LogFactory.getLog(DeviceOrganizationMgtServiceImpl.class);
     Gson gson = new Gson();
 
-    @Override
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/add-device-organization")
-    public Response addDeviceOrganization(DeviceOrganizationRequest deviceOrganizationRequest) {
+    public Response addDeviceOrganization(DeviceOrganization deviceOrganizationRequest) {
         try {
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
-            DeviceOrganization deviceOrganization = new DeviceOrganization();
-            deviceOrganization.setDeviceId(deviceOrganizationRequest.getDeviceId());
-            deviceOrganization.setParentDeviceId(deviceOrganizationRequest.getParentDeviceId());
-            boolean resp = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+//            DeviceOrganization deviceOrganization = new DeviceOrganization();
+//            deviceOrganization.setDeviceId(DeviceOrganization.getDeviceId());
+//            deviceOrganization.setParentDeviceId(DeviceOrganization.getParentDeviceId());
+            boolean resp = deviceOrganizationService.addDeviceOrganization(deviceOrganizationRequest);
             return Response.status(Response.Status.OK).entity(gson.toJson(resp)).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
 
-    @Override
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/children")
     public Response getChildrenOfDeviceNode(
             @QueryParam("deviceId") int deviceId,
@@ -78,9 +81,8 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         }
     }
 
-    @Override
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/parents")
     public Response getParentsOfDeviceNode(
             @QueryParam("deviceId") int deviceId,
@@ -97,9 +99,8 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         }
     }
 
-    @Override
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/all")
     public Response getAllDeviceOrganizations() {
         try {
@@ -111,9 +112,8 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         }
     }
 
-    @Override
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/{organizationId}")
     public Response getDeviceOrganizationById(@PathParam("organizationId") int organizationId) {
         try {
@@ -125,9 +125,8 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         }
     }
 
-    @Override
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/exists")
     public Response isDeviceOrganizationExist(
             @QueryParam("deviceId") int deviceId,
@@ -142,7 +141,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/child-exists")
     public Response isChildDeviceIdExist(@QueryParam("deviceId") int deviceID) {
         try {
@@ -156,7 +155,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/unique")
     public Response getDeviceOrganizationByUniqueKey(
             @QueryParam("deviceId") int deviceId,
@@ -170,10 +169,8 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         }
     }
 
-
-    @Override
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/device-exists")
     public Response doesDeviceIdExist(@QueryParam("deviceId") int deviceId) {
         try {
@@ -185,10 +182,8 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         }
     }
 
-    @Override
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Override
     @Path("/update")
     public Response updateDeviceOrganization(DeviceOrganization deviceOrganization) {
         try {
@@ -200,8 +195,8 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         }
     }
 
-    @Override
     @DELETE
+    @Override
     @Path("/delete/{organizationId}")
     public Response deleteDeviceOrganizationById(@PathParam("organizationId") int organizationId) {
         try {
@@ -213,8 +208,8 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         }
     }
 
-    @Override
     @DELETE
+    @Override
     @Path("/delete-associations/{deviceId}")
     public Response deleteDeviceAssociations(@PathParam("deviceId") int deviceId) {
         try {

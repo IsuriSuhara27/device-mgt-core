@@ -21,16 +21,16 @@ import io.entgra.device.mgt.core.apimgt.annotations.Scope;
 import io.entgra.device.mgt.core.apimgt.annotations.Scopes;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.beans.ErrorResponse;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.SwaggerDefinition;
-import io.swagger.annotations.Info;
-import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Extension;
 import io.swagger.annotations.ExtensionProperty;
+import io.swagger.annotations.Info;
+import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
-import io.swagger.annotations.ApiResponses;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -73,7 +73,7 @@ import javax.ws.rs.core.Response;
         @Scope(
                 name = "Device Organization",
                 description = "Device Organization",
-                key = "perm:devices:view",
+                key = "perm:get-activity",
                 roles = {"Internal/devicemgt-user"},
                 permissions = {"/device-mgt/devices/owning-device/view"}
         )
@@ -90,19 +90,17 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating the success or failure of the operation.
      */
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/add-device-organization")
     @ApiOperation(
-            consumes = MediaType.TEXT_PLAIN,
-            produces = MediaType.TEXT_PLAIN,
+            consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON,
             httpMethod = "POST",
             value = "Add a new device Organization.",
             notes = "This endpoint allows you to add a new device organization.",
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -125,7 +123,7 @@ public interface DeviceOrganizationMgtService {
                             message = "Internal Server Error. An error occurred while processing the request.",
                             response = Response.class)
             })
-    Response addDeviceOrganization(DeviceOrganizationRequest request);
+    Response addDeviceOrganization(DeviceOrganization request);
 
     /**
      * Retrieves a list of child nodes of a given device node, up to a specified depth.
@@ -136,10 +134,8 @@ public interface DeviceOrganizationMgtService {
      * @return A response containing a list of child device nodes.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/children")
     @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Get Child Nodes of a Device Node",
@@ -181,10 +177,8 @@ public interface DeviceOrganizationMgtService {
      * @return A response containing a list of parent device nodes.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/parents")
     @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Retrieve Parent Nodes of a Device Node",
@@ -192,7 +186,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -224,10 +218,8 @@ public interface DeviceOrganizationMgtService {
      * @return A response containing a list of all device organizations.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/all")
     @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Retrieve All Device Organizations",
@@ -235,7 +227,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -259,13 +251,12 @@ public interface DeviceOrganizationMgtService {
      * Retrieves a specific device organization by its organization ID.
      *
      * @param organizationId The organization ID of the device organization to retrieve.
-     * @return A response containing the device organization with the specified ID.
+     * @return A response containing the device organization with the specifi
+     * ed ID.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{organizationId}")
     @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Retrieve Device Organization by ID",
@@ -273,7 +264,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -301,10 +292,8 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating whether the organization exists or not.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/exists")
     @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Check Device Organization Existence",
@@ -312,7 +301,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -343,10 +332,8 @@ public interface DeviceOrganizationMgtService {
      * @return A response containing the retrieved DeviceOrganization object, or null if not found.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/unique")
     @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Get Device Organization by Unique Key",
@@ -354,7 +341,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -383,10 +370,8 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating whether the device exists or not.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/device-exists")
     @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Check if Device ID Exists in Device Organization",
@@ -394,7 +379,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -421,10 +406,8 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating whether the child device exists or not.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/child-exists")
     @ApiOperation(
-            consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
             value = "Check if Child Device ID Exists in Device Organization",
@@ -432,7 +415,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:view")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -460,8 +443,6 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating the success or failure of the operation.
      */
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/update")
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
@@ -472,7 +453,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:update")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -514,7 +495,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:delete")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
@@ -553,7 +534,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:devices:delete-associations")
+                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
                     })
             }
     )
