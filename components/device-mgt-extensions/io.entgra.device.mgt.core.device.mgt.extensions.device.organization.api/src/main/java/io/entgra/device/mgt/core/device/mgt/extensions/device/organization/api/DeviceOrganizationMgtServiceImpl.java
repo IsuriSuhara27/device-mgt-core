@@ -51,11 +51,16 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
     @Override
     @Path("/add-device-organization")
     public Response addDeviceOrganization(DeviceOrganization deviceOrganizationRequest) {
+        if (deviceOrganizationRequest == null) {
+            String errorMessage = "The payload of the device organization is incorrect.";
+            return Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
+        }
         try {
+            if (deviceOrganizationRequest.getDeviceId() <= 0 || deviceOrganizationRequest.getParentDeviceId() <= 0) {
+                String errorMessage = "The payload of the device organization is incorrect.";
+                return Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
+            }
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
-//            DeviceOrganization deviceOrganization = new DeviceOrganization();
-//            deviceOrganization.setDeviceId(DeviceOrganization.getDeviceId());
-//            deviceOrganization.setParentDeviceId(DeviceOrganization.getParentDeviceId());
             boolean resp = deviceOrganizationService.addDeviceOrganization(deviceOrganizationRequest);
             return Response.status(Response.Status.OK).entity(gson.toJson(resp)).build();
         } catch (DeviceOrganizationMgtPluginException e) {

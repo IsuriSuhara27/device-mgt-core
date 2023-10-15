@@ -17,9 +17,9 @@
   ~ under the License.
   -->
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
-    <display-name>Grafana-API-Proxy-Webapp</display-name>
+    <display-name>Admin-Webapp</display-name>
     <servlet>
-        <description>JAX-WS/JAX-RS Grafana API Management Endpoint</description>
+        <description>JAX-WS/JAX-RS Device Management Endpoint</description>
         <display-name>JAX-WS/JAX-RS Servlet</display-name>
         <servlet-name>CXFServlet</servlet-name>
         <servlet-class>
@@ -42,17 +42,16 @@
 
     <context-param>
         <param-name>doAuthentication</param-name>
-        <param-value>false</param-value>
-    </context-param>
-    <context-param>
-        <param-name>basicAuth</param-name>
-        <param-value>false</param-value>
+        <param-value>true</param-value>
     </context-param>
 
     <context-param>
         <param-name>nonSecuredEndPoints</param-name>
         <param-value>
-            /keymgt-test-api/.*,
+            /api/device-mgt/v1.0/users/validate,
+            /api/device-mgt/v1.0/whitelabel/.*/favicon,
+            /api/device-mgt/v1.0/whitelabel/.*/logo,
+            /api/device-mgt/v1.0/whitelabel/.*/icon,
         </param-value>
     </context-param>
 
@@ -69,6 +68,22 @@
         <param-name>isSharedWithAllTenants</param-name>
         <param-value>true</param-value>
     </context-param>
+
+    <!-- Below configuration is used to redirect http requests to https -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>DeviceMgt-Admin</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>
+
+    <filter>
+        <filter-name>ApiOriginFilter</filter-name>
+        <filter-class>io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.ApiOriginFilter</filter-class>
+    </filter>
 
     <filter>
         <filter-name>HttpHeaderSecurityFilter</filter-name>
@@ -103,6 +118,11 @@
 
     <filter-mapping>
         <filter-name>ContentTypeBasedCachePreventionFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>ApiOriginFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 

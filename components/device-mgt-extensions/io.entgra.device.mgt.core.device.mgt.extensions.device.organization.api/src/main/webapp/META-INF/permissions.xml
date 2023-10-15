@@ -29,4 +29,80 @@
 -->
 <PermissionConfiguration>
     <APIVersion></APIVersion>
+
+    <!-- Device Organization related APIs -->
+    <Permission>
+        <name>Create a new Device Organization</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/add-device-organization</url>
+        <method>POST</method>
+    </Permission>
+    <Permission>
+        <name>View Child Devices</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/children</url>
+        <method>GET</method>
+    </Permission>
+    <Permission>
+        <name>View Parent Devices</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/parents</url>
+        <method>GET</method>
+    </Permission>
+    <Permission>
+        <name>View All Device Organizations</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/all</url>
+        <method>GET</method>
+    </Permission>
+    <Permission>
+        <name>View Device Organization Details</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/{organizationId}</url>
+        <method>GET</method>
+    </Permission>
+    <Permission>
+        <name>Check Device Organization Existence</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/exists</url>
+        <method>GET</method>
+    </Permission>
+    <Permission>
+        <name>View Device Organization By Unique key</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/unique</url>
+        <method>GET</method>
+    </Permission>
+    <Permission>
+        <name>Check Device Organization Existence</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/device-exists</url>
+        <method>GET</method>
+    </Permission>
+    <Permission>
+        <name>Check Child Device Existence</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/child-exists</url>
+        <method>GET</method>
+    </Permission>
+    <Permission>
+        <name>Update Device Organization</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/update</url>
+        <method>PUT</method>
+    </Permission>
+    <Permission>
+        <name>Delete Device Organization By ID</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/delete/{organizationId}</url>
+        <method>DELETE</method>
+    </Permission>
+    <Permission>
+        <name>Delete Device Organizations Associated with an ID</name>
+        <path>/device-mgt/devices/owning/view</path>
+        <url>/deviceOrganization/delete-associations/{deviceId}</url>
+        <method>DELETE</method>
+    </Permission>
+
+    <!-- End of Device Organization related APIs -->
 </PermissionConfiguration>
