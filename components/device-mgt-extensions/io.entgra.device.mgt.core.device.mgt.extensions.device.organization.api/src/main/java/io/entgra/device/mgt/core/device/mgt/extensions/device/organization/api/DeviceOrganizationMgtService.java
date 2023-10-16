@@ -73,7 +73,7 @@ import javax.ws.rs.core.Response;
         @Scope(
                 name = "Device Organization",
                 description = "Device Organization",
-                key = "perm:get-activity",
+                key = "device-organization",
                 roles = {"Internal/devicemgt-user"},
                 permissions = {"/device-mgt/devices/owning-device/view"}
         )
@@ -100,7 +100,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -140,7 +140,12 @@ public interface DeviceOrganizationMgtService {
             httpMethod = "GET",
             value = "Get Child Nodes of a Device Node",
             notes = "This endpoint allows you to retrieve a list of child nodes of a given device node up to a specified depth.",
-            tags = "Device Organization Management"
+            tags = "Device Organization Management",
+            extensions = {
+                    @Extension(properties = {
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                    })
+            }
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -186,7 +191,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -227,7 +232,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -264,7 +269,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -301,7 +306,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -341,7 +346,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -379,7 +384,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -415,7 +420,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -453,7 +458,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -495,7 +500,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )
@@ -534,7 +539,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "perm:get-activity")
+                            @ExtensionProperty(name = SCOPE, value = "device-organization")
                     })
             }
     )

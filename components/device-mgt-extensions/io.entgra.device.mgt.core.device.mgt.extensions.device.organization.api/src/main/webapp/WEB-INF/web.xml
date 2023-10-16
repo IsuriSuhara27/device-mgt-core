@@ -19,7 +19,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
     <display-name>Admin-Webapp</display-name>
     <servlet>
-        <description>JAX-WS/JAX-RS Device Management Endpoint</description>
+        <description>JAX-WS/JAX-RS Device Organization Endpoint</description>
         <display-name>JAX-WS/JAX-RS Servlet</display-name>
         <servlet-name>CXFServlet</servlet-name>
         <servlet-class>
@@ -43,16 +43,6 @@
     <context-param>
         <param-name>doAuthentication</param-name>
         <param-value>true</param-value>
-    </context-param>
-
-    <context-param>
-        <param-name>nonSecuredEndPoints</param-name>
-        <param-value>
-            /api/device-mgt/v1.0/users/validate,
-            /api/device-mgt/v1.0/whitelabel/.*/favicon,
-            /api/device-mgt/v1.0/whitelabel/.*/logo,
-            /api/device-mgt/v1.0/whitelabel/.*/icon,
-        </param-value>
     </context-param>
 
     <!--publish to apim-->
