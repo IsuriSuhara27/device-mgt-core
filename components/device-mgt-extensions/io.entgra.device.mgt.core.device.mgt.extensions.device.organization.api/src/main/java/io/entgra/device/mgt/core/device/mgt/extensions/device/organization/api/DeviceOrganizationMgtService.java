@@ -73,7 +73,7 @@ import javax.ws.rs.core.Response;
         @Scope(
                 name = "Device Organization",
                 description = "Device Organization",
-                key = "device-organization",
+                key = "dm:device-organization",
                 roles = {"Internal/devicemgt-user"},
                 permissions = {"/device-mgt/devices/owning-device/view"}
         )
@@ -100,7 +100,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -143,7 +143,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -191,7 +191,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -232,7 +232,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -269,7 +269,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -306,7 +306,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -346,7 +346,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -384,7 +384,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -420,7 +420,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -458,7 +458,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -500,7 +500,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
@@ -539,7 +539,7 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
                     })
             }
     )
