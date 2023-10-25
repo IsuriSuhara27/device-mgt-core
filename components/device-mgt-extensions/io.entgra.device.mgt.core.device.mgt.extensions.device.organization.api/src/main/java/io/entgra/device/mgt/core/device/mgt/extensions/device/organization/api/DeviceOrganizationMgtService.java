@@ -60,13 +60,14 @@ import javax.ws.rs.core.Response;
                 }
         ),
         tags = {
-                @Tag(name = "deviceOrganization_management", description = "DeviceOrganization management related REST-API. " +
+                @Tag(name = "deviceOrganization_management, device_management", description = "DeviceOrganization management related REST-API. " +
                         "This can be used to manipulate device organization related details.")
         }
 )
-@Path("/deviceOrganization")
+
 @Api(value = "DeviceOrganization Management", description = "This API carries all device Organization management " +
         "related operations.")
+@Path("/deviceOrganization")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Scopes(scopes = {
@@ -75,7 +76,7 @@ import javax.ws.rs.core.Response;
                 description = "Device Organization",
                 key = "dm:device-organization",
                 roles = {"Internal/devicemgt-user"},
-                permissions = {"/device-mgt/devices/owning-device/view"}
+                permissions = {"/device-mgt/devices/owning-device/organization"}
         )
 }
 )

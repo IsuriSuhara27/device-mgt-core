@@ -26,17 +26,17 @@
     <jaxrs:server id="services" address="/">
         <jaxrs:serviceBeans>
             <ref bean="deviceOrganizationMgtService"/>
+            <ref bean="swaggerResource"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <ref bean="jsonProvider"/>
-            <!--<ref bean="errorHandler"/>-->
+<!--            <ref bean="jsonProvider"/>-->
             <ref bean="swaggerWriter"/>
         </jaxrs:providers>
     </jaxrs:server>
 
     <bean id="swaggerWriter" class="io.swagger.jaxrs.listing.SwaggerSerializers" />
     <bean id="swaggerResource" class="io.swagger.jaxrs.listing.ApiListingResource" />
-    <bean id="ValidationInterceptor" class="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.beans.ValidationInterceptor"/>
+    <bean id="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.beans.ValidationInterceptor" class="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.beans.ValidationInterceptor"/>
 <!--    <bean id="GlobalExceptionMapper" class="io.entgra.device.mgt.core.device.mgt.api.jaxrs.exception.GlobalThrowableMapper"/>-->
 
     <bean id="swaggerConfig" class="io.swagger.jaxrs.config.BeanConfig">
@@ -55,7 +55,6 @@
 
     <bean id="deviceOrganizationMgtService" class="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.DeviceOrganizationMgtServiceImpl"/>
 
-    <!--<bean id="errorHandler" class="io.entgra.device.mgt.core.device.mgt.api.jaxrs.common.ErrorHandler"/>-->
     <cxf:bus>
         <cxf:inInterceptors>
             <ref bean="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.beans.ValidationInterceptor"/>
