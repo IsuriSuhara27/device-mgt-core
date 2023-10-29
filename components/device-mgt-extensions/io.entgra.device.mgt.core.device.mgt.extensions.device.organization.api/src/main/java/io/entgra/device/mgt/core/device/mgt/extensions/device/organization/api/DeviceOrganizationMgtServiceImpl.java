@@ -39,7 +39,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-@Path("/deviceOrganization")
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtService {
@@ -49,7 +49,6 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @POST
     @Override
-    @Path("/add-device-organization")
     public Response addDeviceOrganization(DeviceOrganization deviceOrganizationRequest) {
         if (deviceOrganizationRequest == null) {
             String errorMessage = "The payload of the device organization is incorrect.";
@@ -62,7 +61,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             }
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             boolean resp = deviceOrganizationService.addDeviceOrganization(deviceOrganizationRequest);
-            return Response.status(Response.Status.OK).entity(gson.toJson(resp)).build();
+            return Response.status(Response.Status.OK).entity(resp).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -70,7 +69,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @GET
     @Override
-    @Path("/children")
+    @Path("children")
     public Response getChildrenOfDeviceNode(
             @QueryParam("deviceId") int deviceId,
             @QueryParam("maxDepth") int maxDepth,
@@ -80,7 +79,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceNode deviceNode = new DeviceNode();
             deviceNode.setDeviceId(deviceId);
             List<DeviceNode> children = deviceOrganizationService.getChildrenOfDeviceNode(deviceNode, maxDepth, includeDevice);
-            return Response.status(Response.Status.OK).entity(gson.toJson(children)).build();
+            return Response.status(Response.Status.OK).entity(children).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -88,7 +87,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @GET
     @Override
-    @Path("/parents")
+    @Path("parents")
     public Response getParentsOfDeviceNode(
             @QueryParam("deviceId") int deviceId,
             @QueryParam("maxDepth") int maxDepth,
@@ -98,7 +97,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceNode deviceNode = new DeviceNode();
             deviceNode.setDeviceId(deviceId);
             List<DeviceNode> parents = deviceOrganizationService.getParentsOfDeviceNode(deviceNode, maxDepth, includeDevice);
-            return Response.status(Response.Status.OK).entity(gson.toJson(parents)).build();
+            return Response.status(Response.Status.OK).entity(parents).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -106,12 +105,11 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @GET
     @Override
-    @Path("/all")
     public Response getAllDeviceOrganizations() {
         try {
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             List<DeviceOrganization> organizations = deviceOrganizationService.getAllDeviceOrganizations();
-            return Response.status(Response.Status.OK).entity(gson.toJson(organizations)).build();
+            return Response.status(Response.Status.OK).entity(organizations).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -119,12 +117,12 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @GET
     @Override
-    @Path("/{organizationId}")
+    @Path("{organizationId}")
     public Response getDeviceOrganizationById(@PathParam("organizationId") int organizationId) {
         try {
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByID(organizationId);
-            return Response.status(Response.Status.OK).entity(gson.toJson(organization)).build();
+            return Response.status(Response.Status.OK).entity(organization).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -132,56 +130,32 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @GET
     @Override
-    @Path("/exists")
+    @Path("exists")
     public Response isDeviceOrganizationExist(
             @QueryParam("deviceId") int deviceId,
             @QueryParam("parentDeviceId") int parentDeviceId) {
         try {
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             boolean exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId, parentDeviceId);
-            return Response.status(Response.Status.OK).entity(gson.toJson(exists)).build();
-        } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
-    }
-
-    @GET
-    @Override
-    @Path("/child-exists")
-    public Response isChildDeviceIdExist(@QueryParam("deviceId") int deviceID) {
-        try {
-            DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
-            boolean exists = deviceOrganizationService.isChildDeviceIdExist(deviceID);
-            return Response.status(Response.Status.OK).entity(gson.toJson(exists)).build();
+            return Response.status(Response.Status.OK).entity(exists).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
 
 
+
+
     @GET
     @Override
-    @Path("/unique")
+    @Path("organization")
     public Response getDeviceOrganizationByUniqueKey(
             @QueryParam("deviceId") int deviceId,
             @QueryParam("parentDeviceId") int parentDeviceId) {
         try {
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceId, parentDeviceId);
-            return Response.status(Response.Status.OK).entity(gson.toJson(organization)).build();
-        } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
-        }
-    }
-
-    @GET
-    @Override
-    @Path("/device-exists")
-    public Response doesDeviceIdExist(@QueryParam("deviceId") int deviceId) {
-        try {
-            DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
-            boolean exists = deviceOrganizationService.isDeviceIdExist(deviceId);
-            return Response.status(Response.Status.OK).entity(gson.toJson(exists)).build();
+            return Response.status(Response.Status.OK).entity(organization).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -189,12 +163,11 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @PUT
     @Override
-    @Path("/update")
     public Response updateDeviceOrganization(DeviceOrganization deviceOrganization) {
         try {
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             boolean resp = deviceOrganizationService.updateDeviceOrganization(deviceOrganization);
-            return Response.status(Response.Status.OK).entity(gson.toJson(resp)).build();
+            return Response.status(Response.Status.OK).entity(resp).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -202,12 +175,12 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @DELETE
     @Override
-    @Path("/delete/{organizationId}")
+    @Path("{organizationId}")
     public Response deleteDeviceOrganizationById(@PathParam("organizationId") int organizationId) {
         try {
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             boolean resp = deviceOrganizationService.deleteDeviceOrganizationByID(organizationId);
-            return Response.status(Response.Status.OK).entity(gson.toJson(resp)).build();
+            return Response.status(Response.Status.OK).entity(resp).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -215,12 +188,12 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @DELETE
     @Override
-    @Path("/delete-associations/{deviceId}")
+    @Path("associations/{deviceId}")
     public Response deleteDeviceAssociations(@PathParam("deviceId") int deviceId) {
         try {
             DeviceOrganizationService deviceOrganizationService = new DeviceOrganizationServiceImpl();
             boolean resp = deviceOrganizationService.deleteDeviceAssociations(deviceId);
-            return Response.status(Response.Status.OK).entity(gson.toJson(resp)).build();
+            return Response.status(Response.Status.OK).entity(resp).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }

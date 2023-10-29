@@ -29,6 +29,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Extension;
 import io.swagger.annotations.ExtensionProperty;
 import io.swagger.annotations.Info;
+import io.swagger.annotations.ResponseHeader;
 import io.swagger.annotations.SwaggerDefinition;
 import io.swagger.annotations.Tag;
 
@@ -54,30 +55,51 @@ import javax.ws.rs.core.Response;
                 title = "",
                 extensions = {
                         @Extension(properties = {
-                                @ExtensionProperty(name = "name", value = "DeviceOrganization Management"),
-                                @ExtensionProperty(name = "context", value = "/api/device-mgt/v1.0/deviceOrganization"),
+                                @ExtensionProperty(name = "name", value = "DeviceOrganizationManagement"),
+                                @ExtensionProperty(name = "context", value = "/api/device-org/v1.0"),
                         })
                 }
         ),
         tags = {
-                @Tag(name = "deviceOrganization_management, device_management", description = "DeviceOrganization management related REST-API. " +
-                        "This can be used to manipulate device organization related details.")
+                @Tag(name = "device_organization_management, device_management", description = "Device organization " +
+                        "management related REST-API. This can be used to manipulate device organization related details.")
         }
 )
 
-@Api(value = "DeviceOrganization Management", description = "This API carries all device Organization management " +
+@Api(value = "Device Organization Management", description = "This API carries all device organization management " +
         "related operations.")
-@Path("/deviceOrganization")
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @Scopes(scopes = {
         @Scope(
-                name = "Device Organization",
-                description = "Device Organization",
-                key = "dm:device-organization",
+                name = "View Device Organization",
+                description = "View Device Organization",
+                key = "dm:device-org:view",
                 roles = {"Internal/devicemgt-user"},
-                permissions = {"/device-mgt/devices/owning-device/organization"}
-        )
+                permissions = {"/device-mgt/organization/view"}
+        ),
+        @Scope(
+                name = "Add Device Organization",
+                description = "Add Device Organization",
+                key = "dm:device-org:add",
+                roles = {"Internal/devicemgt-user"},
+                permissions = {"/device-mgt/organization/add"}
+        ),
+        @Scope(
+                name = "Modify Device Organization",
+                description = "Modify Device Organization",
+                key = "dm:device-org:modify",
+                roles = {"Internal/devicemgt-user"},
+                permissions = {"/device-mgt/organization/modify"}
+        ),
+        @Scope(
+                name = "Delete Device Organization",
+                description = "Delete Device Organization",
+                key = "dm:device-org:delete",
+                roles = {"Internal/devicemgt-user"},
+                permissions = {"/device-mgt/organization/delete"}
+        ),
 }
 )
 public interface DeviceOrganizationMgtService {
@@ -91,7 +113,6 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating the success or failure of the operation.
      */
     @POST
-    @Path("/add-device-organization")
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
@@ -101,28 +122,41 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:add")
                     })
             }
     )
     @ApiResponses(
             value = {
                     @ApiResponse(
-                            code = 200,
-                            message = "OK. \n Successfully created the device organization.",
-                            response = String.class),
-                    @ApiResponse(
                             code = 201,
-                            message = "Created. Successfully created a new resource.",
-                            response = Response.class),
+                            message = "OK. \n Successfully created the device organization.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description =
+                                                    "Date and time the resource was last modified.\n" +
+                                                            "Used by caches, or in conditional requests."),
+                            }),
                     @ApiResponse(
                             code = 400,
-                            message = "Bad Request. Invalid input data.",
-                            response = Response.class),
+                            message =
+                                    "Bad Request. \n"),
+                    @ApiResponse(
+                            code = 406,
+                            message = "Not Acceptable.\n The requested media type is not supported"),
                     @ApiResponse(
                             code = 500,
-                            message = "Internal Server Error. An error occurred while processing the request.",
-                            response = Response.class)
+                            message = "Internal Server Error. \n Server error occurred while fetching the " +
+                                    "list of supported device types.",
+                            response = ErrorResponse.class)
             })
     Response addDeviceOrganization(DeviceOrganization request);
 
@@ -135,7 +169,7 @@ public interface DeviceOrganizationMgtService {
      * @return A response containing a list of child device nodes.
      */
     @GET
-    @Path("/children")
+    @Path("children")
     @ApiOperation(
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
@@ -144,26 +178,43 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:view")
                     })
             }
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. Successfully retrieved the list of child nodes."
-            ),
-            @ApiResponse(
-                    code = 400,
-                    message = "Bad Request. Invalid input data.",
-                    response = ErrorResponse.class
-            ),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = ErrorResponse.class
-            )
-    })
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            code = 200,
+                            message = "OK. \n Successfully fetched the child devices.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description =
+                                                    "Date and time the resource was last modified.\n" +
+                                                            "Used by caches, or in conditional requests."),
+                            }
+                    ),
+                    @ApiResponse(
+                            code = 400,
+                            message =
+                                    "Bad Request. \n"),
+                    @ApiResponse(
+                            code = 406,
+                            message = "Not Acceptable.\n The requested media type is not supported"),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. \n Server error occurred while fetching the " +
+                                    "list of supported device types.",
+                            response = ErrorResponse.class)
+            })
     Response getChildrenOfDeviceNode(
             @ApiParam(value = "The ID of the parent device node.", required = true)
             @QueryParam("deviceId") int deviceId,
@@ -183,7 +234,7 @@ public interface DeviceOrganizationMgtService {
      * @return A response containing a list of parent device nodes.
      */
     @GET
-    @Path("/parents")
+    @Path("parents")
     @ApiOperation(
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
@@ -192,23 +243,43 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:view")
                     })
             }
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. Successfully retrieved the list of parent nodes."),
-            @ApiResponse(
-                    code = 400,
-                    message = "Bad Request. Invalid input data.",
-                    response = ErrorResponse.class),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = ErrorResponse.class)
-    })
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            code = 200,
+                            message = "OK. \n Successfully fetched the parent devices.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description =
+                                                    "Date and time the resource was last modified.\n" +
+                                                            "Used by caches, or in conditional requests."),
+                            }
+                    ),
+                    @ApiResponse(
+                            code = 400,
+                            message =
+                                    "Bad Request. \n"),
+                    @ApiResponse(
+                            code = 406,
+                            message = "Not Acceptable.\n The requested media type is not supported"),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. \n Server error occurred while fetching the " +
+                                    "list of supported device types.",
+                            response = ErrorResponse.class)
+            })
     Response getParentsOfDeviceNode(
             @ApiParam(value = "The ID of the child device node.", required = true)
             @QueryParam("deviceId") int deviceId,
@@ -224,7 +295,6 @@ public interface DeviceOrganizationMgtService {
      * @return A response containing a list of all device organizations.
      */
     @GET
-    @Path("/all")
     @ApiOperation(
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
@@ -233,23 +303,43 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:view")
                     })
             }
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. Successfully retrieved the list of all device organizations."),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found. \n No organizations found.",
-                    response = ErrorResponse.class),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = ErrorResponse.class)
-    })
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            code = 200,
+                            message = "OK. \n Successfully fetched the all devices.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description =
+                                                    "Date and time the resource was last modified.\n" +
+                                                            "Used by caches, or in conditional requests."),
+                            }
+                    ),
+                    @ApiResponse(
+                            code = 400,
+                            message =
+                                    "Bad Request. \n"),
+                    @ApiResponse(
+                            code = 406,
+                            message = "Not Acceptable.\n The requested media type is not supported"),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. \n Server error occurred while fetching the " +
+                                    "list of supported device types.",
+                            response = ErrorResponse.class)
+            })
     Response getAllDeviceOrganizations();
 
 
@@ -257,11 +347,10 @@ public interface DeviceOrganizationMgtService {
      * Retrieves a specific device organization by its organization ID.
      *
      * @param organizationId The organization ID of the device organization to retrieve.
-     * @return A response containing the device organization with the specifi
-     * ed ID.
+     * @return A response containing the device organization with the specified ID.
      */
     @GET
-    @Path("/{organizationId}")
+    @Path("{organizationId}")
     @ApiOperation(
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
@@ -270,23 +359,43 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:view")
                     })
             }
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. Successfully retrieved the device organization by ID."),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found. The specified organization does not exist.",
-                    response = ErrorResponse.class),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = ErrorResponse.class)
-    })
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            code = 200,
+                            message = "OK. \n Successfully fetched the device organization by ID.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description =
+                                                    "Date and time the resource was last modified.\n" +
+                                                            "Used by caches, or in conditional requests."),
+                            }
+                    ),
+                    @ApiResponse(
+                            code = 400,
+                            message =
+                                    "Bad Request. \n"),
+                    @ApiResponse(
+                            code = 406,
+                            message = "Not Acceptable.\n The requested media type is not supported"),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. \n Server error occurred while fetching the " +
+                                    "list of supported device types.",
+                            response = ErrorResponse.class)
+            })
     Response getDeviceOrganizationById(@PathParam("organizationId") int organizationId);
 
 
@@ -298,7 +407,7 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating whether the organization exists or not.
      */
     @GET
-    @Path("/exists")
+    @Path("exists")
     @ApiOperation(
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
@@ -307,24 +416,43 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:view")
                     })
             }
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. The organization exists.",
-                    response = Response.class),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found. The organization does not exist.",
-                    response = Response.class),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = ErrorResponse.class)
-    })
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            code = 200,
+                            message = "OK. \n Successfull. The device organization exists.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description =
+                                                    "Date and time the resource was last modified.\n" +
+                                                            "Used by caches, or in conditional requests."),
+                            }
+                    ),
+                    @ApiResponse(
+                            code = 400,
+                            message =
+                                    "Bad Request. \n"),
+                    @ApiResponse(
+                            code = 406,
+                            message = "Not Acceptable.\n The requested media type is not supported"),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. \n Server error occurred while fetching the " +
+                                    "list of supported device types.",
+                            response = ErrorResponse.class)
+            })
     Response isDeviceOrganizationExist(
             @QueryParam("deviceId") int deviceId,
             @QueryParam("parentDeviceId") int parentDeviceId);
@@ -338,7 +466,7 @@ public interface DeviceOrganizationMgtService {
      * @return A response containing the retrieved DeviceOrganization object, or null if not found.
      */
     @GET
-    @Path("/unique")
+    @Path("organization")
     @ApiOperation(
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
@@ -347,100 +475,46 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:view")
                     })
             }
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. The organization exists.",
-                    response = DeviceOrganization.class),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found. The specified organization does not exist."),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = ErrorResponse.class)
-    })
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            code = 200,
+                            message = "OK. \n Successfully retrieved organization details.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description =
+                                                    "Date and time the resource was last modified.\n" +
+                                                            "Used by caches, or in conditional requests."),
+                            }
+                    ),
+                    @ApiResponse(
+                            code = 400,
+                            message =
+                                    "Bad Request. \n"),
+                    @ApiResponse(
+                            code = 406,
+                            message = "Not Acceptable.\n The requested media type is not supported"),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. \n Server error occurred while fetching the " +
+                                    "list of supported device types.",
+                            response = ErrorResponse.class)
+            })
     Response getDeviceOrganizationByUniqueKey(
             @QueryParam("deviceId") int deviceId,
             @QueryParam("parentDeviceId") int parentDeviceId);
-
-    /**
-     * Checks whether a record with the specified device ID exists either in the deviceID column or
-     * parentDeviceID column in the device organization table.
-     *
-     * @param deviceId The ID of the device to check.
-     * @return A response indicating whether the device exists or not.
-     */
-    @GET
-    @Path("/device-exists")
-    @ApiOperation(
-            produces = MediaType.APPLICATION_JSON,
-            httpMethod = "GET",
-            value = "Check if Device ID Exists in Device Organization",
-            notes = "Checks whether a record with the specified device ID exists in the device organization table.",
-            tags = "Device Organization Management",
-            extensions = {
-                    @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
-                    })
-            }
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. The device exists in the device organization."),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found. The device does not exist in the device organization."),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = ErrorResponse.class)
-    })
-    Response doesDeviceIdExist(
-            @ApiParam(value = "The ID of the device to check.", required = true)
-            @QueryParam("deviceId") int deviceId);
-
-    /**
-     * Checks if a child device with the specified device ID already exists.
-     *
-     * @param deviceID The ID of the child device to check.
-     * @return A response indicating whether the child device exists or not.
-     */
-    @GET
-    @Path("/child-exists")
-    @ApiOperation(
-            produces = MediaType.APPLICATION_JSON,
-            httpMethod = "GET",
-            value = "Check if Child Device ID Exists in Device Organization",
-            notes = "Checks whether a child device with the specified device ID exists in the device organization.",
-            tags = "Device Organization Management",
-            extensions = {
-                    @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
-                    })
-            }
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. The child device exists in the device organization."),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found. The child device does not exist in the device organization."),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = ErrorResponse.class)
-    })
-    Response isChildDeviceIdExist(
-            @ApiParam(value = "The ID of the child device to check.", required = true)
-            @QueryParam("deviceID") int deviceID);
-
 
     /**
      * Updates a device organization.
@@ -449,7 +523,6 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating the success or failure of the operation.
      */
     @PUT
-    @Path("/update")
     @ApiOperation(
             consumes = MediaType.APPLICATION_JSON,
             produces = MediaType.APPLICATION_JSON,
@@ -459,28 +532,46 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:modify")
                     })
             }
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. Successfully updated the device organization.",
-                    response = Response.class),
-            @ApiResponse(
-                    code = 400,
-                    message = "Bad Request. Invalid input data.",
-                    response = Response.class),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found. The specified device organization does not exist.",
-                    response = Response.class),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = Response.class)
-    })
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            code = 200,
+                            message = "OK. \n Successfully updated device organization.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description = "Date and time the resource was last modified.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                            }),
+                    @ApiResponse(
+                            code = 304,
+                            message = "Not Modified. Empty body because the client already has the latest version" +
+                                    " of the requested resource.\n"),
+                    @ApiResponse(
+                            code = 400,
+                            message = "Bad Request. \n Invalid request or validation error.",
+                            response = ErrorResponse.class),
+                    @ApiResponse(
+                            code = 404,
+                            message = "Not Found. \n A deviceType with the specified device type was not found.",
+                            response = ErrorResponse.class),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. \n " +
+                                    "Server error occurred while retrieving the device details.",
+                            response = ErrorResponse.class)
+            })
     Response updateDeviceOrganization(
             @ApiParam(value = "The updated device organization.", required = true)
             DeviceOrganization deviceOrganization);
@@ -493,7 +584,7 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating the success or failure of the operation.
      */
     @DELETE
-    @Path("/delete/{organizationId}")
+    @Path("{organizationId}")
     @ApiOperation(
             httpMethod = "DELETE",
             value = "Delete a Device Organization",
@@ -501,24 +592,46 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:delete")
                     })
             }
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. Successfully deleted the device organization.",
-                    response = Response.class),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found. The specified device organization does not exist.",
-                    response = Response.class),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = Response.class)
-    })
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            code = 200,
+                            message = "OK. \n Successfully deleted the device organization.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description = "Date and time the resource was last modified.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                            }),
+                    @ApiResponse(
+                            code = 304,
+                            message = "Not Modified. Empty body because the client already has the latest version" +
+                                    " of the requested resource.\n"),
+                    @ApiResponse(
+                            code = 400,
+                            message = "Bad Request. \n Invalid request or validation error.",
+                            response = ErrorResponse.class),
+                    @ApiResponse(
+                            code = 404,
+                            message = "Not Found. \n A deviceType with the specified device type was not found.",
+                            response = ErrorResponse.class),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. \n " +
+                                    "Server error occurred while retrieving the device details.",
+                            response = ErrorResponse.class)
+            })
     Response deleteDeviceOrganizationById(
             @ApiParam(value = "The organization ID of the device organization to delete.", required = true)
             @PathParam("organizationId") int organizationId);
@@ -532,7 +645,7 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating the success or failure of the operation.
      */
     @DELETE
-    @Path("/delete-associations/{deviceId}")
+    @Path("associations/{deviceId}")
     @ApiOperation(
             httpMethod = "DELETE",
             value = "Delete Device Associations",
@@ -540,24 +653,46 @@ public interface DeviceOrganizationMgtService {
             tags = "Device Organization Management",
             extensions = {
                     @Extension(properties = {
-                            @ExtensionProperty(name = SCOPE, value = "dm:device-organization")
+                            @ExtensionProperty(name = SCOPE, value = "dm:device-org:delete")
                     })
             }
     )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    code = 200,
-                    message = "OK. Successfully deleted the device associations.",
-                    response = Response.class),
-            @ApiResponse(
-                    code = 404,
-                    message = "Not Found. No associations found for the specified device ID.",
-                    response = Response.class),
-            @ApiResponse(
-                    code = 500,
-                    message = "Internal Server Error. An error occurred while processing the request.",
-                    response = Response.class)
-    })
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            code = 200,
+                            message = "OK. \n Successfully deleted device organizations.",
+                            responseHeaders = {
+                                    @ResponseHeader(
+                                            name = "Content-Type",
+                                            description = "The content type of the body"),
+                                    @ResponseHeader(
+                                            name = "ETag",
+                                            description = "Entity Tag of the response resource.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                                    @ResponseHeader(
+                                            name = "Last-Modified",
+                                            description = "Date and time the resource was last modified.\n" +
+                                                    "Used by caches, or in conditional requests."),
+                            }),
+                    @ApiResponse(
+                            code = 304,
+                            message = "Not Modified. Empty body because the client already has the latest version" +
+                                    " of the requested resource.\n"),
+                    @ApiResponse(
+                            code = 400,
+                            message = "Bad Request. \n Invalid request or validation error.",
+                            response = ErrorResponse.class),
+                    @ApiResponse(
+                            code = 404,
+                            message = "Not Found. \n A deviceType with the specified device type was not found.",
+                            response = ErrorResponse.class),
+                    @ApiResponse(
+                            code = 500,
+                            message = "Internal Server Error. \n " +
+                                    "Server error occurred while retrieving the device details.",
+                            response = ErrorResponse.class)
+            })
     Response deleteDeviceAssociations(
             @ApiParam(value = "The ID of the device for which associations should be deleted.", required = true)
             @PathParam("deviceId") int deviceId);

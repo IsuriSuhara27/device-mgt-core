@@ -29,7 +29,7 @@
             <ref bean="swaggerResource"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-<!--            <ref bean="jsonProvider"/>-->
+            <ref bean="jsonProvider"/>
             <ref bean="swaggerWriter"/>
         </jaxrs:providers>
     </jaxrs:server>
@@ -44,8 +44,8 @@
         <property name="version" value="1.0"/>
         <property name="host" value="localhost:9443"/>
         <property name="schemes" value="https" />
-        <property name="basePath" value="/api/device-mgt/v1.0"/>
-        <property name="title" value="Device Management Admin Service API Definitions"/>
+        <property name="basePath" value="/api/device-org/v1.0"/>
+        <property name="title" value="Device Organization Management Service API Definitions"/>
         <property name="contact" value="dev@entgra.io"/>
         <property name="license" value="Apache 2.0"/>
         <property name="licenseUrl" value="http://www.apache.org/licenses/LICENSE-2.0.html"/>
@@ -54,6 +54,7 @@
 
 
     <bean id="deviceOrganizationMgtService" class="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.DeviceOrganizationMgtServiceImpl"/>
+    <bean id="jsonProvider" class="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.beans.GsonMessageBodyHandler"/>
 
     <cxf:bus>
         <cxf:inInterceptors>

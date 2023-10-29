@@ -51,7 +51,7 @@ public class APIUtil {
     private static final String DEFAULT_ENTERPRISE_TAG= "androidforwork";
     private static final String DEFAULT_ANALYTICS_MGT_TAG= "analytics_management";
 
-    private static final String DEFAULT_DEVICE_ORGANIZATION_MGT_TAG= "deviceOrganization_management";
+    private static final String DEFAULT_DEVICE_ORGANIZATION_MGT_TAG= "device_organization_management";
 
     public static final String PERMISSION_PROPERTY_NAME = "name";
 

@@ -22,7 +22,7 @@
     <parent>
         <artifactId>device-mgt-extensions</artifactId>
         <groupId>io.entgra.device.mgt.core</groupId>
-        <version>5.0.31-SNAPSHOT</version>
+        <version>5.0.32-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -46,7 +46,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>WEB-INF/lib/*cxf*.jar</packagingExcludes>
-                    <warName>api#deviceOrganization-mgt-v1.0</warName>
+                    <warName>api#device-org#v1.0</warName>
                 </configuration>
             </plugin>
             <plugin>
@@ -98,7 +98,7 @@
                                     <tasks>
                                         <copy todir="${basedir}/../../../repository/deployment/server/webapps" overwrite="true">
                                             <fileset dir="${basedir}/target">
-                                                <include name="api#deviceOrganization-mgt-v1.0.war" />
+                                                <include name="api#device-org#v1.0.war" />
                                             </fileset>
                                         </copy>
                                     </tasks>

@@ -22,7 +22,7 @@
     <parent>
         <groupId>io.entgra.device.mgt.core</groupId>
         <artifactId>device-mgt-extensions-feature</artifactId>
-        <version>5.0.31-SNAPSHOT</version>
+        <version>5.0.32-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -56,7 +56,7 @@
                                     <outputDirectory>
                                         ${project.build.directory}/maven-shared-archive-resources/webapps
                                     </outputDirectory>
-                                    <destFileName>api#deviceOrganization-mgt-v1.0.war</destFileName>
+                                    <destFileName>api#device-org#v1.0.war</destFileName>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
