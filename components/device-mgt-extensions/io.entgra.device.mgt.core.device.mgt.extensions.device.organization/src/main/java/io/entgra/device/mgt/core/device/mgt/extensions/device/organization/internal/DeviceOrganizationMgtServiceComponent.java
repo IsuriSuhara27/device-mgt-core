@@ -31,31 +31,30 @@ import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
-///**
-// * @scr.component name="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal.DeviceOrganizationMgtServiceComponent" immediate="true"
-// * @scr.reference name="org.wso2.carbon.device.manager"
-// * interface="io.entgra.device.mgt.core.device.mgt.core.service.DeviceManagementProviderService"
-// * cardinality="1..1"
-// * policy="dynamic"
-// * bind="setDeviceManagementService"
-// * unbind="unsetDeviceManagementService"
-// * @scr.reference name="org.wso2.carbon.ndatasource"
-// * interface="org.wso2.carbon.ndatasource.core.DataSourceService"
-// * cardinality="1..1"
-// * policy="dynamic"
-// * bind="setDataSourceService"
-// * unbind="unsetDataSourceService"
-// * @scr.reference name="registry.service"
-// * interface="org.wso2.carbon.registry.core.service.RegistryService"
-// * cardinality="0..1"
-// * policy="dynamic"
-// * bind="setRegistryService"
-// * unbind="unsetRegistryService"
-// */
+/**
+ * @scr.component name="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal.DeviceOrganizationMgtServiceComponent"
+ * immediate="true"
+ * @scr.reference name="org.wso2.carbon.ndatasource"
+ * interface="org.wso2.carbon.ndatasource.core.DataSourceService"
+ * cardinality="1..1"
+ * policy="dynamic"
+ * bind="setDataSourceService"
+ * unbind="unsetDataSourceService"
+ * @scr.reference name="registry.service"
+ * interface="org.wso2.carbon.registry.core.service.RegistryService"
+ * cardinality="0..1"
+ * policy="dynamic"
+ * bind="setRegistryService"
+ * unbind="unsetRegistryService"
+ */
 public class DeviceOrganizationMgtServiceComponent {
 
     private static final Log log = LogFactory.getLog(DeviceOrganizationMgtServiceComponent.class);
 
+    /**
+     *
+     * @param componentContext
+     */
     protected void activate(ComponentContext componentContext) {
 
         if (log.isDebugEnabled()) {
@@ -80,13 +79,20 @@ public class DeviceOrganizationMgtServiceComponent {
         }
     }
 
+    /**
+     *
+     * @param componentContext
+     */
     protected void deactivate(ComponentContext componentContext) {
         if (log.isDebugEnabled()) {
             log.debug("De-activating Device Organization Management Service Component");
         }
     }
 
-
+    /**
+     *
+     * @param dataSourceService
+     */
     protected void setDataSourceService(DataSourceService dataSourceService) {
         /* This is to avoid mobile device management component getting initialized before the underlying datasources
         are registered */
@@ -95,6 +101,10 @@ public class DeviceOrganizationMgtServiceComponent {
         }
     }
 
+    /**
+     *
+     * @param dataSourceService
+     */
     protected void unsetDataSourceService(DataSourceService dataSourceService) {
         //do nothing
         if (log.isDebugEnabled()) {
