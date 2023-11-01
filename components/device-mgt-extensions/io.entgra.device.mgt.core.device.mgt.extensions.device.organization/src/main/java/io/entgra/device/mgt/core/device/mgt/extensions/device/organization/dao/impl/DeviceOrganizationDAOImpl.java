@@ -26,8 +26,18 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.excep
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.getDeviceFromResultSet;
 import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.loadDeviceOrganization;
@@ -255,7 +265,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 if (deviceOrganization.getParentDeviceId() != null) {
                     stmt.setInt(2, deviceOrganization.getParentDeviceId());
                 } else {
-                    stmt.setNull(2, Types.INTEGER);
+                    stmt.setNull(2, java.sql.Types.INTEGER);
                 }
                 if (deviceOrganization.getDeviceOrganizationMeta() != null) {
                     stmt.setString(3, deviceOrganization.getDeviceOrganizationMeta());
@@ -297,7 +307,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 if (parentDeviceId != null) {
                     stmt.setInt(2, parentDeviceId);
                 } else {
-                    stmt.setInt(2, Types.NULL);
+                    stmt.setNull(2, java.sql.Types.INTEGER);
                 }
 
                 try (ResultSet rs = stmt.executeQuery()) {

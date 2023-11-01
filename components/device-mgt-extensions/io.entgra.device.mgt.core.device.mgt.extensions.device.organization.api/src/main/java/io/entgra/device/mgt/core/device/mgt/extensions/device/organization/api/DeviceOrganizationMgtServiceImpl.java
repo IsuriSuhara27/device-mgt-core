@@ -55,7 +55,11 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             return Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
         }
         try {
-            if (deviceOrganizationRequest.getDeviceId() <= 0 || deviceOrganizationRequest.getParentDeviceId() <= 0) {
+            if (
+                    deviceOrganizationRequest.getDeviceId() <= 0 ||
+                            !(deviceOrganizationRequest.getParentDeviceId() == null ||
+                                    deviceOrganizationRequest.getParentDeviceId() >= 0)
+            ) {
                 String errorMessage = "The payload of the device organization is incorrect.";
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
             }
@@ -133,7 +137,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
     @Path("exists")
     public Response isDeviceOrganizationExist(
             @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") int parentDeviceId) {
+            @QueryParam("parentDeviceId") Integer parentDeviceId) {
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             boolean exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId, parentDeviceId);
@@ -149,7 +153,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
     @Path("organization")
     public Response getDeviceOrganizationByUniqueKey(
             @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") int parentDeviceId) {
+            @QueryParam("parentDeviceId") Integer parentDeviceId) {
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceId, parentDeviceId);

@@ -20,6 +20,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao;
 import io.entgra.device.mgt.core.device.mgt.core.config.datasource.DataSourceConfig;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.impl.DeviceOrganizationDAOImpl;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.UnsupportedDatabaseEngineException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,6 +47,16 @@ public class DeviceOrganizationDAOFactory {
         databaseEngine = ConnectionManagerUtil.getDatabaseType();
     }
 
+    public static final class DataBaseTypes {
+        private DataBaseTypes() {
+        }
+        public static final String DB_TYPE_MYSQL = "MySQL";
+        public static final String DB_TYPE_ORACLE = "Oracle";
+        public static final String DB_TYPE_MSSQL = "Microsoft SQL Server";
+        public static final String DB_TYPE_H2 = "H2";
+        public static final String DB_TYPE_POSTGRESQL = "PostgreSQL";
+    }
+
     /**
      * Retrieves a DeviceOrganizationDAO implementation based on the configured database engine.
      *
@@ -53,12 +64,19 @@ public class DeviceOrganizationDAOFactory {
      */
     public static DeviceOrganizationDAO getDeviceOrganizationDAO() {
         if (databaseEngine != null) {
-            //noinspection SwitchStatementWithTooFewBranches
             switch (databaseEngine) {
-                default:
+                case DataBaseTypes.DB_TYPE_H2:
+                case DataBaseTypes.DB_TYPE_MYSQL:
+                case DataBaseTypes.DB_TYPE_POSTGRESQL:
+                case DataBaseTypes.DB_TYPE_MSSQL:
+                case DataBaseTypes.DB_TYPE_ORACLE:
                     return new DeviceOrganizationDAOImpl();
+                default:
+                    throw new UnsupportedDatabaseEngineException("Unsupported database engine : " + databaseEngine);
             }
         }
         throw new IllegalStateException("Database engine has not initialized properly.");
     }
 }
+
+

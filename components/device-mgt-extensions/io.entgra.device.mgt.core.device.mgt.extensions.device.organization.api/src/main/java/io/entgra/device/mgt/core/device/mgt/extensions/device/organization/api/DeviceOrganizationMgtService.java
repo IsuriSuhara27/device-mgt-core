@@ -455,7 +455,7 @@ public interface DeviceOrganizationMgtService {
             })
     Response isDeviceOrganizationExist(
             @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") int parentDeviceId);
+            @QueryParam("parentDeviceId") Integer parentDeviceId);
 
 
     /**
@@ -504,6 +504,10 @@ public interface DeviceOrganizationMgtService {
                             message =
                                     "Bad Request. \n"),
                     @ApiResponse(
+                            code = 404,
+                            message =
+                                    "Not Found. \n"),
+                    @ApiResponse(
                             code = 406,
                             message = "Not Acceptable.\n The requested media type is not supported"),
                     @ApiResponse(
@@ -514,7 +518,7 @@ public interface DeviceOrganizationMgtService {
             })
     Response getDeviceOrganizationByUniqueKey(
             @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") int parentDeviceId);
+            @QueryParam("parentDeviceId") Integer parentDeviceId);
 
     /**
      * Updates a device organization.

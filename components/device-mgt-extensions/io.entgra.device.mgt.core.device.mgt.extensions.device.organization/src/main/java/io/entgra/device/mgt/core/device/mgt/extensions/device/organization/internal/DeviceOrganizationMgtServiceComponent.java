@@ -21,6 +21,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.inte
 import io.entgra.device.mgt.core.device.mgt.core.config.DeviceConfigurationManager;
 import io.entgra.device.mgt.core.device.mgt.core.config.DeviceManagementConfig;
 import io.entgra.device.mgt.core.device.mgt.core.config.datasource.DataSourceConfig;
+import io.entgra.device.mgt.core.device.mgt.core.service.DeviceManagementProviderService;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAOFactory;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.impl.DeviceOrganizationServiceImpl;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi.DeviceOrganizationService;
@@ -32,8 +33,13 @@ import org.wso2.carbon.ndatasource.core.DataSourceService;
 import org.wso2.carbon.registry.core.service.RegistryService;
 
 /**
- * @scr.component name="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal.DeviceOrganizationMgtServiceComponent"
- * immediate="true"
+ * @scr.component name="io.entgra.device.mgt.core.device.mgt.extensions.device.organization.internal.DeviceOrganizationMgtServiceComponent" immediate="true"
+ * @scr.reference name="org.wso2.carbon.device.manager"
+ * interface="io.entgra.device.mgt.core.device.mgt.core.service.DeviceManagementProviderService"
+ * cardinality="1..1"
+ * policy="dynamic"
+ * bind="setDeviceManagementService"
+ * unbind="unsetDeviceManagementService"
  * @scr.reference name="org.wso2.carbon.ndatasource"
  * interface="org.wso2.carbon.ndatasource.core.DataSourceService"
  * cardinality="1..1"
@@ -52,7 +58,6 @@ public class DeviceOrganizationMgtServiceComponent {
     private static final Log log = LogFactory.getLog(DeviceOrganizationMgtServiceComponent.class);
 
     /**
-     *
      * @param componentContext
      */
     protected void activate(ComponentContext componentContext) {
@@ -80,7 +85,6 @@ public class DeviceOrganizationMgtServiceComponent {
     }
 
     /**
-     *
      * @param componentContext
      */
     protected void deactivate(ComponentContext componentContext) {
@@ -89,8 +93,23 @@ public class DeviceOrganizationMgtServiceComponent {
         }
     }
 
+    @SuppressWarnings("unused")
+    protected void setDeviceManagementService(DeviceManagementProviderService deviceManagementProviderService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Setting Device Management Service to Device Organization Mgt SC");
+        }
+        DeviceOrganizationMgtDataHolder.getInstance().setDeviceManagementProviderService(deviceManagementProviderService);
+    }
+
+    @SuppressWarnings("unused")
+    protected void unsetDeviceManagementService(DeviceManagementProviderService deviceManagementService) {
+        if (log.isDebugEnabled()) {
+            log.debug("Removing Device Management Service from Device Organization Mgt SC");
+        }
+        DeviceOrganizationMgtDataHolder.getInstance().setDeviceManagementProviderService(null);
+    }
+
     /**
-     *
      * @param dataSourceService
      */
     protected void setDataSourceService(DataSourceService dataSourceService) {
@@ -102,7 +121,6 @@ public class DeviceOrganizationMgtServiceComponent {
     }
 
     /**
-     *
      * @param dataSourceService
      */
     protected void unsetDataSourceService(DataSourceService dataSourceService) {
