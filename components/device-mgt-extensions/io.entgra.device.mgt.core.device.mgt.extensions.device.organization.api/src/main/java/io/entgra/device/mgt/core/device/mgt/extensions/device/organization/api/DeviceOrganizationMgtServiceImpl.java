@@ -137,10 +137,16 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
     @Path("exists")
     public Response isDeviceOrganizationExist(
             @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") Integer parentDeviceId) {
+            @QueryParam("parentDeviceId") String parentDeviceId) {
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
-            boolean exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId, parentDeviceId);
+            boolean exists;
+            if (parentDeviceId.equals("null")) {
+                log.info("inside if");
+                exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId,  null);
+            } else {
+                exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId,  Integer.valueOf(parentDeviceId));
+            }
             return Response.status(Response.Status.OK).entity(exists).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -153,10 +159,15 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
     @Path("organization")
     public Response getDeviceOrganizationByUniqueKey(
             @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") Integer parentDeviceId) {
+            @QueryParam("parentDeviceId") String parentDeviceId) {
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
-            DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceId, parentDeviceId);
+            DeviceOrganization organization;
+            if (parentDeviceId.equals("null")) {
+                organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceId,  null);
+            } else {
+                organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceId,  Integer.valueOf(parentDeviceId));
+            }
             return Response.status(Response.Status.OK).entity(organization).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();

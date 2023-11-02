@@ -15,10 +15,10 @@ public class DeviceOrgAPIUtils {
     private static final Log log = LogFactory.getLog(DeviceOrgAPIUtils.class);
 
     /**
-     * Initializing and accessing method for WhiteLabelManagementService.
+     * Initializing and accessing method for DeviceOrganizationService.
      *
-     * @return WhiteLabelManagementService instance
-     * @throws IllegalStateException if whiteLabelManagementService cannot be initialized
+     * @return DeviceOrganizationService instance
+     * @throws IllegalStateException if deviceOrganizationService cannot be initialized
      */
     public static DeviceOrganizationService getDeviceOrganizationService() {
         if (deviceOrganizationService == null) {
@@ -28,7 +28,7 @@ public class DeviceOrgAPIUtils {
                     deviceOrganizationService = (DeviceOrganizationService) ctx.getOSGiService(
                             DeviceOrganizationService.class, null);
                     if (deviceOrganizationService == null) {
-                        throw new IllegalStateException("Whitelabel Management service not initialized.");
+                        throw new IllegalStateException("Device Organization Management service not initialized.");
                     }
                 }
             }

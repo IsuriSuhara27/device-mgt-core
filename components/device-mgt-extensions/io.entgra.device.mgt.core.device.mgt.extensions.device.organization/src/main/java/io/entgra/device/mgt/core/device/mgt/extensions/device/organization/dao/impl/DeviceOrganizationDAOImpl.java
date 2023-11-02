@@ -296,18 +296,21 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     public boolean isDeviceOrganizationExist(int deviceId, Integer parentDeviceId)
             throws DeviceOrganizationMgtDAOException {
         try {
+            String sql;
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String sql = "SELECT 1 " +
-                    "FROM DM_DEVICE_ORGANIZATION DO " +
-                    "WHERE (DO.DEVICE_ID = ? AND DO.PARENT_DEVICE_ID = ?) " +
-                    "LIMIT 1";
+
+            if (parentDeviceId != null) {
+                // If parentDeviceId is not null, use it in the query.
+                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
+            } else {
+                // If parentDeviceId is null, use a query that checks for null values.
+                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID IS NULL";
+            }
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, deviceId);
                 if (parentDeviceId != null) {
                     stmt.setInt(2, parentDeviceId);
-                } else {
-                    stmt.setNull(2, java.sql.Types.INTEGER);
                 }
 
                 try (ResultSet rs = stmt.executeQuery()) {

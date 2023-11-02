@@ -454,8 +454,10 @@ public interface DeviceOrganizationMgtService {
                             response = ErrorResponse.class)
             })
     Response isDeviceOrganizationExist(
+            @ApiParam(value = "The ID of the child device.", required = true)
             @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") Integer parentDeviceId);
+            @ApiParam(value = "The ID of the parent device.")
+            @QueryParam("parentDeviceId") String parentDeviceId);
 
 
     /**
@@ -517,8 +519,10 @@ public interface DeviceOrganizationMgtService {
                             response = ErrorResponse.class)
             })
     Response getDeviceOrganizationByUniqueKey(
+            @ApiParam(value = "The ID of the child device.", required = true)
             @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") Integer parentDeviceId);
+            @ApiParam(value = "The ID of the parent device.")
+            @QueryParam("parentDeviceId") String parentDeviceId);
 
     /**
      * Updates a device organization.
