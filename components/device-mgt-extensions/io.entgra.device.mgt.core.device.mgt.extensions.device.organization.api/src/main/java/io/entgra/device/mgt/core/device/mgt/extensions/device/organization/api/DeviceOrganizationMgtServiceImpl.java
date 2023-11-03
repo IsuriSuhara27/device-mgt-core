@@ -142,7 +142,6 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             boolean exists;
             if (parentDeviceId.equals("null")) {
-                log.info("inside if");
                 exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId,  null);
             } else {
                 exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId,  Integer.valueOf(parentDeviceId));

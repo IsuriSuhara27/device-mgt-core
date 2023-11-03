@@ -113,8 +113,6 @@ public class DeviceOrganizationMgtServiceComponent {
      * @param dataSourceService
      */
     protected void setDataSourceService(DataSourceService dataSourceService) {
-        /* This is to avoid mobile device management component getting initialized before the underlying datasources
-        are registered */
         if (log.isDebugEnabled()) {
             log.debug("Data source service set to Device Organization Mgt component");
         }

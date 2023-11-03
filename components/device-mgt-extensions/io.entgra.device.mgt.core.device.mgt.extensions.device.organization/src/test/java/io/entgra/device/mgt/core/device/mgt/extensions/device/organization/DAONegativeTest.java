@@ -2,15 +2,10 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization;
 
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAO;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAOFactory;
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.mock.BaseDeviceOrganizationTest;
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 public class DAONegativeTest extends BaseDeviceOrganizationTest {
 

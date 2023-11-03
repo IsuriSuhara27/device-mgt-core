@@ -31,7 +31,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -300,10 +299,8 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             Connection conn = ConnectionManagerUtil.getDBConnection();
 
             if (parentDeviceId != null) {
-                // If parentDeviceId is not null, use it in the query.
                 sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
             } else {
-                // If parentDeviceId is null, use a query that checks for null values.
                 sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID IS NULL";
             }
 
@@ -340,10 +337,8 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             Connection conn = ConnectionManagerUtil.getDBConnection();
 
             if (parentDeviceId != null) {
-                // If parentDeviceId is not null, use it in the query.
                 sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
             } else {
-                // If parentDeviceId is null, use a query that checks for null values.
                 sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID IS NULL";
             }
 

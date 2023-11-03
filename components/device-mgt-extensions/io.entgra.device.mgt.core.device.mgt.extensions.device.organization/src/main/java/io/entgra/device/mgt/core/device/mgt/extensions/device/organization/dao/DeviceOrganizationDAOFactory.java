@@ -50,6 +50,7 @@ public class DeviceOrganizationDAOFactory {
     public static final class DataBaseTypes {
         private DataBaseTypes() {
         }
+
         public static final String DB_TYPE_MYSQL = "MySQL";
         public static final String DB_TYPE_ORACLE = "Oracle";
         public static final String DB_TYPE_MSSQL = "Microsoft SQL Server";

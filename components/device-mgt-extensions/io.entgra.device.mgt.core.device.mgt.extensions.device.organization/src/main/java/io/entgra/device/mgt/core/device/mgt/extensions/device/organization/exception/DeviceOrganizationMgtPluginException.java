@@ -48,8 +48,8 @@ public class DeviceOrganizationMgtPluginException extends Exception {
     /**
      * Constructs a new `DeviceOrganizationMgtPluginException` with a specified detail message and a nested exception.
      *
-     * @param msg       The detail message that describes the exception.
-     * @param nestedEx  The nested exception.
+     * @param msg      The detail message that describes the exception.
+     * @param nestedEx The nested exception.
      */
     public DeviceOrganizationMgtPluginException(String msg, Exception nestedEx) {
         super(msg, nestedEx);

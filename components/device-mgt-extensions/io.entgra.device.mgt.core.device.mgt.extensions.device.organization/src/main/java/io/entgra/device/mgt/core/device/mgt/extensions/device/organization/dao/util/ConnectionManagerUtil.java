@@ -100,7 +100,7 @@ public class ConnectionManagerUtil {
     /**
      * Ends the current database transaction by setting auto-commit mode to true.
      *
-     * @throws DBConnectionException If an error occurs while ending the transaction.
+     * @throws DBConnectionException            If an error occurs while ending the transaction.
      * @throws IllegalTransactionStateException If there is no active transaction to end.
      */
     public static void endDBTransaction() throws DBConnectionException {
@@ -248,8 +248,8 @@ public class ConnectionManagerUtil {
     /**
      * Lookup a data source using the given data source name and JNDI properties.
      *
-     * @param dataSourceName  The JNDI name of the data source to lookup.
-     * @param jndiProperties  Optional JNDI properties used for the lookup.
+     * @param dataSourceName The JNDI name of the data source to lookup.
+     * @param jndiProperties Optional JNDI properties used for the lookup.
      * @return A data source object representing the looked-up data source.
      * @throws RuntimeException If an error occurs during the lookup process.
      */
@@ -273,7 +273,7 @@ public class ConnectionManagerUtil {
      * Get the name of the database product to which the current connection belongs.
      *
      * @return A string representing the name of the database product.
-     *         Returns null if an error occurs during the retrieval process.
+     * Returns null if an error occurs during the retrieval process.
      */
     public static String getDatabaseType() {
         try {

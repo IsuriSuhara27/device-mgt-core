@@ -47,8 +47,8 @@ public class DeviceOrganizationMgtDAOException extends Exception {
     /**
      * Constructs a new `DeviceOrganizationMgtDAOException` with a specified detail message and a nested exception.
      *
-     * @param msg       The detail message that describes the exception.
-     * @param nestedEx  The nested exception.
+     * @param msg      The detail message that describes the exception.
+     * @param nestedEx The nested exception.
      */
     public DeviceOrganizationMgtDAOException(String msg, Exception nestedEx) {
         super(msg, nestedEx);

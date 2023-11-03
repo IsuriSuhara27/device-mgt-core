@@ -31,8 +31,8 @@ public interface DeviceOrganizationDAO {
     /**
      * Retrieves child devices per particular device ID
      *
-     * @param node The device node for which child devices are retrieved.
-     * @param maxDepth The maximum depth to traverse when fetching child devices.
+     * @param node          The device node for which child devices are retrieved.
+     * @param maxDepth      The maximum depth to traverse when fetching child devices.
      * @param includeDevice Flag to indicate whether to include the parent device in the result.
      * @return A list of child device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving child devices.
@@ -42,8 +42,8 @@ public interface DeviceOrganizationDAO {
     /**
      * Retrieves parent devices for a given device node.
      *
-     * @param node The device node for which parent devices are retrieved.
-     * @param maxDepth The maximum depth to traverse when fetching parent devices.
+     * @param node          The device node for which parent devices are retrieved.
+     * @param maxDepth      The maximum depth to traverse when fetching parent devices.
      * @param includeDevice Flag to indicate whether to include the current device node in the result.
      * @return A list of parent device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving parent devices.
@@ -80,7 +80,7 @@ public interface DeviceOrganizationDAO {
     /**
      * Get a device organization by the CHILD_PARENT_COMP_KEY unique key.
      *
-     * @param deviceId      The ID of the child device.
+     * @param deviceId       The ID of the child device.
      * @param parentDeviceId The ID of the parent device.
      * @return The DeviceOrganization object if found, null otherwise.
      * @throws DeviceOrganizationMgtDAOException if an error occurs while accessing the database.
