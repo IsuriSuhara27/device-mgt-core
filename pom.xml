@@ -68,9 +68,9 @@
         <module>features/subtype-mgt</module>
         <module>features/tenant-mgt</module>
         <module>features/operation-template-mgt-plugin-feature</module>
-        <module>
-            components/device-mgt-extensions/io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api
-        </module>
+<!--        <module>-->
+<!--            components/device-mgt-extensions/io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api-->
+<!--        </module>-->
 
     </modules>
 
@@ -1677,6 +1677,16 @@
             <dependency>
                 <groupId>io.entgra.device.mgt.core</groupId>
                 <artifactId>io.entgra.device.mgt.core.device.mgt.extensions.pull.notification</artifactId>
+                <version>${io.entgra.device.mgt.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.entgra.device.mgt.core</groupId>
+                <artifactId>io.entgra.device.mgt.core.device.mgt.extensions.device.organization</artifactId>
+                <version>${io.entgra.device.mgt.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.entgra.device.mgt.core</groupId>
+                <artifactId>io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api</artifactId>
                 <version>${io.entgra.device.mgt.core.version}</version>
             </dependency>
             <dependency>
