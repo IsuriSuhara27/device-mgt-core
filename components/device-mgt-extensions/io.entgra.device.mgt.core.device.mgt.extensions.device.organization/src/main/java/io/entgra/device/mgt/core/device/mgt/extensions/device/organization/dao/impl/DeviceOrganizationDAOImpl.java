@@ -21,6 +21,7 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.D
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
 import org.apache.commons.logging.Log;
@@ -243,6 +244,73 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             throw new DeviceOrganizationMgtDAOException(msg, e);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request) throws DeviceOrganizationMgtDAOException {
+        List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
+        try {
+            Connection conn = ConnectionManagerUtil.getDBConnection();
+            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE PARENT_DEVICE_ID IS NULL " +
+                    "LIMIT ? OFFSET ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, request.getLimit());
+                stmt.setInt(2, request.getOffSet());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        DeviceOrganization deviceOrganization = loadDeviceOrganization(rs);
+                        deviceOrganizations.add(deviceOrganization);
+                    }
+                }
+            }
+            return deviceOrganizations;
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining DB connection to retrieving device organization root details.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        } catch (SQLException e) {
+            String msg = "Error occurred while processing SQL to retrieving device organization roots.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request) throws DeviceOrganizationMgtDAOException {
+        List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
+        try {
+            Connection conn = ConnectionManagerUtil.getDBConnection();
+            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE ID NOT IN (SELECT DISTINCT PARENT_DEVICE_ID " +
+                    "FROM DM_DEVICE_ORGANIZATION WHERE PARENT_DEVICE_ID IS NOT NULL) " +
+                    "LIMIT ? OFFSET ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setInt(1, request.getLimit());
+                stmt.setInt(2, request.getOffSet());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        DeviceOrganization deviceOrganization = loadDeviceOrganization(rs);
+                        deviceOrganizations.add(deviceOrganization);
+                    }
+                }
+            }
+            return deviceOrganizations;
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining DB connection to retrieving all device organizations details.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        } catch (SQLException e) {
+            String msg = "Error occurred while processing SQL to retrieving all device organizations.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtDAOException(msg, e);
+        }
+    }
+
 
     /**
      * {@inheritDoc}

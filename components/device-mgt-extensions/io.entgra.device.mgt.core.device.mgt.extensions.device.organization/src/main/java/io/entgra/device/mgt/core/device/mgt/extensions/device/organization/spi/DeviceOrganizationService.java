@@ -19,6 +19,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi;
 
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
 
 import java.util.List;
@@ -69,6 +70,20 @@ public interface DeviceOrganizationService {
      * @throws DeviceOrganizationMgtPluginException If an error occurs during the operation.
      */
     List<DeviceOrganization> getAllDeviceOrganizations() throws DeviceOrganizationMgtPluginException;
+
+    /**
+     * Retrieves device Organization Leafs
+     * @return A list of leaf device organizations.
+     * @throws DeviceOrganizationMgtPluginException
+     */
+    List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request) throws DeviceOrganizationMgtPluginException;
+
+    /**
+     * Retrieves device Organization Roots
+     * @return A list of root device organizations.
+     * @throws DeviceOrganizationMgtPluginException
+     */
+    List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request) throws DeviceOrganizationMgtPluginException;
 
     /**
      * Retrieves a specific device organization by its organization ID.

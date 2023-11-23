@@ -19,6 +19,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao;
 
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
 
 import java.util.List;
@@ -57,6 +58,20 @@ public interface DeviceOrganizationDAO {
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving device organization records.
      */
     List<DeviceOrganization> getAllDeviceOrganizations() throws DeviceOrganizationMgtDAOException;
+
+    /**
+     * Retrieves device Organization Roots
+     * @return A list of root device organization records.
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    public List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request) throws DeviceOrganizationMgtDAOException;
+
+    /**
+     * Retrieves device Organization Leafs
+     * @return A list of leaf device organization records.
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    public List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Adds a new record to the device organization table.

@@ -2,6 +2,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization;
 
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.impl.DeviceOrganizationServiceImpl;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.mock.BaseDeviceOrganizationTest;
@@ -232,6 +233,40 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testGetAllOrganizations() throws DeviceOrganizationMgtPluginException {
         List<DeviceOrganization> organizations = deviceOrganizationService.getAllDeviceOrganizations();
+        for (DeviceOrganization organization : organizations) {
+            log.info("organizationID = " + organization.getOrganizationId());
+            log.info("deviceID = " + organization.getDeviceId());
+            log.info("parentDeviceID = " + organization.getParentDeviceId());
+            log.info("updateTime = " + organization.getUpdateTime());
+            log.info("----------------------------------------------");
+        }
+        Assert.assertNotNull(organizations, "List of organizations cannot be null");
+        Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
+    }
+
+    @Test(dependsOnMethods = "testAddDeviceOrganizationWithNullParent")
+    public void testGetRootOrganizations() throws DeviceOrganizationMgtPluginException {
+        int offset  = 0;
+        int limit = 10;
+        PaginationRequest request = new PaginationRequest(offset, limit);
+        List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationRoots(request);
+        for (DeviceOrganization organization : organizations) {
+            log.info("organizationID = " + organization.getOrganizationId());
+            log.info("deviceID = " + organization.getDeviceId());
+            log.info("parentDeviceID = " + organization.getParentDeviceId());
+            log.info("updateTime = " + organization.getUpdateTime());
+            log.info("----------------------------------------------");
+        }
+        Assert.assertNotNull(organizations, "List of organizations cannot be null");
+        Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
+    }
+
+    @Test(dependsOnMethods = "testAddDeviceOrganization")
+    public void testGetLeafOrganizations() throws DeviceOrganizationMgtPluginException {
+        int offset  = 0;
+        int limit = 10;
+        PaginationRequest request = new PaginationRequest(offset, limit);
+        List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationLeafs(request);
         for (DeviceOrganization organization : organizations) {
             log.info("organizationID = " + organization.getOrganizationId());
             log.info("deviceID = " + organization.getDeviceId());

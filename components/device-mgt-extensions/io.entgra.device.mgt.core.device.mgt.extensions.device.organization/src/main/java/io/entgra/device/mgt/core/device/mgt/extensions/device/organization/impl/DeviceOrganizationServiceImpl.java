@@ -22,6 +22,7 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.D
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.BadRequestException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
@@ -119,6 +120,52 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
             return deviceOrganizationDao.getAllDeviceOrganizations();
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining the database connection to retrieve all device organizations.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } catch (DeviceOrganizationMgtDAOException e) {
+            String msg = "Error occurred in the database level while retrieving all device organizations.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } finally {
+            // Close the database connection
+            ConnectionManagerUtil.closeDBConnection();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request) throws DeviceOrganizationMgtPluginException {
+        try {
+            // Open a database connection
+            ConnectionManagerUtil.openDBConnection();
+            return deviceOrganizationDao.getDeviceOrganizationRoots(request);
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining the database connection to retrieve all device organizations.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } catch (DeviceOrganizationMgtDAOException e) {
+            String msg = "Error occurred in the database level while retrieving all device organizations.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } finally {
+            // Close the database connection
+            ConnectionManagerUtil.closeDBConnection();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request) throws DeviceOrganizationMgtPluginException {
+        try {
+            // Open a database connection
+            ConnectionManagerUtil.openDBConnection();
+            return deviceOrganizationDao.getDeviceOrganizationLeafs(request);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve all device organizations.";
             log.error(msg);

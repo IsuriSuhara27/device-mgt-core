@@ -19,22 +19,16 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api;
 
 import com.google.gson.Gson;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.util.DeviceOrgAPIUtils;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.util.RequestValidationUtil;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi.DeviceOrganizationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -109,10 +103,32 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @GET
     @Override
-    public Response getAllDeviceOrganizations() {
+    @Path("/leafs")
+    public Response getDeviceOrganizationLeafs(
+            @QueryParam("offset") int offset,
+            @QueryParam("limit") int limit) {
+        RequestValidationUtil.validatePaginationParameters(offset, limit);
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
-            List<DeviceOrganization> organizations = deviceOrganizationService.getAllDeviceOrganizations();
+            PaginationRequest request = new PaginationRequest(offset, limit);
+            List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationLeafs(request);
+            return Response.status(Response.Status.OK).entity(organizations).build();
+        } catch (DeviceOrganizationMgtPluginException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/roots")
+    @Override
+    public Response getDeviceOrganizationRoots(
+            @QueryParam("offset") int offset,
+            @QueryParam("limit") int limit) {
+        RequestValidationUtil.validatePaginationParameters(offset, limit);
+        try {
+            DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
+            PaginationRequest request = new PaginationRequest(offset, limit);
+            List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationRoots(request);
             return Response.status(Response.Status.OK).entity(organizations).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -142,9 +158,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             boolean exists;
             if (parentDeviceId.equals("null")) {
-                exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId,  null);
+                exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId, null);
             } else {
-                exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId,  Integer.valueOf(parentDeviceId));
+                exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId, Integer.valueOf(parentDeviceId));
             }
             return Response.status(Response.Status.OK).entity(exists).build();
         } catch (DeviceOrganizationMgtPluginException e) {
@@ -163,9 +179,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             DeviceOrganization organization;
             if (parentDeviceId.equals("null")) {
-                organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceId,  null);
+                organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceId, null);
             } else {
-                organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceId,  Integer.valueOf(parentDeviceId));
+                organization = deviceOrganizationService.getDeviceOrganizationByUniqueKey(deviceId, Integer.valueOf(parentDeviceId));
             }
             return Response.status(Response.Status.OK).entity(organization).build();
         } catch (DeviceOrganizationMgtPluginException e) {
