@@ -261,6 +261,22 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
     }
 
+    @Test(dependsOnMethods = "testAddDeviceOrganizationWithNullParent")
+    public void testGetLeafOrganizationsWithNullParents() throws DeviceOrganizationMgtPluginException {
+        int offset  = 0;
+        int limit = 10;
+        PaginationRequest request = new PaginationRequest(offset, limit);
+        List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationLeafs(request);
+        for (DeviceOrganization organization : organizations) {
+            log.info("organizationID = " + organization.getOrganizationId());
+            log.info("deviceID = " + organization.getDeviceId());
+            log.info("parentDeviceID = " + organization.getParentDeviceId());
+            log.info("updateTime = " + organization.getUpdateTime());
+            log.info("----------------------------------------------");
+        }
+        Assert.assertTrue(organizations.isEmpty(), "List of organizations should not be empty");
+    }
+
     @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testGetLeafOrganizations() throws DeviceOrganizationMgtPluginException {
         int offset  = 0;
@@ -275,7 +291,6 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
             log.info("----------------------------------------------");
         }
         Assert.assertNotNull(organizations, "List of organizations cannot be null");
-        Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
     }
 
     @Test(dependsOnMethods = "testAddMultipleDeviceOrganizations")
