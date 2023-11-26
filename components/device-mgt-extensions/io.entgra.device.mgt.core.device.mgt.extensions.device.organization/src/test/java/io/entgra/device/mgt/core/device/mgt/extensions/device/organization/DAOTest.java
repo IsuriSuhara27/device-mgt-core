@@ -3,7 +3,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAO;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAOFactory;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNodeResult;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
@@ -32,26 +32,22 @@ public class DAOTest extends BaseDeviceOrganizationTest {
     @Test(dependsOnMethods = "testAddDeviceOrganizationDAO")
     public void testGetChildrenOfDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
         ConnectionManagerUtil.openDBConnection();
-        DeviceNode node = new DeviceNode();
-        node.setDeviceId(2);
+        int deviceId = 2;
         int maxDepth = 4;
         boolean includeDevice = true;
-        List<DeviceNode> childrenList = deviceOrganizationDAO.getChildrenOfDeviceNode(node, maxDepth, includeDevice);
+        DeviceNodeResult childrenList = deviceOrganizationDAO.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice);
         ConnectionManagerUtil.closeDBConnection();
-        log.info(childrenList.size());
         Assert.assertNotNull(childrenList, "Cannot be null");
     }
 
     @Test(dependsOnMethods = "testAddDeviceOrganizationDAO")
     public void testGetParentsOfDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
         ConnectionManagerUtil.openDBConnection();
-        DeviceNode node = new DeviceNode();
-        node.setDeviceId(4);
+        int deviceID = 4;
         int maxDepth = 4;
         boolean includeDevice = false;
-        List<DeviceNode> parentList = deviceOrganizationDAO.getParentsOfDeviceNode(node, maxDepth, includeDevice);
+        DeviceNodeResult parentList = deviceOrganizationDAO.getParentsOfDeviceNode(deviceID, maxDepth, includeDevice);
         ConnectionManagerUtil.closeDBConnection();
-        log.info(parentList.size());
         Assert.assertNotNull(parentList, "Cannot be null");
     }
 

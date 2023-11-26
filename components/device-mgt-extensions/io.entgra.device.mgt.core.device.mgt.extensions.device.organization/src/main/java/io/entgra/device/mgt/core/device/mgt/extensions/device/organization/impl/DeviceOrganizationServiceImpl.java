@@ -20,7 +20,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.impl
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAO;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAOFactory;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNodeResult;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.BadRequestException;
@@ -47,27 +47,28 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceNode> getChildrenOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice)
+    public DeviceNodeResult getChildrenOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException {
-        if (node == null || node.getDeviceId() <= 0 || maxDepth < 0) {
+        if (deviceId <= 0 || maxDepth < 0) {
             String msg = "Invalid input parameters for retrieving child devices : " +
-                    "deviceID = " + (node != null ? node.getDeviceId() : null) + ", maxDepth = " + maxDepth +
+                    "deviceID = " + deviceId + ", maxDepth = " + maxDepth +
                     ", includeDevice = " + includeDevice;
             throw new BadRequestException(msg);
         }
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.getChildrenOfDeviceNode(node, maxDepth, includeDevice);
+            //set device details
+            return deviceOrganizationDao.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve child devices : " +
-                    "deviceID = " + node.getDeviceId() + ", maxDepth = " + maxDepth + ", includeDevice = " +
+                    "deviceID = " + deviceId + ", maxDepth = " + maxDepth + ", includeDevice = " +
                     includeDevice;
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);
         } catch (DeviceOrganizationMgtDAOException e) {
             String msg = "Error occurred in the database level while retrieving child devices : " +
-                    "deviceID = " + node.getDeviceId() + ", maxDepth = " + maxDepth + ", includeDevice = " +
+                    "deviceID = " + deviceId + ", maxDepth = " + maxDepth + ", includeDevice = " +
                     includeDevice;
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);
@@ -81,27 +82,27 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceNode> getParentsOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice)
+    public DeviceNodeResult getParentsOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException {
-        if (node == null || node.getDeviceId() <= 0 || maxDepth <= 0) {
+        if (deviceId <= 0 || maxDepth <= 0) {
             String msg = "Invalid input parameters for retrieving parent devices. Params : " +
-                    "deviceID = " + (node != null ? node.getDeviceId() : null) + ", maxDepth = " + maxDepth +
+                    "deviceID = " + deviceId + ", maxDepth = " + maxDepth +
                     ", includeDevice = " + includeDevice;
             throw new BadRequestException(msg);
         }
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.getParentsOfDeviceNode(node, maxDepth, includeDevice);
+            return deviceOrganizationDao.getParentsOfDeviceNode(deviceId, maxDepth, includeDevice);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve parent devices for : " +
-                    "device ID = " + node.getDeviceId() + ", maxDepth = " + maxDepth + ", includeDevice = " +
+                    "device ID = " + deviceId + ", maxDepth = " + maxDepth + ", includeDevice = " +
                     includeDevice;
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);
         } catch (DeviceOrganizationMgtDAOException e) {
             String msg = "Error occurred in the database level while retrieving parent devices for : " +
-                    "device ID = " + node.getDeviceId() + ", maxDepth = " + maxDepth + ", includeDevice = " +
+                    "device ID = " + deviceId + ", maxDepth = " + maxDepth + ", includeDevice = " +
                     includeDevice;
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);

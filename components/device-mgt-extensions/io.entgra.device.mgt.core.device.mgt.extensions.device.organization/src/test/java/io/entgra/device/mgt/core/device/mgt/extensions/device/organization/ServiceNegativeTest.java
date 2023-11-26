@@ -1,6 +1,5 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization;
 
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.BadRequestException;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
@@ -25,50 +24,50 @@ public class ServiceNegativeTest extends BaseDeviceOrganizationTest {
         log.info("Service test initialized");
     }
 
-    @Test(description = "This method tests Get Children Of method under negative circumstances with null data",
+    @Test(description = "This method tests Get Children Of method under negative circumstances with negative deviceId",
             expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testGetChildrenOfWithInvalidInput() throws DeviceOrganizationMgtPluginException {
-        DeviceNode invalidNode = null;
+        int deviceId = -1;
         int maxDepth = -1;
         boolean includeDevice = true;
-        deviceOrganizationService.getChildrenOfDeviceNode(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice);
     }
 
-    @Test(description = "This method tests Get Children Of method under negative circumstances with an invalid DeviceNode",
+    @Test(description = "This method tests Get Children Of method under negative circumstances with an invalid deviceId",
             expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testGetChildrenOfWithInvalidDeviceNode() throws DeviceOrganizationMgtPluginException {
-        DeviceNode invalidNode = new DeviceNode(); // Provide an invalid DeviceNode
+        int deviceId = 0;
         int maxDepth = 2;
         boolean includeDevice = true;
-        deviceOrganizationService.getChildrenOfDeviceNode(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice);
     }
 
-    @Test(description = "This method tests Get Parents Of method under negative circumstances with null data",
+    @Test(description = "This method tests Get Parents Of method under negative circumstances with invalid data",
             expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testGetParentsOfWithInvalidInput() throws DeviceOrganizationMgtPluginException {
-        DeviceNode invalidNode = null;
+        int deviceID = 0;
         int maxDepth = -1;
         boolean includeDevice = true;
-        deviceOrganizationService.getParentsOfDeviceNode(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getParentsOfDeviceNode(deviceID, maxDepth, includeDevice);
     }
 
-    @Test(description = "This method tests Get Parents Of method under negative circumstances with an invalid DeviceNode"
+    @Test(description = "This method tests Get Parents Of method under negative circumstances with an invalid ID"
             , expectedExceptions = {DeviceOrganizationMgtPluginException.class})
     public void testGetParentsOfWithInvalidDeviceNode() throws DeviceOrganizationMgtPluginException {
-        DeviceNode invalidNode = new DeviceNode(); // Provide an invalid DeviceNode
+        int deviceID = -2;
         int maxDepth = 2;
         boolean includeDevice = true;
-        deviceOrganizationService.getParentsOfDeviceNode(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getParentsOfDeviceNode(deviceID, maxDepth, includeDevice);
     }
 
     @Test(description = "This method tests Get Parents Of method under negative circumstances with an invalid DeviceNode"
             , expectedExceptions = {DeviceOrganizationMgtPluginException.class}
     )
     public void testGetParentsOfWithNullDeviceNode() throws DeviceOrganizationMgtPluginException {
-        DeviceNode invalidNode = null; // Provide an invalid DeviceNode
+        int deviceID = -1;
         int maxDepth = 2;
         boolean includeDevice = true;
-        deviceOrganizationService.getParentsOfDeviceNode(invalidNode, maxDepth, includeDevice);
+        deviceOrganizationService.getParentsOfDeviceNode(deviceID, maxDepth, includeDevice);
     }
 
 

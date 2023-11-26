@@ -20,6 +20,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto;
 
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * This abstract class represents a device organization entity used in DeviceOrganizationService.
@@ -71,5 +72,23 @@ public class DeviceOrganization {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DeviceOrganization that = (DeviceOrganization) o;
+        // Compare fields for equality
+        return Objects.equals(organizationId, that.organizationId)
+                && Objects.equals(deviceId, that.deviceId)
+                && Objects.equals(parentDeviceId, that.parentDeviceId)
+                && Objects.equals(deviceOrganizationMeta, that.deviceOrganizationMeta);
+    }
+
+    @Override
+    public int hashCode() {
+        // Hash based on fields
+        return Objects.hash(organizationId, deviceId, parentDeviceId, deviceOrganizationMeta);
     }
 }

@@ -1,6 +1,6 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization;
 
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNodeResult;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
@@ -31,12 +31,10 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     public void testGetChildrenOf() throws DeviceOrganizationMgtPluginException {
         boolean exists = deviceOrganizationService.isDeviceIdExist(17);
         if (exists) {
-            DeviceNode deviceNode = new DeviceNode();
-            deviceNode.setDeviceId(17);
+            int deviceID = 17;
             int maxDepth = 10;
-            boolean includeDevice = true;
-            List<DeviceNode> childrenList = deviceOrganizationService.getChildrenOfDeviceNode(deviceNode, maxDepth, includeDevice);
-
+            boolean includeDevice = false;
+            DeviceNodeResult childrenList = deviceOrganizationService.getChildrenOfDeviceNode(deviceID, maxDepth, includeDevice);
             Assert.assertNotNull(childrenList, "Cannot be null");
         }
     }
@@ -45,11 +43,10 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     public void testGetParentsOf() throws DeviceOrganizationMgtPluginException {
         boolean exists = deviceOrganizationService.isChildDeviceIdExist(20);
         if (exists) {
-            DeviceNode deviceNode = new DeviceNode();
-            deviceNode.setDeviceId(20);
+            int deviceID = 20;
             int maxDepth = 3;
             boolean includeDevice = false;
-            List<DeviceNode> parentList = deviceOrganizationService.getParentsOfDeviceNode(deviceNode, maxDepth, includeDevice);
+            DeviceNodeResult parentList = deviceOrganizationService.getParentsOfDeviceNode(deviceID, maxDepth, includeDevice);
 
             Assert.assertNotNull(parentList, "Cannot be null");
         }
@@ -246,7 +243,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
     @Test(dependsOnMethods = "testAddDeviceOrganizationWithNullParent")
     public void testGetRootOrganizations() throws DeviceOrganizationMgtPluginException {
-        int offset  = 0;
+        int offset = 0;
         int limit = 10;
         PaginationRequest request = new PaginationRequest(offset, limit);
         List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationRoots(request);
@@ -263,7 +260,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
     @Test(dependsOnMethods = "testAddDeviceOrganizationWithNullParent")
     public void testGetLeafOrganizationsWithNullParents() throws DeviceOrganizationMgtPluginException {
-        int offset  = 0;
+        int offset = 0;
         int limit = 10;
         PaginationRequest request = new PaginationRequest(offset, limit);
         List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationLeafs(request);
@@ -279,7 +276,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
     @Test(dependsOnMethods = "testAddDeviceOrganization")
     public void testGetLeafOrganizations() throws DeviceOrganizationMgtPluginException {
-        int offset  = 0;
+        int offset = 0;
         int limit = 10;
         PaginationRequest request = new PaginationRequest(offset, limit);
         List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationLeafs(request);

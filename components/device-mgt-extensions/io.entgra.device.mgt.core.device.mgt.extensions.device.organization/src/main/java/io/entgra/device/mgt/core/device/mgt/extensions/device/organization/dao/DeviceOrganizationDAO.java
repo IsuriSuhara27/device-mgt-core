@@ -17,7 +17,7 @@
  */
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao;
 
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNodeResult;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtDAOException;
@@ -32,24 +32,24 @@ public interface DeviceOrganizationDAO {
     /**
      * Retrieves child devices per particular device ID
      *
-     * @param node          The device node for which child devices are retrieved.
+     * @param deviceId      The device ID for which child devices are retrieved.
      * @param maxDepth      The maximum depth to traverse when fetching child devices.
      * @param includeDevice Flag to indicate whether to include the parent device in the result.
      * @return A list of child device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving child devices.
      */
-    List<DeviceNode> getChildrenOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
+    DeviceNodeResult getChildrenOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Retrieves parent devices for a given device node.
      *
-     * @param node          The device node for which parent devices are retrieved.
+     * @param deviceId      The device ID for which parent devices are retrieved.
      * @param maxDepth      The maximum depth to traverse when fetching parent devices.
      * @param includeDevice Flag to indicate whether to include the current device node in the result.
      * @return A list of parent device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving parent devices.
      */
-    List<DeviceNode> getParentsOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
+    DeviceNodeResult getParentsOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Retrieves all device organization records.
@@ -61,6 +61,7 @@ public interface DeviceOrganizationDAO {
 
     /**
      * Retrieves device Organization Roots
+     *
      * @return A list of root device organization records.
      * @throws DeviceOrganizationMgtDAOException
      */
@@ -68,6 +69,7 @@ public interface DeviceOrganizationDAO {
 
     /**
      * Retrieves device Organization Leafs
+     *
      * @return A list of leaf device organization records.
      * @throws DeviceOrganizationMgtDAOException
      */

@@ -17,7 +17,7 @@
  */
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi;
 
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNodeResult;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
@@ -42,25 +42,25 @@ public interface DeviceOrganizationService {
     /**
      * Retrieves a list of child nodes of a given device node, up to a specified depth.
      *
-     * @param node          The parent device node.
+     * @param deviceID      The parent device ID.
      * @param maxDepth      The maximum depth of child nodes to retrieve.
      * @param includeDevice Indicates whether to include device information in the retrieved nodes.
      * @return A list of child device nodes.
      * @throws DeviceOrganizationMgtPluginException If an error occurs during the operation.
      */
-    List<DeviceNode> getChildrenOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice)
+    DeviceNodeResult getChildrenOfDeviceNode(int deviceID, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException;
 
     /**
      * Retrieves a list of parent nodes of a given device node, up to a specified depth.
      *
-     * @param node          The child device node.
+     * @param deviceID      The child device ID.
      * @param maxDepth      The maximum depth of parent nodes to retrieve.
      * @param includeDevice Indicates whether to include device information in the retrieved nodes.
      * @return A list of parent device nodes.
      * @throws DeviceOrganizationMgtPluginException If an error occurs during the operation.
      */
-    List<DeviceNode> getParentsOfDeviceNode(DeviceNode node, int maxDepth, boolean includeDevice)
+    DeviceNodeResult getParentsOfDeviceNode(int deviceID, int maxDepth, boolean includeDevice)
             throws DeviceOrganizationMgtPluginException;
 
     /**
@@ -73,6 +73,7 @@ public interface DeviceOrganizationService {
 
     /**
      * Retrieves device Organization Leafs
+     *
      * @return A list of leaf device organizations.
      * @throws DeviceOrganizationMgtPluginException
      */
@@ -80,6 +81,7 @@ public interface DeviceOrganizationService {
 
     /**
      * Retrieves device Organization Roots
+     *
      * @return A list of root device organizations.
      * @throws DeviceOrganizationMgtPluginException
      */

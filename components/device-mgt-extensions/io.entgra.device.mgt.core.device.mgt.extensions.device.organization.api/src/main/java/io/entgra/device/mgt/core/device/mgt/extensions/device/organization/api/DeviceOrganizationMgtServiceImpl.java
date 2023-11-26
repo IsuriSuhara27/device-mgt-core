@@ -20,7 +20,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api;
 import com.google.gson.Gson;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.util.DeviceOrgAPIUtils;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.util.RequestValidationUtil;
-import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNode;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNodeResult;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DeviceOrganizationMgtPluginException;
@@ -28,7 +28,15 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi.D
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -74,9 +82,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             @QueryParam("includeDevice") boolean includeDevice) {
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
-            DeviceNode deviceNode = new DeviceNode();
-            deviceNode.setDeviceId(deviceId);
-            List<DeviceNode> children = deviceOrganizationService.getChildrenOfDeviceNode(deviceNode, maxDepth, includeDevice);
+            DeviceNodeResult children = deviceOrganizationService.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice);
             return Response.status(Response.Status.OK).entity(children).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -92,9 +98,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             @QueryParam("includeDevice") boolean includeDevice) {
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
-            DeviceNode deviceNode = new DeviceNode();
-            deviceNode.setDeviceId(deviceId);
-            List<DeviceNode> parents = deviceOrganizationService.getParentsOfDeviceNode(deviceNode, maxDepth, includeDevice);
+            DeviceNodeResult parents = deviceOrganizationService.getParentsOfDeviceNode(deviceId, maxDepth, includeDevice);
             return Response.status(Response.Status.OK).entity(parents).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
