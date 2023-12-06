@@ -19,6 +19,8 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto;
 
 
+import io.entgra.device.mgt.core.device.mgt.common.Device;
+
 import java.util.Date;
 import java.util.Objects;
 
@@ -30,6 +32,7 @@ public class DeviceOrganization {
 
     private int organizationId;
     private int deviceId;
+    private Device device;
     private Integer parentDeviceId;
     private String deviceOrganizationMeta;
     private Date updateTime;
@@ -48,6 +51,13 @@ public class DeviceOrganization {
 
     public void setDeviceId(int deviceId) {
         this.deviceId = deviceId;
+    }
+
+    public Device getDevice() {
+        return device;
+    }
+    public void setDevice(Device device) {
+        this.device = device;
     }
 
     public Integer getParentDeviceId() {

@@ -42,6 +42,7 @@ import java.util.Set;
 
 import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.getDeviceFromResultSet;
 import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.loadDeviceOrganization;
+import static io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.DeviceOrganizationDaoUtil.loadDeviceOrganizationWithDeviceDetails;
 
 /**
  * Implementation of the DeviceOrganizationDAO interface.
@@ -323,9 +324,12 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION " +
-                    "WHERE (PARENT_DEVICE_ID IS NULL AND " +
-                    "DEVICE_ID NOT IN " +
+            String sql = "SELECT D.ID, D.NAME, D.DESCRIPTION, D.DEVICE_IDENTIFICATION, DT.NAME AS DEVICE_TYPE_NAME, " +
+                    "DO.ORGANIZATION_ID, DO.DEVICE_ID, DO.PARENT_DEVICE_ID, DO.DEVICE_ORGANIZATION_META ," +
+                    "DO.LAST_UPDATED_TIMESTAMP FROM DM_DEVICE_ORGANIZATION DO JOIN DM_DEVICE D ON D.ID = DO.DEVICE_ID " +
+                    "JOIN DM_DEVICE_TYPE DT ON D.DEVICE_TYPE_ID = DT.ID " +
+                    "WHERE (DO.PARENT_DEVICE_ID IS NULL AND " +
+                    "DO.DEVICE_ID NOT IN " +
                     "(SELECT DEVICE_ID FROM DM_DEVICE_ORGANIZATION " +
                     "WHERE PARENT_DEVICE_ID IS NOT NULL)) " +
                     "LIMIT ? OFFSET ?";
@@ -335,7 +339,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 stmt.setInt(2, request.getOffSet());
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
-                        DeviceOrganization deviceOrganization = loadDeviceOrganization(rs);
+                        DeviceOrganization deviceOrganization = loadDeviceOrganizationWithDeviceDetails(rs);
                         deviceOrganizations.add(deviceOrganization);
                     }
                 }

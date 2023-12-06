@@ -275,6 +275,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
             log.info("deviceID = " + organization.getDeviceId());
             log.info("parentDeviceID = " + organization.getParentDeviceId());
             log.info("updateTime = " + organization.getUpdateTime());
+            log.info("deviceSerial = " + organization.getDevice().getDeviceIdentifier());
             log.info("----------------------------------------------");
         }
         Assert.assertNotNull(organizations, "List of organizations cannot be null");
@@ -292,6 +293,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
             log.info("deviceID = " + organization.getDeviceId());
             log.info("parentDeviceID = " + organization.getParentDeviceId());
             log.info("updateTime = " + organization.getUpdateTime());
+            log.info("deviceSerial = " + organization.getDevice().getDeviceIdentifier());
             log.info("----------------------------------------------");
         }
         Assert.assertNotNull(organizations, "List of organizations cannot be null");

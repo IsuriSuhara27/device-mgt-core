@@ -38,6 +38,21 @@ public class DeviceOrganizationDaoUtil {
         return deviceOrganization;
     }
 
+    public static DeviceOrganization loadDeviceOrganizationWithDeviceDetails(ResultSet rs) throws SQLException {
+        DeviceOrganization deviceOrganization = new DeviceOrganization();
+        deviceOrganization.setOrganizationId(rs.getInt("ORGANIZATION_ID"));
+        deviceOrganization.setDeviceId(rs.getInt("DEVICE_ID"));
+        if (rs.getInt("PARENT_DEVICE_ID") != 0) {
+            deviceOrganization.setParentDeviceId(rs.getInt("PARENT_DEVICE_ID"));
+        } else {
+            deviceOrganization.setParentDeviceId(null);
+        }
+        deviceOrganization.setDeviceOrganizationMeta(rs.getString("DEVICE_ORGANIZATION_META"));
+        deviceOrganization.setUpdateTime(rs.getDate("LAST_UPDATED_TIMESTAMP"));
+        deviceOrganization.setDevice(getDeviceDetails(rs));
+        return deviceOrganization;
+    }
+
     /**
      * Helper method to create a DeviceNode object from a ResultSet
      *
@@ -48,14 +63,18 @@ public class DeviceOrganizationDaoUtil {
     public static DeviceNode getDeviceFromResultSet(ResultSet rs) throws SQLException {
         DeviceNode node = new DeviceNode();
         node.setDeviceId(rs.getInt("ID"));
+        node.setDevice(getDeviceDetails(rs));
+        return node;
+    }
+
+    public static Device getDeviceDetails(ResultSet rs) throws SQLException {
         Device device = new Device();
         device.setId(rs.getInt("ID"));
         device.setDescription(rs.getString("DESCRIPTION"));
         device.setName(rs.getString("NAME"));
         device.setType(rs.getString("DEVICE_TYPE_NAME"));
         device.setDeviceIdentifier(rs.getString("DEVICE_IDENTIFICATION"));
-        node.setDevice(device);
-        return node;
+        return device;
     }
 
 }
