@@ -33,7 +33,19 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         if (exists) {
             int deviceID = 17;
             int maxDepth = 10;
-            boolean includeDevice = false;
+            boolean includeDevice = true;
+            DeviceNodeResult childrenList = deviceOrganizationService.getChildrenOfDeviceNode(deviceID, maxDepth, includeDevice);
+            Assert.assertNotNull(childrenList, "Cannot be null");
+        }
+    }
+
+    @Test(dependsOnMethods = "testAddDeviceOrganizationWithNullParent")
+    public void testGetChildrenOfWithOneParent() throws DeviceOrganizationMgtPluginException {
+        boolean exists = deviceOrganizationService.isDeviceIdExist(3);
+        if (exists) {
+            int deviceID = 3;
+            int maxDepth = 4;
+            boolean includeDevice = true;
             DeviceNodeResult childrenList = deviceOrganizationService.getChildrenOfDeviceNode(deviceID, maxDepth, includeDevice);
             Assert.assertNotNull(childrenList, "Cannot be null");
         }

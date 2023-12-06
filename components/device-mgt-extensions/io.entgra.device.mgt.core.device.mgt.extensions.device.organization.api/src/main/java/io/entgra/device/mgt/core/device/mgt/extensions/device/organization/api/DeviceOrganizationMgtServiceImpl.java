@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -107,10 +108,10 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @GET
     @Override
-    @Path("/leafs")
+    @Path("leafs")
     public Response getDeviceOrganizationLeafs(
-            @QueryParam("offset") int offset,
-            @QueryParam("limit") int limit) {
+            @DefaultValue("0") @QueryParam("offset") int offset,
+            @DefaultValue("20") @QueryParam("limit") int limit) {
         RequestValidationUtil.validatePaginationParameters(offset, limit);
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
@@ -123,11 +124,11 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
     }
 
     @GET
-    @Path("/roots")
+    @Path("roots")
     @Override
     public Response getDeviceOrganizationRoots(
-            @QueryParam("offset") int offset,
-            @QueryParam("limit") int limit) {
+            @DefaultValue("0") @QueryParam("offset") int offset,
+            @DefaultValue("20") @QueryParam("limit") int limit) {
         RequestValidationUtil.validatePaginationParameters(offset, limit);
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();

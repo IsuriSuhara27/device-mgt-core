@@ -126,6 +126,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 "JOIN DM_DEVICE_TYPE DT ON D.DEVICE_TYPE_ID = DT.ID " +
                 "WHERE DO.PARENT_DEVICE_ID = ?";
 
+        boolean hasChildren = false;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, node.getDeviceId());
 
@@ -133,6 +134,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 while (rs.next()) {
                     DeviceNode child = getDeviceFromResultSet(rs);
                     node.getChildren().add(child);
+                    hasChildren = true;
                     if (includeDevice
                             && !parentAdded
                     ) {
@@ -156,6 +158,12 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                     );
                 }
             }
+        }
+
+        // Add the parent node if it doesn't have children and includeDevice is true
+        if (!hasChildren && includeDevice && !parentAdded) {
+            childNodes.add(node);
+            parentAdded = true;
         }
     }
 

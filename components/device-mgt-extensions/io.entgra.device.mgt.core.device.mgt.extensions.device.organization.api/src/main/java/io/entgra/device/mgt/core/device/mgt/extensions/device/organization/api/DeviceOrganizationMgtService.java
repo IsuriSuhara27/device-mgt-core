@@ -35,6 +35,7 @@ import io.swagger.annotations.Tag;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -61,7 +62,7 @@ import javax.ws.rs.core.Response;
                 }
         ),
         tags = {
-                @Tag(name = "device_organization_management, device_management", description = "Device organization " +
+                @Tag(name = "device_organization_management", description = "Device organization " +
                         "management related REST-API. This can be used to manipulate device organization related details.")
         }
 )
@@ -347,14 +348,14 @@ public interface DeviceOrganizationMgtService {
                     value = "The starting pagination index for the complete list of qualified items",
                     required = false,
                     defaultValue = "0")
-            @QueryParam("offset")
+            @DefaultValue("0") @QueryParam("offset")
             int offset,
             @ApiParam(
                     name = "limit",
                     value = "Provide how many policy details you require from the starting pagination index/offset.",
                     required = false,
                     defaultValue = "5")
-            @QueryParam("limit")
+            @DefaultValue("20") @QueryParam("limit")
             int limit);
 
     /**
@@ -415,14 +416,14 @@ public interface DeviceOrganizationMgtService {
                     value = "The starting pagination index for the complete list of qualified items",
                     required = false,
                     defaultValue = "0")
-            @QueryParam("offset")
+            @DefaultValue("0") @QueryParam("offset")
             int offset,
             @ApiParam(
                     name = "limit",
                     value = "Provide how many policy details you require from the starting pagination index/offset.",
                     required = false,
                     defaultValue = "5")
-            @QueryParam("limit")
+            @DefaultValue("20") @QueryParam("limit")
             int limit);
 
     /**

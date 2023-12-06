@@ -45,6 +45,7 @@
         <module>io.entgra.device.mgt.core.device.mgt.extensions.stateengine</module>
         <module>io.entgra.device.mgt.core.device.mgt.extensions.userstore.role.mapper</module>
         <module>io.entgra.device.mgt.core.device.mgt.extensions.device.organization</module>
+        <module>io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api</module>
     </modules>
 
 </project>
