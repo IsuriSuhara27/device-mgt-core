@@ -323,8 +323,13 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE PARENT_DEVICE_ID IS NULL " +
+            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION " +
+                    "WHERE (PARENT_DEVICE_ID IS NULL AND " +
+                    "DEVICE_ID NOT IN " +
+                    "(SELECT DEVICE_ID FROM DM_DEVICE_ORGANIZATION " +
+                    "WHERE PARENT_DEVICE_ID IS NOT NULL)) " +
                     "LIMIT ? OFFSET ?";
+
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, request.getLimit());
                 stmt.setInt(2, request.getOffSet());

@@ -148,7 +148,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
         // Define specific combinations of deviceID and parentDeviceID
         int[][] combinations = {
-                {20, 19}, {19, 18}, {18, 17}, {20, 5}, {20, 17}, {19, 16}, {17, 16}, {16, 17}
+                {20, 19}, {19, 18}, {18, 17}, {20, 5}, {20, 17}, {19, 16}, {17, 16}, {16, 17}, {2, 1}
                 // Add more combinations as needed
         };
 
@@ -174,6 +174,17 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
             iterationCount++;
         }
+
+        DeviceOrganization nullParent = new DeviceOrganization();
+        nullParent.setDeviceId(1);
+        nullParent.setParentDeviceId(null);
+        boolean isNullParentAdded = deviceOrganizationService.addDeviceOrganization(nullParent);
+
+        DeviceOrganization secondNullParent = new DeviceOrganization();
+        secondNullParent.setDeviceId(2);
+        secondNullParent.setParentDeviceId(null);
+        boolean isSecondNullParentAdded = deviceOrganizationService.addDeviceOrganization(secondNullParent);
+
 
         // Optionally, you can assert that the correct number of organizations were inserted
         Assert.assertEquals(organizationCount, combinations.length, "Inserted organizations count mismatch");
@@ -255,6 +266,23 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
     @Test(dependsOnMethods = "testAddDeviceOrganizationWithNullParent")
     public void testGetRootOrganizations() throws DeviceOrganizationMgtPluginException {
+        int offset = 0;
+        int limit = 10;
+        PaginationRequest request = new PaginationRequest(offset, limit);
+        List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationRoots(request);
+        for (DeviceOrganization organization : organizations) {
+            log.info("organizationID = " + organization.getOrganizationId());
+            log.info("deviceID = " + organization.getDeviceId());
+            log.info("parentDeviceID = " + organization.getParentDeviceId());
+            log.info("updateTime = " + organization.getUpdateTime());
+            log.info("----------------------------------------------");
+        }
+        Assert.assertNotNull(organizations, "List of organizations cannot be null");
+        Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
+    }
+
+    @Test(dependsOnMethods = "testAddMultipleDeviceOrganizations")
+    public void testGetMultipleRootOrganizations() throws DeviceOrganizationMgtPluginException {
         int offset = 0;
         int limit = 10;
         PaginationRequest request = new PaginationRequest(offset, limit);
