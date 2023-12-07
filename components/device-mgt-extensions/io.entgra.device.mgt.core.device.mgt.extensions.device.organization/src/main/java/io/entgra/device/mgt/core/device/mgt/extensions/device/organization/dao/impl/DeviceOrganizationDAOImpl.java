@@ -320,7 +320,8 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request) throws DeviceOrganizationMgtDAOException {
+    public List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request)
+            throws DeviceOrganizationMgtDAOException {
         List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
@@ -365,9 +366,8 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE ORGANIZATION_ID NOT IN " +
-                    "(SELECT DISTINCT PARENT_DEVICE_ID FROM DM_DEVICE_ORGANIZATION WHERE PARENT_DEVICE_ID IS NOT NULL " +
-                    "OR ORGANIZATION_ID IS NOT NULL) " +
+            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID NOT IN " +
+                    "(SELECT DISTINCT PARENT_DEVICE_ID FROM DM_DEVICE_ORGANIZATION WHERE PARENT_DEVICE_ID IS NOT NULL ) " +
                     "LIMIT ? OFFSET ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setInt(1, request.getLimit());

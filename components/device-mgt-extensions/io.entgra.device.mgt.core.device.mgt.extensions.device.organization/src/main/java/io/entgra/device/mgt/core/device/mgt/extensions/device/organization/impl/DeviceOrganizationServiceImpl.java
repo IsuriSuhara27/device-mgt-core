@@ -162,7 +162,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request) throws DeviceOrganizationMgtPluginException {
+    public List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request)
+            throws DeviceOrganizationMgtPluginException {
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();

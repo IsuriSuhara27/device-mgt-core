@@ -148,7 +148,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
         // Define specific combinations of deviceID and parentDeviceID
         int[][] combinations = {
-                {20, 19}, {19, 18}, {18, 17}, {20, 5}, {20, 17}, {19, 16}, {17, 16}, {16, 17}, {2, 1}
+                {20, 19}, {19, 18}, {18, 17}, {20, 5}, {20, 17}, {19, 16}, {17, 16}, {16, 17}, {2, 1},{3, 2}
                 // Add more combinations as needed
         };
 
@@ -300,8 +300,8 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
     }
 
-    @Test(dependsOnMethods = "testAddDeviceOrganizationWithNullParent")
-    public void testGetLeafOrganizationsWithNullParents() throws DeviceOrganizationMgtPluginException {
+    @Test(dependsOnMethods = "testAddMultipleDeviceOrganizations")
+    public void testGetLeafOrganizationsWithMultipleDeviceOrganizations() throws DeviceOrganizationMgtPluginException {
         int offset = 0;
         int limit = 10;
         PaginationRequest request = new PaginationRequest(offset, limit);
@@ -313,7 +313,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
             log.info("updateTime = " + organization.getUpdateTime());
             log.info("----------------------------------------------");
         }
-        Assert.assertTrue(organizations.isEmpty(), "List of organizations should not be empty");
+        Assert.assertFalse(organizations.isEmpty(), "List of organizations should not be empty");
     }
 
     @Test(dependsOnMethods = "testAddDeviceOrganization")
