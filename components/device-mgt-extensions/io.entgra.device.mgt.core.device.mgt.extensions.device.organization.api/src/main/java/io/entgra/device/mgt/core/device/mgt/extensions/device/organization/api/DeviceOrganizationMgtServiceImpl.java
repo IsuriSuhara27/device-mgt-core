@@ -18,6 +18,7 @@
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api;
 
 import com.google.gson.Gson;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.beans.SuccessResponse;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.util.DeviceOrgAPIUtils;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.util.RequestValidationUtil;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNodeResult;
@@ -68,7 +69,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             }
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             boolean resp = deviceOrganizationService.addDeviceOrganization(deviceOrganizationRequest);
-            return Response.status(Response.Status.OK).entity(resp).build();
+            SuccessResponse response = new SuccessResponse();
+            response.setSuccess(resp);
+            return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -167,7 +170,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             } else {
                 exists = deviceOrganizationService.isDeviceOrganizationExist(deviceId, Integer.valueOf(parentDeviceId));
             }
-            return Response.status(Response.Status.OK).entity(exists).build();
+            SuccessResponse response = new SuccessResponse();
+            response.setSuccess(exists);
+            return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -200,7 +205,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             boolean resp = deviceOrganizationService.updateDeviceOrganization(deviceOrganization);
-            return Response.status(Response.Status.OK).entity(resp).build();
+            SuccessResponse response = new SuccessResponse();
+            response.setSuccess(resp);
+            return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -213,7 +220,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             boolean resp = deviceOrganizationService.deleteDeviceOrganizationByID(organizationId);
-            return Response.status(Response.Status.OK).entity(resp).build();
+            SuccessResponse response = new SuccessResponse();
+            response.setSuccess(resp);
+            return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -226,7 +235,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             boolean resp = deviceOrganizationService.deleteDeviceAssociations(deviceId);
-            return Response.status(Response.Status.OK).entity(resp).build();
+            SuccessResponse response = new SuccessResponse();
+            response.setSuccess(resp);
+            return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
