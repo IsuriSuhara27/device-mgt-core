@@ -56,6 +56,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
     public Response addDeviceOrganization(DeviceOrganization deviceOrganizationRequest) {
         if (deviceOrganizationRequest == null) {
             String errorMessage = "The payload of the device organization is incorrect.";
+            log.error(errorMessage);
             return Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
         }
         try {
@@ -73,7 +74,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             response.setSuccess(resp);
             return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "device organization failed to be created";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 
@@ -89,7 +92,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceNodeResult children = deviceOrganizationService.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice);
             return Response.status(Response.Status.OK).entity(children).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "get Children of device node failed";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 
@@ -105,7 +110,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceNodeResult parents = deviceOrganizationService.getParentsOfDeviceNode(deviceId, maxDepth, includeDevice);
             return Response.status(Response.Status.OK).entity(parents).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "get Parent of device node failed";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 
@@ -122,7 +129,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationLeafs(request);
             return Response.status(Response.Status.OK).entity(organizations).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "get leaf organizations failed";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 
@@ -139,7 +148,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             List<DeviceOrganization> organizations = deviceOrganizationService.getDeviceOrganizationRoots(request);
             return Response.status(Response.Status.OK).entity(organizations).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "get root organizations failed";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 
@@ -152,7 +163,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             DeviceOrganization organization = deviceOrganizationService.getDeviceOrganizationByID(organizationId);
             return Response.status(Response.Status.OK).entity(organization).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "get organization by organization Id failed";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 
@@ -174,6 +187,8 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             response.setSuccess(exists);
             return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
+            String errorMessage = "organization existence check for device Id and parent device Id failed";
+            log.error(errorMessage);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
@@ -195,7 +210,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             }
             return Response.status(Response.Status.OK).entity(organization).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "organization get for device Id and parent device Id failed";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 
@@ -209,7 +226,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             response.setSuccess(resp);
             return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "update organization failed";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 
@@ -224,7 +243,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             response.setSuccess(resp);
             return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "delete organization by organization Id failed";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 
@@ -239,7 +260,9 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             response.setSuccess(resp);
             return Response.status(Response.Status.OK).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+            String errorMessage = "delete organizations associated with a device Id failed";
+            log.error(errorMessage);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errorMessage).build();
         }
     }
 }
