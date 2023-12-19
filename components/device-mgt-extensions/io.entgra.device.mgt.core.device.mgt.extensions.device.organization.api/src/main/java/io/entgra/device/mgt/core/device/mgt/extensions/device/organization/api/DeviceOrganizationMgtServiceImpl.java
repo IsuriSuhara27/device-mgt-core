@@ -49,7 +49,7 @@ import java.util.List;
 public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtService {
 
     private static final Log log = LogFactory.getLog(DeviceOrganizationMgtServiceImpl.class);
-    Gson gson = new Gson();
+    private static final Gson gson = new Gson();
 
     @POST
     @Override
@@ -72,7 +72,7 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
             boolean resp = deviceOrganizationService.addDeviceOrganization(deviceOrganizationRequest);
             SuccessResponse response = new SuccessResponse();
             response.setSuccess(resp);
-            return Response.status(Response.Status.OK).entity(response).build();
+            return Response.status(Response.Status.CREATED).entity(response).build();
         } catch (DeviceOrganizationMgtPluginException e) {
             String errorMessage = "device organization failed to be created";
             log.error(errorMessage);

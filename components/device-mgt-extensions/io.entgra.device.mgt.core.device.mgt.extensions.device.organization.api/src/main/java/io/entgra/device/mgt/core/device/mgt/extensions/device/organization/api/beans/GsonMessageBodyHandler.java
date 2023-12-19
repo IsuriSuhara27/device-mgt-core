@@ -36,6 +36,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -46,7 +47,6 @@ public class GsonMessageBodyHandler implements MessageBodyWriter<Object>, Messag
 
     public static final String DATE_FORMAT = "EEE, d MMM yyyy HH:mm:ss Z";
     private Gson gson;
-    private static final String UTF_8 = "UTF-8";
 
     public boolean isReadable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
         return true;
@@ -65,7 +65,7 @@ public class GsonMessageBodyHandler implements MessageBodyWriter<Object>, Messag
                            InputStream entityStream)
             throws IOException, WebApplicationException {
 
-        InputStreamReader reader = new InputStreamReader(entityStream, "UTF-8");
+        InputStreamReader reader = new InputStreamReader(entityStream, StandardCharsets.UTF_8);
 
         try {
             return getGson().fromJson(reader, type);
@@ -87,7 +87,7 @@ public class GsonMessageBodyHandler implements MessageBodyWriter<Object>, Messag
                         OutputStream entityStream)
             throws IOException, WebApplicationException {
 
-        OutputStreamWriter writer = new OutputStreamWriter(entityStream, UTF_8);
+        OutputStreamWriter writer = new OutputStreamWriter(entityStream, StandardCharsets.UTF_8);
         try {
             getGson().toJson(object, type, writer);
         } finally {

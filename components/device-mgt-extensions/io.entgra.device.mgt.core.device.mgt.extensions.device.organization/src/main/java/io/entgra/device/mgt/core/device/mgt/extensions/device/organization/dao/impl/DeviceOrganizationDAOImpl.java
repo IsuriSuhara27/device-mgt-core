@@ -132,8 +132,10 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             stmt.setInt(1, node.getDeviceId());
 
             try (ResultSet rs = stmt.executeQuery()) {
+                DeviceNode child;
+                DeviceOrganization organization;
                 while (rs.next()) {
-                    DeviceNode child = getDeviceFromResultSet(rs);
+                    child = getDeviceFromResultSet(rs);
                     node.getChildren().add(child);
                     hasChildren = true;
                     if (includeDevice
@@ -143,7 +145,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                         parentAdded = true; // Set the flag to true after adding the parent device.
                     }
 
-                    DeviceOrganization organization = loadDeviceOrganization(rs);
+                    organization = loadDeviceOrganization(rs);
                     organizations.add(organization);
 
                     getChildrenRecursive(
@@ -244,15 +246,17 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, node.getDeviceId());
             try (ResultSet rs = stmt.executeQuery()) {
+                DeviceNode parent;
+                DeviceOrganization organization;
                 while (rs.next()) {
-                    DeviceNode parent = getDeviceFromResultSet(rs);
+                    parent = getDeviceFromResultSet(rs);
                     node.getParents().add(parent);
                     if (includeDevice && !childAdded) {
                         parentNodes.add(node);
                         childAdded = true;
                     }
 
-                    DeviceOrganization organization = loadDeviceOrganization(rs);
+                    organization = loadDeviceOrganization(rs);
                     organizations.add(organization);
 
                     getParentsRecursive(
@@ -298,8 +302,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 try (ResultSet rs = stmt.executeQuery()) {
+                    DeviceOrganization deviceOrganization;
                     while (rs.next()) {
-                        DeviceOrganization deviceOrganization = loadDeviceOrganization(rs);
+                        deviceOrganization = loadDeviceOrganization(rs);
                         deviceOrganizations.add(deviceOrganization);
                     }
                 }
@@ -339,8 +344,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 stmt.setInt(1, request.getLimit());
                 stmt.setInt(2, request.getOffSet());
                 try (ResultSet rs = stmt.executeQuery()) {
+                    DeviceOrganization deviceOrganization;
                     while (rs.next()) {
-                        DeviceOrganization deviceOrganization = loadDeviceOrganizationWithDeviceDetails(rs);
+                        deviceOrganization = loadDeviceOrganizationWithDeviceDetails(rs);
                         deviceOrganizations.add(deviceOrganization);
                     }
                 }
@@ -373,8 +379,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                 stmt.setInt(1, request.getLimit());
                 stmt.setInt(2, request.getOffSet());
                 try (ResultSet rs = stmt.executeQuery()) {
+                    DeviceOrganization deviceOrganization;
                     while (rs.next()) {
-                        DeviceOrganization deviceOrganization = loadDeviceOrganization(rs);
+                        deviceOrganization = loadDeviceOrganization(rs);
                         deviceOrganizations.add(deviceOrganization);
                     }
                 }

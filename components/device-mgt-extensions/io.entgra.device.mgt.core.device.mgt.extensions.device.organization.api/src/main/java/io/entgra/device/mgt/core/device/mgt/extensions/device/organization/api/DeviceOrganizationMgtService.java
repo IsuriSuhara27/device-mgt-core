@@ -17,6 +17,7 @@
  */
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api;
 
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.util.DeviceOrgConstants;
 import io.entgra.device.mgt.core.apimgt.annotations.Scope;
 import io.entgra.device.mgt.core.apimgt.annotations.Scopes;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.api.beans.ErrorResponse;
@@ -105,7 +106,7 @@ import javax.ws.rs.core.Response;
 )
 public interface DeviceOrganizationMgtService {
 
-    String SCOPE = "scope";
+    String SCOPE = DeviceOrgConstants.SCOPE;
 
     /**
      * Adds a new device organization.
