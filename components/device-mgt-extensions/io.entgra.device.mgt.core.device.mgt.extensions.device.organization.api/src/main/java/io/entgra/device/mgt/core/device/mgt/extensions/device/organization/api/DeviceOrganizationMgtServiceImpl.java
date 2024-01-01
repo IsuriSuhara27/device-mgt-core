@@ -171,10 +171,10 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @GET
     @Override
-    @Path("exists")
+    @Path("exists/{deviceId}/{parentDeviceId}")
     public Response isDeviceOrganizationExist(
-            @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") String parentDeviceId) {
+            @PathParam("deviceId") int deviceId,
+            @PathParam("parentDeviceId") String parentDeviceId) {
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             boolean exists;
@@ -196,10 +196,10 @@ public class DeviceOrganizationMgtServiceImpl implements DeviceOrganizationMgtSe
 
     @GET
     @Override
-    @Path("organization")
+    @Path("organization/{deviceId}/{parentDeviceId}")
     public Response getDeviceOrganizationByUniqueKey(
-            @QueryParam("deviceId") int deviceId,
-            @QueryParam("parentDeviceId") String parentDeviceId) {
+            @PathParam("deviceId") int deviceId,
+            @PathParam("parentDeviceId") String parentDeviceId) {
         try {
             DeviceOrganizationService deviceOrganizationService = DeviceOrgAPIUtils.getDeviceOrganizationService();
             DeviceOrganization organization;

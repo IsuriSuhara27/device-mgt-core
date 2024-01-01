@@ -491,7 +491,7 @@ public interface DeviceOrganizationMgtService {
      * @return A response indicating whether the organization exists or not.
      */
     @GET
-    @Path("exists")
+    @Path("exists/{deviceId}/{parentDeviceId}")
     @ApiOperation(
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
@@ -538,10 +538,10 @@ public interface DeviceOrganizationMgtService {
                             response = ErrorResponse.class)
             })
     Response isDeviceOrganizationExist(
-            @ApiParam(value = "The ID of the child device.", required = true)
-            @QueryParam("deviceId") int deviceId,
-            @ApiParam(value = "The ID of the parent device.")
-            @QueryParam("parentDeviceId") String parentDeviceId);
+            @ApiParam(name = "deviceId", value = "The ID of the child device.", required = true)
+            @PathParam("deviceId") int deviceId,
+            @ApiParam(name = "parentDeviceId", value = "The ID of the parent device.")
+            @PathParam("parentDeviceId") String parentDeviceId);
 
 
     /**
@@ -552,7 +552,7 @@ public interface DeviceOrganizationMgtService {
      * @return A response containing the retrieved DeviceOrganization object, or null if not found.
      */
     @GET
-    @Path("organization")
+    @Path("organization/{deviceId}/{parentDeviceId}")
     @ApiOperation(
             produces = MediaType.APPLICATION_JSON,
             httpMethod = "GET",
@@ -603,10 +603,10 @@ public interface DeviceOrganizationMgtService {
                             response = ErrorResponse.class)
             })
     Response getDeviceOrganizationByUniqueKey(
-            @ApiParam(value = "The ID of the child device.", required = true)
-            @QueryParam("deviceId") int deviceId,
-            @ApiParam(value = "The ID of the parent device.")
-            @QueryParam("parentDeviceId") String parentDeviceId);
+            @ApiParam(name = "deviceId", value = "The ID of the child device.", required = true)
+            @PathParam("deviceId") int deviceId,
+            @ApiParam(name = "parentDeviceId", value = "The ID of the parent device.")
+            @PathParam("parentDeviceId") String parentDeviceId);
 
     /**
      * Updates a device organization.
@@ -786,7 +786,7 @@ public interface DeviceOrganizationMgtService {
                             response = ErrorResponse.class)
             })
     Response deleteDeviceAssociations(
-            @ApiParam(value = "The ID of the device for which associations should be deleted.", required = true)
+            @ApiParam(name = "deviceId", value = "The ID of the device for which associations should be deleted.", required = true)
             @PathParam("deviceId") int deviceId);
 
 
