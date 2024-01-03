@@ -30,6 +30,7 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.excep
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.spi.DeviceOrganizationService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import java.util.List;
 
@@ -59,7 +60,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
             //set device details
-            return deviceOrganizationDao.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice, tenantID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve child devices : " +
                     "deviceID = " + deviceId + ", maxDepth = " + maxDepth + ", includeDevice = " +
@@ -93,7 +95,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.getParentsOfDeviceNode(deviceId, maxDepth, includeDevice);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.getParentsOfDeviceNode(deviceId, maxDepth, includeDevice, tenantID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve parent devices for : " +
                     "device ID = " + deviceId + ", maxDepth = " + maxDepth + ", includeDevice = " +
@@ -143,7 +146,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.getDeviceOrganizationRoots(request);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.getDeviceOrganizationRoots(request, tenantID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve all device organizations.";
             log.error(msg);
@@ -167,7 +171,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.getDeviceOrganizationLeafs(request);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.getDeviceOrganizationLeafs(request, tenantID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve all device organizations.";
             log.error(msg);
@@ -206,6 +211,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
 
         try {
             ConnectionManagerUtil.beginDBTransaction();
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            deviceOrganization.setTenantID(tenantID);
             boolean result = deviceOrganizationDao.addDeviceOrganization(deviceOrganization);
             if (result) {
                 msg = "Device organization added successfully. Device Organization details : " +
@@ -250,7 +257,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
         try {
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.isDeviceOrganizationExist(deviceID, parentDeviceID);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.isDeviceOrganizationExist(deviceID, parentDeviceID, tenantID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to check organization existence. " +
                     "Params : deviceID = " + deviceID + ", parentDeviceID = " + parentDeviceID;
@@ -279,7 +287,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
         try {
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.getDeviceOrganizationByUniqueKey(deviceID, parentDeviceID);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.getDeviceOrganizationByUniqueKey(deviceID, parentDeviceID, tenantID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve organization. " +
                     "Params : deviceID = " + deviceID + ", parentDeviceID = " + parentDeviceID;
@@ -312,6 +321,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
 
         try {
             ConnectionManagerUtil.beginDBTransaction();
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            deviceOrganization.setTenantID(tenantID);
             boolean result = deviceOrganizationDao.updateDeviceOrganization(deviceOrganization);
             if (result) {
                 msg = "Device organization updated successfully for organizationID = " + deviceOrganization.getOrganizationId();
@@ -355,7 +366,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.getDeviceOrganizationByID(organizationID);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.getDeviceOrganizationByID(organizationID, tenantID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to retrieve deviceOrganization for : "
                     + "organizationID = " + organizationID;
@@ -394,7 +406,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
 
         try {
             ConnectionManagerUtil.beginDBTransaction();
-            boolean result = deviceOrganizationDao.deleteDeviceOrganizationByID(organizationID);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            boolean result = deviceOrganizationDao.deleteDeviceOrganizationByID(organizationID, tenantID);
             if (result) {
                 msg = "Device organization record deleted successfully for organizationID = " + organizationID;
                 if (log.isDebugEnabled()) {
@@ -445,7 +458,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
 
         try {
             ConnectionManagerUtil.beginDBTransaction();
-            boolean result = deviceOrganizationDao.deleteDeviceAssociations(deviceID);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            boolean result = deviceOrganizationDao.deleteDeviceAssociations(deviceID, tenantID);
             if (result) {
                 msg = "Device organization records associated with deviceID = " + deviceID + " are deleted successfully.";
                 if (log.isDebugEnabled()) {
@@ -489,7 +503,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.isDeviceIdExist(deviceID);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.isDeviceIdExist(deviceID, tenantID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to check deviceID existence " +
                     "in deviceOrganization : deviceID = " + deviceID;
@@ -520,7 +535,8 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         try {
             // Open a database connection
             ConnectionManagerUtil.openDBConnection();
-            return deviceOrganizationDao.isChildDeviceIdExist(deviceID);
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.isChildDeviceIdExist(deviceID, tenantID);
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining the database connection to check child deviceID existence " +
                     "in deviceOrganization : deviceID = " + deviceID;

@@ -55,7 +55,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public DeviceNodeResult getChildrenOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice)
+    public DeviceNodeResult getChildrenOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice, int tenantID)
             throws DeviceOrganizationMgtDAOException {
         List<DeviceNode> childNodes = new ArrayList<>();
         Set<DeviceOrganization> organizations = new HashSet<>();
@@ -75,6 +75,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                     childNodes,
                     includeDevice,
                     parentAdded,
+                    tenantID,
                     organizations
             );
             if (!includeDevice
@@ -104,6 +105,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                                       List<DeviceNode> childNodes,
                                       boolean includeDevice,
                                       boolean parentAdded,
+                                      int tenantID,
                                       Set<DeviceOrganization> organizations
     )
             throws SQLException {
@@ -121,15 +123,16 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         visited.add(node.getDeviceId());
 
         String sql = "SELECT D.ID, D.NAME, D.DESCRIPTION, D.DEVICE_IDENTIFICATION, DT.NAME AS DEVICE_TYPE_NAME, " +
-                "DO.ORGANIZATION_ID, DO.DEVICE_ID, DO.PARENT_DEVICE_ID, DO.DEVICE_ORGANIZATION_META ," +
+                "DO.ORGANIZATION_ID, DO.TENANT_ID, DO.DEVICE_ID, DO.PARENT_DEVICE_ID, DO.DEVICE_ORGANIZATION_META ," +
                 "DO.LAST_UPDATED_TIMESTAMP FROM DM_DEVICE D " +
                 "JOIN DM_DEVICE_ORGANIZATION DO ON D.ID = DO.DEVICE_ID " +
                 "JOIN DM_DEVICE_TYPE DT ON D.DEVICE_TYPE_ID = DT.ID " +
-                "WHERE DO.PARENT_DEVICE_ID = ?";
+                "WHERE DO.TENANT_ID = ? AND DO.PARENT_DEVICE_ID = ? ";
 
         boolean hasChildren = false;
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, node.getDeviceId());
+            stmt.setInt(1, tenantID);
+            stmt.setInt(2, node.getDeviceId());
 
             try (ResultSet rs = stmt.executeQuery()) {
                 DeviceNode child;
@@ -157,6 +160,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                             childNodes,
                             includeDevice,
                             parentAdded,
+                            tenantID,
                             organizations
                     );
                 }
@@ -174,7 +178,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public DeviceNodeResult getParentsOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice)
+    public DeviceNodeResult getParentsOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice, int tenantID)
             throws DeviceOrganizationMgtDAOException {
 
         List<DeviceNode> parentNodes = new ArrayList<>();
@@ -194,6 +198,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                     parentNodes,
                     includeDevice,
                     childAdded,
+                    tenantID,
                     organizations);
             if (!includeDevice && !childAdded) {
                 parentNodes.add(deviceNode);
@@ -221,6 +226,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                                      List<DeviceNode> parentNodes,
                                      boolean includeDevice,
                                      boolean childAdded,
+                                     int tenantID,
                                      Set<DeviceOrganization> organizations)
             throws SQLException {
         if (maxDepth <= 0) {
@@ -237,14 +243,15 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         visited.add(node.getDeviceId());
 
         String sql = "SELECT D.ID, D.NAME, D.DESCRIPTION, D.DEVICE_IDENTIFICATION, DT.NAME AS DEVICE_TYPE_NAME, " +
-                "DO.ORGANIZATION_ID, DO.DEVICE_ID, DO.PARENT_DEVICE_ID, DO.DEVICE_ORGANIZATION_META ," +
+                "DO.ORGANIZATION_ID,  DO.TENANT_ID, DO.DEVICE_ID, DO.PARENT_DEVICE_ID, DO.DEVICE_ORGANIZATION_META ," +
                 "DO.LAST_UPDATED_TIMESTAMP FROM DM_DEVICE D " +
                 "JOIN DM_DEVICE_ORGANIZATION DO ON D.ID = DO.PARENT_DEVICE_ID " +
                 "JOIN DM_DEVICE_TYPE DT ON D.DEVICE_TYPE_ID = DT.ID " +
-                "WHERE DO.DEVICE_ID = ?";
+                "WHERE DO.TENANT_ID = ? AND DO.DEVICE_ID = ?";
 
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, node.getDeviceId());
+            stmt.setInt(1, tenantID);
+            stmt.setInt(2, node.getDeviceId());
             try (ResultSet rs = stmt.executeQuery()) {
                 DeviceNode parent;
                 DeviceOrganization organization;
@@ -268,6 +275,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                             parentNodes,
                             includeDevice,
                             childAdded,
+                            tenantID,
                             organizations);
                 }
             }
@@ -325,24 +333,25 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request)
+    public List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request, int tenantID)
             throws DeviceOrganizationMgtDAOException {
         List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
             String sql = "SELECT D.ID, D.NAME, D.DESCRIPTION, D.DEVICE_IDENTIFICATION, DT.NAME AS DEVICE_TYPE_NAME, " +
-                    "DO.ORGANIZATION_ID, DO.DEVICE_ID, DO.PARENT_DEVICE_ID, DO.DEVICE_ORGANIZATION_META ," +
+                    "DO.ORGANIZATION_ID,  DO.TENANT_ID, DO.DEVICE_ID, DO.PARENT_DEVICE_ID, DO.DEVICE_ORGANIZATION_META ," +
                     "DO.LAST_UPDATED_TIMESTAMP FROM DM_DEVICE_ORGANIZATION DO JOIN DM_DEVICE D ON D.ID = DO.DEVICE_ID " +
                     "JOIN DM_DEVICE_TYPE DT ON D.DEVICE_TYPE_ID = DT.ID " +
-                    "WHERE (DO.PARENT_DEVICE_ID IS NULL AND " +
+                    "WHERE DO.TENANT_ID = ? AND (DO.PARENT_DEVICE_ID IS NULL AND " +
                     "DO.DEVICE_ID NOT IN " +
                     "(SELECT DEVICE_ID FROM DM_DEVICE_ORGANIZATION " +
                     "WHERE PARENT_DEVICE_ID IS NOT NULL)) " +
                     "LIMIT ? OFFSET ?";
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, request.getLimit());
-                stmt.setInt(2, request.getOffSet());
+                stmt.setInt(1, tenantID);
+                stmt.setInt(2, request.getLimit());
+                stmt.setInt(3, request.getOffSet());
                 try (ResultSet rs = stmt.executeQuery()) {
                     DeviceOrganization deviceOrganization;
                     while (rs.next()) {
@@ -368,16 +377,17 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request) throws DeviceOrganizationMgtDAOException {
+    public List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request, int tenantID) throws DeviceOrganizationMgtDAOException {
         List<DeviceOrganization> deviceOrganizations = new ArrayList<>();
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID NOT IN " +
+            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE TENANT_ID = ? AND DEVICE_ID NOT IN " +
                     "(SELECT DISTINCT PARENT_DEVICE_ID FROM DM_DEVICE_ORGANIZATION WHERE PARENT_DEVICE_ID IS NOT NULL ) " +
                     "LIMIT ? OFFSET ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, request.getLimit());
-                stmt.setInt(2, request.getOffSet());
+                stmt.setInt(1, tenantID);
+                stmt.setInt(2, request.getLimit());
+                stmt.setInt(3, request.getOffSet());
                 try (ResultSet rs = stmt.executeQuery()) {
                     DeviceOrganization deviceOrganization;
                     while (rs.next()) {
@@ -407,27 +417,28 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
             throws DeviceOrganizationMgtDAOException {
 
         try {
-            String sql = "INSERT INTO DM_DEVICE_ORGANIZATION (DEVICE_ID, PARENT_DEVICE_ID, " +
-                    "DEVICE_ORGANIZATION_META,LAST_UPDATED_TIMESTAMP)" +
-                    " VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO DM_DEVICE_ORGANIZATION (TENANT_ID, DEVICE_ID, PARENT_DEVICE_ID, " +
+                    "DEVICE_ORGANIZATION_META, LAST_UPDATED_TIMESTAMP)" +
+                    " VALUES (?, ?, ?, ?, ?)";
 
             Connection conn = ConnectionManagerUtil.getDBConnection();
             Calendar calendar = Calendar.getInstance();
             Timestamp timestamp = new Timestamp(calendar.getTime().getTime());
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, deviceOrganization.getDeviceId());
+                stmt.setInt(1, deviceOrganization.getTenantID());
+                stmt.setInt(2, deviceOrganization.getDeviceId());
                 if (deviceOrganization.getParentDeviceId() != null) {
-                    stmt.setInt(2, deviceOrganization.getParentDeviceId());
+                    stmt.setInt(3, deviceOrganization.getParentDeviceId());
                 } else {
-                    stmt.setNull(2, java.sql.Types.INTEGER);
+                    stmt.setNull(3, java.sql.Types.INTEGER);
                 }
                 if (deviceOrganization.getDeviceOrganizationMeta() != null) {
-                    stmt.setString(3, deviceOrganization.getDeviceOrganizationMeta());
+                    stmt.setString(4, deviceOrganization.getDeviceOrganizationMeta());
                 } else {
-                    stmt.setString(3, "");
+                    stmt.setString(4, "");
                 }
 
-                stmt.setTimestamp(4, timestamp);
+                stmt.setTimestamp(5, timestamp);
                 return stmt.executeUpdate() > 0;
             }
         } catch (DBConnectionException e) {
@@ -447,22 +458,23 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public boolean isDeviceOrganizationExist(int deviceId, Integer parentDeviceId)
+    public boolean isDeviceOrganizationExist(int deviceId, Integer parentDeviceId, int tenantID)
             throws DeviceOrganizationMgtDAOException {
         try {
             String sql;
             Connection conn = ConnectionManagerUtil.getDBConnection();
 
             if (parentDeviceId != null) {
-                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
+                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE TENANT_ID = ? AND DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
             } else {
-                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID IS NULL";
+                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE TENANT_ID = ? AND DEVICE_ID = ? AND PARENT_DEVICE_ID IS NULL";
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, deviceId);
+                stmt.setInt(1, tenantID);
+                stmt.setInt(2, deviceId);
                 if (parentDeviceId != null) {
-                    stmt.setInt(2, parentDeviceId);
+                    stmt.setInt(3, parentDeviceId);
                 }
 
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -485,22 +497,23 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     /**
      * {@inheritDoc}
      */
-    public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId)
+    public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId, int tenantID)
             throws DeviceOrganizationMgtDAOException {
         try {
             String sql;
             Connection conn = ConnectionManagerUtil.getDBConnection();
 
             if (parentDeviceId != null) {
-                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
+                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE TENANT_ID = ? AND DEVICE_ID = ? AND PARENT_DEVICE_ID = ?";
             } else {
-                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND PARENT_DEVICE_ID IS NULL";
+                sql = "SELECT * FROM DM_DEVICE_ORGANIZATION WHERE TENANT_ID = ? AND DEVICE_ID = ? AND PARENT_DEVICE_ID IS NULL";
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, deviceId);
+                stmt.setInt(1, tenantID);
+                stmt.setInt(2, deviceId);
                 if (parentDeviceId != null) {
-                    stmt.setInt(2, parentDeviceId);
+                    stmt.setInt(3, parentDeviceId);
                 }
 
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -531,7 +544,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     public boolean updateDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtDAOException {
         String msg;
-        DeviceOrganization organization = getDeviceOrganizationByID(deviceOrganization.getOrganizationId());
+        DeviceOrganization organization = getDeviceOrganizationByID(deviceOrganization.getOrganizationId(), deviceOrganization.getTenantID());
 
         if (organization == null) {
             msg = "Device Organization does not exist for organization ID = " + deviceOrganization.getOrganizationId();
@@ -589,13 +602,14 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public DeviceOrganization getDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException {
+    public DeviceOrganization getDeviceOrganizationByID(int organizationId, int tenantID) throws DeviceOrganizationMgtDAOException {
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION do WHERE do.ORGANIZATION_ID = ? ";
+            String sql = "SELECT * FROM DM_DEVICE_ORGANIZATION DO WHERE DO.TENANT_ID = ? AND DO.ORGANIZATION_ID = ? ";
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, organizationId);
+                stmt.setInt(1, tenantID);
+                stmt.setInt(2, organizationId);
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         return loadDeviceOrganization(rs);
@@ -622,15 +636,16 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException {
+    public boolean deleteDeviceOrganizationByID(int organizationId, int tenantID) throws DeviceOrganizationMgtDAOException {
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String deleteOrganizationSql = "DELETE FROM DM_DEVICE_ORGANIZATION WHERE ORGANIZATION_ID = ?";
+            String deleteOrganizationSql = "DELETE FROM DM_DEVICE_ORGANIZATION WHERE TENANT_ID = ? AND ORGANIZATION_ID = ?";
 
             try (PreparedStatement deleteOrgStmt = conn.prepareStatement(deleteOrganizationSql)) {
 
                 // Delete the organization
-                deleteOrgStmt.setInt(1, organizationId);
+                deleteOrgStmt.setInt(1, tenantID);
+                deleteOrgStmt.setInt(2, organizationId);
                 return deleteOrgStmt.executeUpdate() > 0;
             }
 
@@ -651,20 +666,22 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteDeviceAssociations(int deviceId) throws DeviceOrganizationMgtDAOException {
+    public boolean deleteDeviceAssociations(int deviceId, int tenantID) throws DeviceOrganizationMgtDAOException {
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String deleteByDeviceIdSql = "DELETE FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ?";
-            String deleteByParentDeviceIdSql = "DELETE FROM DM_DEVICE_ORGANIZATION WHERE PARENT_DEVICE_ID = ?";
+            String deleteByDeviceIdSql = "DELETE FROM DM_DEVICE_ORGANIZATION WHERE TENANT_ID = ? AND DEVICE_ID = ?";
+            String deleteByParentDeviceIdSql = "DELETE FROM DM_DEVICE_ORGANIZATION WHERE TENANT_ID = ? AND PARENT_DEVICE_ID = ?";
 
             try (PreparedStatement deleteByDeviceIdStmt = conn.prepareStatement(deleteByDeviceIdSql);
                  PreparedStatement deleteByParentDeviceIdStmt = conn.prepareStatement(deleteByParentDeviceIdSql)) {
 
                 // Delete device organizations where the device is the device_id
-                deleteByDeviceIdStmt.setInt(1, deviceId);
+                deleteByDeviceIdStmt.setInt(1, tenantID);
+                deleteByDeviceIdStmt.setInt(2, deviceId);
 
                 // Delete device organizations where the device is the parent_device_id
-                deleteByParentDeviceIdStmt.setInt(1, deviceId);
+                deleteByParentDeviceIdStmt.setInt(1, tenantID);
+                deleteByParentDeviceIdStmt.setInt(2, deviceId);
 
                 return deleteByDeviceIdStmt.executeUpdate() > 0 | deleteByParentDeviceIdStmt.executeUpdate() > 0;
 
@@ -686,17 +703,18 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public boolean isDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException {
+    public boolean isDeviceIdExist(int deviceId, int tenantID) throws DeviceOrganizationMgtDAOException {
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
             String sql = "SELECT 1 " +
                     "FROM DM_DEVICE_ORGANIZATION " +
-                    "WHERE device_id = ? OR parent_device_id = ? " +
+                    "WHERE TENANT_ID = ? AND (device_id = ? OR parent_device_id = ?) " +
                     "LIMIT 1";
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, deviceId);
+                stmt.setInt(1, tenantID);
                 stmt.setInt(2, deviceId);
+                stmt.setInt(3, deviceId);
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     return rs.next(); // Returns true if a match is found, false otherwise
@@ -719,16 +737,17 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
      * {@inheritDoc}
      */
     @Override
-    public boolean isChildDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException {
+    public boolean isChildDeviceIdExist(int deviceId, int tenantID) throws DeviceOrganizationMgtDAOException {
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
             String sql = "SELECT 1 " +
                     "FROM DM_DEVICE_ORGANIZATION " +
-                    "WHERE device_id = ? " +
+                    "WHERE TENANT_ID = ? AND device_id = ? " +
                     "LIMIT 1";
 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setInt(1, deviceId);
+                stmt.setInt(1, tenantID);
+                stmt.setInt(2, deviceId);
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     return rs.next(); // Returns true if a match is found, false otherwise

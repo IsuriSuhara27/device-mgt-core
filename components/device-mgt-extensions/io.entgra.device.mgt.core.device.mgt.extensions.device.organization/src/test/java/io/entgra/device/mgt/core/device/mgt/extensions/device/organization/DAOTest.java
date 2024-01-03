@@ -28,6 +28,7 @@ import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.excep
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.mock.BaseDeviceOrganizationTest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -53,7 +54,8 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         int deviceId = 2;
         int maxDepth = 4;
         boolean includeDevice = true;
-        DeviceNodeResult childrenList = deviceOrganizationDAO.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice);
+        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        DeviceNodeResult childrenList = deviceOrganizationDAO.getChildrenOfDeviceNode(deviceId, maxDepth, includeDevice, tenantID);
         ConnectionManagerUtil.closeDBConnection();
         Assert.assertNotNull(childrenList, "Cannot be null");
     }
@@ -64,7 +66,8 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         int deviceID = 4;
         int maxDepth = 4;
         boolean includeDevice = false;
-        DeviceNodeResult parentList = deviceOrganizationDAO.getParentsOfDeviceNode(deviceID, maxDepth, includeDevice);
+        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+        DeviceNodeResult parentList = deviceOrganizationDAO.getParentsOfDeviceNode(deviceID, maxDepth, includeDevice, tenantID);
         ConnectionManagerUtil.closeDBConnection();
         Assert.assertNotNull(parentList, "Cannot be null");
     }
@@ -72,12 +75,13 @@ public class DAOTest extends BaseDeviceOrganizationTest {
     @Test
     public void testAddDeviceOrganizationDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
 
+        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConnectionManagerUtil.beginDBTransaction();
-        deviceOrganizationDAO.deleteDeviceAssociations(1);
+        deviceOrganizationDAO.deleteDeviceAssociations(1, tenantID);
         ConnectionManagerUtil.commitDBTransaction();
         ConnectionManagerUtil.closeDBConnection();
         ConnectionManagerUtil.beginDBTransaction();
-        deviceOrganizationDAO.deleteDeviceAssociations(2);
+        deviceOrganizationDAO.deleteDeviceAssociations(2, tenantID);
         ConnectionManagerUtil.commitDBTransaction();
         ConnectionManagerUtil.closeDBConnection();
         DeviceOrganization deviceOrganization = new DeviceOrganization();
@@ -110,8 +114,9 @@ public class DAOTest extends BaseDeviceOrganizationTest {
 
     @Test(dependsOnMethods = "testAddDeviceOrganizationDAO")
     public void testGetDeviceOrganizationByIDDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
+        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConnectionManagerUtil.beginDBTransaction();
-        DeviceOrganization deviceOrganization = deviceOrganizationDAO.getDeviceOrganizationByID(1);
+        DeviceOrganization deviceOrganization = deviceOrganizationDAO.getDeviceOrganizationByID(1, tenantID);
         ConnectionManagerUtil.closeDBConnection();
         if (deviceOrganization != null) {
             log.info("Device Organization device ID : " + deviceOrganization.getDeviceId() +
@@ -121,24 +126,27 @@ public class DAOTest extends BaseDeviceOrganizationTest {
 
     @Test(dependsOnMethods = "testAddDeviceOrganizationDAO")
     public void testDoesDeviceIdExistDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
+        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConnectionManagerUtil.beginDBTransaction();
-        boolean isDeviceIdExist = deviceOrganizationDAO.isDeviceIdExist(1);
+        boolean isDeviceIdExist = deviceOrganizationDAO.isDeviceIdExist(1, tenantID);
         ConnectionManagerUtil.closeDBConnection();
 
     }
 
     @Test(dependsOnMethods = "testAddDeviceOrganizationDAO")
     public void testDeleteDeviceOrganizationByIDDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
+        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConnectionManagerUtil.beginDBTransaction();
-        boolean result = deviceOrganizationDAO.deleteDeviceOrganizationByID(1);
+        boolean result = deviceOrganizationDAO.deleteDeviceOrganizationByID(1, tenantID);
         ConnectionManagerUtil.commitDBTransaction();
         ConnectionManagerUtil.closeDBConnection();
     }
 
     @Test(dependsOnMethods = "testAddDeviceOrganizationDAO")
     public void deleteDeviceOrganizationsByDeviceIdDAO() throws DBConnectionException, DeviceOrganizationMgtDAOException {
+        int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
         ConnectionManagerUtil.beginDBTransaction();
-        boolean result = deviceOrganizationDAO.deleteDeviceAssociations(1);
+        boolean result = deviceOrganizationDAO.deleteDeviceAssociations(1, tenantID);
         ConnectionManagerUtil.commitDBTransaction();
         ConnectionManagerUtil.closeDBConnection();
     }

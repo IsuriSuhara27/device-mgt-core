@@ -36,6 +36,7 @@ public class DeviceOrganization {
     private Integer parentDeviceId;
     private String deviceOrganizationMeta;
     private Date updateTime;
+    private int tenantID;
 
     public int getOrganizationId() {
         return organizationId;
@@ -84,6 +85,14 @@ public class DeviceOrganization {
         this.updateTime = updateTime;
     }
 
+    public int getTenantID() {
+        return tenantID;
+    }
+
+    public void setTenantID(int tenantID) {
+        this.tenantID = tenantID;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -91,6 +100,7 @@ public class DeviceOrganization {
         DeviceOrganization that = (DeviceOrganization) o;
         // Compare fields for equality
         return Objects.equals(organizationId, that.organizationId)
+                && Objects.equals(tenantID, that.tenantID)
                 && Objects.equals(deviceId, that.deviceId)
                 && Objects.equals(parentDeviceId, that.parentDeviceId)
                 && Objects.equals(deviceOrganizationMeta, that.deviceOrganizationMeta);
@@ -99,6 +109,6 @@ public class DeviceOrganization {
     @Override
     public int hashCode() {
         // Hash based on fields
-        return Objects.hash(organizationId, deviceId, parentDeviceId, deviceOrganizationMeta);
+        return Objects.hash(organizationId, tenantID, deviceId, parentDeviceId, deviceOrganizationMeta);
     }
 }

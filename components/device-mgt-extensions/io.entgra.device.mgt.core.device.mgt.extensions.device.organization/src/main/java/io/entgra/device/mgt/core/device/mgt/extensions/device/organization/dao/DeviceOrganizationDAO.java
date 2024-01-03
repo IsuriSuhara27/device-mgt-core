@@ -38,7 +38,7 @@ public interface DeviceOrganizationDAO {
      * @return A list of child device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving child devices.
      */
-    DeviceNodeResult getChildrenOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
+    DeviceNodeResult getChildrenOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Retrieves parent devices for a given device node.
@@ -49,7 +49,7 @@ public interface DeviceOrganizationDAO {
      * @return A list of parent device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving parent devices.
      */
-    DeviceNodeResult getParentsOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice) throws DeviceOrganizationMgtDAOException;
+    DeviceNodeResult getParentsOfDeviceNode(int deviceId, int maxDepth, boolean includeDevice, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Retrieves all device organization records.
@@ -65,7 +65,7 @@ public interface DeviceOrganizationDAO {
      * @return A list of root device organization records.
      * @throws DeviceOrganizationMgtDAOException
      */
-    public List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request) throws DeviceOrganizationMgtDAOException;
+    public List<DeviceOrganization> getDeviceOrganizationRoots(PaginationRequest request, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Retrieves device Organization Leafs
@@ -73,7 +73,7 @@ public interface DeviceOrganizationDAO {
      * @return A list of leaf device organization records.
      * @throws DeviceOrganizationMgtDAOException
      */
-    public List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request) throws DeviceOrganizationMgtDAOException;
+    public List<DeviceOrganization> getDeviceOrganizationLeafs(PaginationRequest request, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Adds a new record to the device organization table.
@@ -92,7 +92,7 @@ public interface DeviceOrganizationDAO {
      * @return True if a record with the specified deviceId and parentDeviceId exists, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while checking the existence of the record.
      */
-    boolean isDeviceOrganizationExist(int deviceId, Integer parentDeviceId) throws DeviceOrganizationMgtDAOException;
+    boolean isDeviceOrganizationExist(int deviceId, Integer parentDeviceId, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Get a device organization by the CHILD_PARENT_COMP_KEY unique key.
@@ -102,7 +102,7 @@ public interface DeviceOrganizationDAO {
      * @return The DeviceOrganization object if found, null otherwise.
      * @throws DeviceOrganizationMgtDAOException if an error occurs while accessing the database.
      */
-    DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId)
+    DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId, int tenantID)
             throws DeviceOrganizationMgtDAOException;
 
     /**
@@ -122,7 +122,7 @@ public interface DeviceOrganizationDAO {
      * @return The DeviceOrganization object representing the retrieved organization, or null if not found.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving the organization record.
      */
-    DeviceOrganization getDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException;
+    DeviceOrganization getDeviceOrganizationByID(int organizationId, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Deletes a device organization record from the database based on the provided organization ID.
@@ -131,7 +131,7 @@ public interface DeviceOrganizationDAO {
      * @return true if the organization record was successfully deleted, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while deleting the organization record.
      */
-    boolean deleteDeviceOrganizationByID(int organizationId) throws DeviceOrganizationMgtDAOException;
+    boolean deleteDeviceOrganizationByID(int organizationId, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Deletes records associated with a particular device ID from the device organization table.
@@ -142,7 +142,7 @@ public interface DeviceOrganizationDAO {
      * @return true if associated records were successfully deleted, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while deleting the associated records.
      */
-    boolean deleteDeviceAssociations(int deviceId) throws DeviceOrganizationMgtDAOException;
+    boolean deleteDeviceAssociations(int deviceId, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Checks whether a record with the specified device ID exists either in the deviceID column or
@@ -152,7 +152,7 @@ public interface DeviceOrganizationDAO {
      * @return true if a record with the given device ID exists, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while querying the database.
      */
-    boolean isDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException;
+    boolean isDeviceIdExist(int deviceId, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
      * Checks if a child device with the given `deviceId` exists in the database.
@@ -161,5 +161,5 @@ public interface DeviceOrganizationDAO {
      * @return `true` if the child device exists, `false` otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while checking the existence.
      */
-    boolean isChildDeviceIdExist(int deviceId) throws DeviceOrganizationMgtDAOException;
+    boolean isChildDeviceIdExist(int deviceId, int tenantID) throws DeviceOrganizationMgtDAOException;
 }
