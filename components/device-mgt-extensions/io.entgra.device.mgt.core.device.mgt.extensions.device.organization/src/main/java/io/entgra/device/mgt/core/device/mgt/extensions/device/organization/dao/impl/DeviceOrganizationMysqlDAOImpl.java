@@ -48,9 +48,9 @@ import static io.entgra.device.mgt.core.device.mgt.extensions.device.organizatio
 /**
  * Implementation of the DeviceOrganizationDAO interface.
  */
-public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
+public class DeviceOrganizationMysqlDAOImpl implements DeviceOrganizationDAO {
 
-    private static final Log log = LogFactory.getLog(DeviceOrganizationDAOImpl.class);
+    private static final Log log = LogFactory.getLog(DeviceOrganizationMysqlDAOImpl.class);
 
     /**
      * {@inheritDoc}
@@ -457,13 +457,12 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
 
     /**
      * Implementation for a test
-     *
      * @param tenantID
      * @throws DeviceOrganizationMgtDAOException
      */
 
     @Override
-    public void addAllDevices(int tenantID) throws DeviceOrganizationMgtDAOException {
+    public void addAllDevices(int tenantID) throws DeviceOrganizationMgtDAOException{
 
         try {
             ConnectionManagerUtil.beginDBTransaction();
@@ -499,9 +498,9 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     }
 
     @Override
-    public void addOrganizations(int tenantID, int start, int end) throws DeviceOrganizationMgtDAOException {
+    public void addOrganizations(int tenantID, int start, int end)  throws DeviceOrganizationMgtDAOException {
 
-        for (int i = start; i <= end; i++) {
+        for (int i = 2; i <= 500; i++) {
             DeviceOrganization organization = new DeviceOrganization();
             organization.setDeviceId(i);
             organization.setParentDeviceId(i - 1);
@@ -521,93 +520,21 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
         }
     }
 
-    @Override
-    public boolean isCyclicRelationshipExist(int deviceID, Integer parentDeviceID, int tenantID)
-            throws DeviceOrganizationMgtDAOException {
-
-        Set<Integer> visited = new HashSet<>();
-        Set<Integer> ancestors = new HashSet<>();
-        try {
-            Connection conn = ConnectionManagerUtil.getDBConnection();
-            // Fetch all ancestors of the current device
-            getAllAncestors(conn, deviceID, tenantID, visited, ancestors);
-
-            // Check if the parentDeviceID is among the ancestors
-            return ancestors.contains(deviceID);
-        } catch (DBConnectionException e) {
-            String msg = "Error occurred while obtaining DB connection to check cyclic relationship for deviceID " +
-                    deviceID + " and parentDeviceID " + parentDeviceID;
-            log.error(msg);
-            throw new DeviceOrganizationMgtDAOException(msg, e);
-        } catch (SQLException e) {
-            String msg = "Error occurred while processing SQL to check cyclic relationship for deviceID " +
-                    deviceID + " and parentDeviceID " + parentDeviceID;
-            log.error(msg);
-            throw new DeviceOrganizationMgtDAOException(msg, e);
-        }
-    }
-
-    private Set<Integer> getAllAncestors(Connection conn, int deviceID, int tenantID, Set<Integer> visited, Set<Integer> ancestors)
-            throws SQLException, DeviceOrganizationMgtDAOException {
-
-        try (PreparedStatement statement = conn.prepareStatement(
-                "SELECT PARENT_DEVICE_ID FROM DM_DEVICE_ORGANIZATION WHERE DEVICE_ID = ? AND TENANT_ID = ?")) {
-            statement.setInt(1, deviceID);
-            statement.setInt(2, tenantID);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    int parentDeviceID = resultSet.getInt("PARENT_DEVICE_ID");
-
-                    if (!visited.contains(parentDeviceID)) {
-                        // If the parentDeviceID has not been visited, add it to the visited set
-                        visited.add(parentDeviceID);
-
-                        // Recursively fetch ancestors for the current parentDeviceID
-                        ancestors.add(parentDeviceID);
-                        ancestors.addAll(getAllAncestors(conn, parentDeviceID, tenantID, visited, ancestors));
-
-                        // Remove the special value if it was added due to a previous cyclic relationship
-                        ancestors.remove(-1);
-                    } else {
-                        // Detected cyclic relationship, you can handle it as needed
-                        ancestors.add(-1);  // Special value indicating a cyclic relationship
-                        return ancestors;
-                    }
-                }
-            }
-        }
-
-        return ancestors;
-    }
-
-
-    //TODO : FOR ORACLE AND POSTGRES SQL isCyclicRelationshipExist need to be implemented.Below method work only for H2 sql
-
     /**
      * {@inheritDoc}
      */
-    public boolean isCyclicRelationshipExistSQL(int deviceID, Integer parentDeviceID, int tenantID)
+    @Override
+    public boolean isCyclicRelationshipExist(int deviceID, Integer parentDeviceID, int tenantID)
             throws DeviceOrganizationMgtDAOException {
         try {
             Connection conn = ConnectionManagerUtil.getDBConnection();
-            String sql = "WITH RECURSIVE all_paths AS ( " +
-                    "SELECT DEVICE_ID, CAST(DEVICE_ID AS VARCHAR(500)) AS path, 0 AS is_cycle " +
-                    "FROM DM_DEVICE_ORGANIZATION WHERE PARENT_DEVICE_ID = ? " +
-                    "UNION ALL " +
-                    "SELECT r.DEVICE_ID, CONCAT(d.path, ',', r.DEVICE_ID), " +
-                    "ARRAY_CONTAINS(r.DEVICE_ID, STRING_SPLIT(d.path, ',')) AS is_cycle " +
-                    "FROM DM_DEVICE_ORGANIZATION r, all_paths d WHERE " +
-                    "r.PARENT_DEVICE_ID = d.DEVICE_ID AND d.is_cycle = 0) " +
-                    "SELECT path, is_cycle FROM all_paths WHERE is_cycle = 1 ";
-            try (PreparedStatement statement = conn.prepareStatement(sql)) {
-                if (parentDeviceID != null) {
-                    statement.setInt(1, parentDeviceID);
-                }
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    return resultSet.next();
-                }
+
+            // Check for indirect cyclic relationship
+            if (hasCyclicRelationship(conn, deviceID, parentDeviceID)){
+                log.error("Indirect cyclic relationship detected. Insertion not allowed.");
+                return true;
             }
+            return false;
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining DB connection to check cyclic relationship for deviceID " +
                     deviceID + " and parentDeviceID " + parentDeviceID;
@@ -618,6 +545,38 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                     deviceID + " and parentDeviceID " + parentDeviceID;
             log.error(msg);
             throw new DeviceOrganizationMgtDAOException(msg, e);
+        }
+    }
+
+    private boolean hasCyclicRelationship(Connection connection, int deviceID, Integer parentDeviceID) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(
+                "WITH RECURSIVE all_paths AS\n" +
+                        "(\n" +
+                        "SELECT DEVICE_ID AS DEVICE_ID,\n" +
+                        "CAST(DEVICE_ID AS CHAR(500)) AS path, 0 AS is_cycle\n" +
+                        "FROM DM_DEVICE_ORGANIZATION\n" +
+                        "WHERE PARENT_DEVICE_ID=3\n" +
+                        "UNION ALL\n" +
+                        "SELECT r.DEVICE_ID,\n" +
+                        "CONCAT(d.path, ',', r.DEVICE_ID),\n" +
+                        "                              FIND_IN_SET(r.DEVICE_ID, d.path)!=0\n" +
+                        "FROM DM_DEVICE_ORGANIZATION r, all_paths d\n" +
+                        "WHERE r.PARENT_DEVICE_ID=d.DEVICE_ID\n" +
+                        "AND is_cycle=0\n" +
+                        "    )\n" +
+                        "SELECT\n" +
+                        "  DEVICE_ID,\n" +
+                        "  path,\n" +
+                        "  is_cycle\n" +
+                        "FROM\n" +
+                        "  all_paths\n" +
+                        "WHERE\n" +
+                        "  is_cycle = 1;")) {
+            statement.setInt(1, deviceID);
+            statement.setInt(2, parentDeviceID);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next();
+            }
         }
     }
 
@@ -664,6 +623,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
     /**
      * {@inheritDoc}
      */
+
     @Override
     public DeviceOrganization getDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId, int tenantID)
             throws DeviceOrganizationMgtDAOException {
@@ -820,12 +780,12 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
 
         } catch (DBConnectionException e) {
             String msg = "Error occurred while obtaining DB connection to delete device organization for " +
-                    "tenantID = " + tenantID + ", deviceId = " + deviceId + "and parentDeviceId = " + parentDeviceId;
+                    "tenantID = " + tenantID +", deviceId = " + deviceId + "and parentDeviceId = " + parentDeviceId;
             log.error(msg);
             throw new DeviceOrganizationMgtDAOException(msg, e);
         } catch (SQLException e) {
             String msg = "Error occurred while obtaining DB connection to delete device organization for " +
-                    "tenantID = " + tenantID + ", deviceId = " + deviceId + "and parentDeviceId = " + parentDeviceId;
+                    "tenantID = " + tenantID +", deviceId = " + deviceId + "and parentDeviceId = " + parentDeviceId;
             log.error(msg);
             throw new DeviceOrganizationMgtDAOException(msg, e);
         }

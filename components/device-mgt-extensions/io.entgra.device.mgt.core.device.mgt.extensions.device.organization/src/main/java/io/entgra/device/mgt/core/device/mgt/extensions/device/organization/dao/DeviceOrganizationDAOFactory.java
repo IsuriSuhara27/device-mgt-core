@@ -19,6 +19,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao;
 
 import io.entgra.device.mgt.core.device.mgt.core.config.datasource.DataSourceConfig;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.impl.DeviceOrganizationDAOImpl;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.impl.DeviceOrganizationMysqlDAOImpl;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.UnsupportedDatabaseEngineException;
 import org.apache.commons.logging.Log;
@@ -67,11 +68,12 @@ public class DeviceOrganizationDAOFactory {
         if (databaseEngine != null) {
             switch (databaseEngine) {
                 case DataBaseTypes.DB_TYPE_H2:
-                case DataBaseTypes.DB_TYPE_MYSQL:
                 case DataBaseTypes.DB_TYPE_POSTGRESQL:
                 case DataBaseTypes.DB_TYPE_MSSQL:
                 case DataBaseTypes.DB_TYPE_ORACLE:
                     return new DeviceOrganizationDAOImpl();
+                case DataBaseTypes.DB_TYPE_MYSQL:
+                    return new DeviceOrganizationMysqlDAOImpl();
                 default:
                     throw new UnsupportedDatabaseEngineException("Unsupported database engine : " + databaseEngine);
             }

@@ -187,11 +187,41 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean addDeviceOrganization(DeviceOrganization deviceOrganization)
+    public void addAllDevices() throws DeviceOrganizationMgtPluginException {
+        try {
+            // Open a database connection
+//            ConnectionManagerUtil.openDBConnection();
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            deviceOrganizationDao.addAllDevices(tenantID);
+        } catch (DeviceOrganizationMgtDAOException e) {
+            String msg = "Error occurred in the database level while retrieving all device organizations.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } finally {
+            // Close the database connection
+//            ConnectionManagerUtil.closeDBConnection();
+        }
+    }
+
+    @Override
+    public void addOrganizations(int start, int end) throws DeviceOrganizationMgtPluginException {
+        try {
+            // Open a database connection
+//            ConnectionManagerUtil.openDBConnection();
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            deviceOrganizationDao.addOrganizations(tenantID, start, end);
+        } catch (DeviceOrganizationMgtDAOException e) {
+            String msg = "Error occurred in the database level while retrieving all device organizations.";
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } finally {
+            // Close the database connection
+//            ConnectionManagerUtil.closeDBConnection();
+        }
+    }
+
+    private boolean insertDeviceOrganization(DeviceOrganization deviceOrganization)
             throws DeviceOrganizationMgtPluginException {
         if (deviceOrganization == null || deviceOrganization.getDeviceId() <= 0 ||
                 !(deviceOrganization.getParentDeviceId() == null || deviceOrganization.getParentDeviceId() > 0)) {
@@ -237,6 +267,96 @@ public class DeviceOrganizationServiceImpl implements DeviceOrganizationService 
             ConnectionManagerUtil.rollbackDBTransaction();
             msg = "Error occurred in the database level while adding device organization. "
                     + "Device Organization details : device ID = " + deviceID + ", parent device ID = " + parentDeviceID;
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } finally {
+            ConnectionManagerUtil.closeDBConnection();
+        }
+    }
+
+    @Override
+    public boolean addDeviceOrganization(DeviceOrganization deviceOrganization)
+            throws DeviceOrganizationMgtPluginException {
+        if (deviceOrganization == null || deviceOrganization.getDeviceId() <= 0 ||
+                !(deviceOrganization.getParentDeviceId() == null || deviceOrganization.getParentDeviceId() > 0)) {
+            throw new BadRequestException("Invalid input parameters for adding deviceOrganizations : " +
+                    "deviceOrganization = " + deviceOrganization +
+                    ", deviceID = " + "deviceID should be a positive number"
+                    + "parentDeviceID = " + "parentDeviceID should be a positive number or null");
+        }
+        String msg;
+        int deviceID = deviceOrganization.getDeviceId();
+        Integer parentDeviceID = deviceOrganization.getParentDeviceId();
+        boolean exists = isDeviceOrganizationExist(deviceID, parentDeviceID);
+        if (exists) {
+            log.error("Device Organization already exists");
+            return false;
+        }
+
+        boolean isInserted = insertDeviceOrganization(deviceOrganization);
+
+        if (isInserted && deviceOrganization.isCheckCyclicRelationship()){
+            try {
+                boolean isCyclic = isCyclicRelationshipExist(deviceOrganization.getDeviceId(), deviceOrganization.getParentDeviceId());
+                if (isCyclic){
+                    log.error("cyclic relationship detected. Insertion not allowed.");
+                    boolean isDeleted = deleteDeviceOrganizationByUniqueKey(deviceID, parentDeviceID);
+                    if (isDeleted) {
+                        isInserted = false;
+                    }
+                }
+            }
+            catch (Exception e){
+                log.error("Error occured. Insertion not allowed.");
+                boolean isDeleted = deleteDeviceOrganizationByUniqueKey(deviceID, parentDeviceID);
+                if (isDeleted) {
+                    isInserted = false;
+                }
+            }
+        }
+        return isInserted;
+    }
+
+    public boolean deleteDeviceOrganizationByUniqueKey(int deviceID, Integer parentDeviceID)
+            throws DeviceOrganizationMgtPluginException {
+        if (deviceID <= 0 || !(parentDeviceID == null || parentDeviceID > 0)) {
+            throw new BadRequestException("Invalid input parameters for deviceOrganization update. : "
+                    + ", deviceID = " + deviceID
+                    + ", parentDeviceID = " + parentDeviceID);
+        }
+        try {
+            ConnectionManagerUtil.openDBConnection();
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.deleteDeviceOrganizationByUniqueKey(deviceID, parentDeviceID, tenantID);
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining the database connection to retrieve organization. " +
+                    "Params : deviceID = " + deviceID + ", parentDeviceID = " + parentDeviceID;
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } catch (DeviceOrganizationMgtDAOException e) {
+            String msg = "Error occurred while retrieving device organization for deviceID " +
+                    deviceID + " and parentDeviceID " + parentDeviceID;
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } finally {
+            ConnectionManagerUtil.closeDBConnection();
+        }
+    }
+
+
+    private boolean isCyclicRelationshipExist(int deviceID, Integer parentDeviceID) throws DeviceOrganizationMgtPluginException {
+        try {
+            ConnectionManagerUtil.openDBConnection();
+            int tenantID = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+            return deviceOrganizationDao.isCyclicRelationshipExist(deviceID, parentDeviceID, tenantID);
+        } catch (DBConnectionException e) {
+            String msg = "Error occurred while obtaining the database connection to check cyclic relationship. " +
+                    "Params : deviceID = " + deviceID + ", parentDeviceID = " + parentDeviceID;
+            log.error(msg);
+            throw new DeviceOrganizationMgtPluginException(msg, e);
+        } catch (DeviceOrganizationMgtDAOException e) {
+            String msg = "Error occurred in the database level while checking for cyclic relationship. " +
+                    "Params : deviceID = " + deviceID + ", parentDeviceID = " + parentDeviceID;
             log.error(msg);
             throw new DeviceOrganizationMgtPluginException(msg, e);
         } finally {

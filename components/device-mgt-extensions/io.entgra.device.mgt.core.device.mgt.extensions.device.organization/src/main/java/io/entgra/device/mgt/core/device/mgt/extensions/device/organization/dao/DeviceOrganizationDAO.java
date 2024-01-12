@@ -35,6 +35,7 @@ public interface DeviceOrganizationDAO {
      * @param deviceId      The device ID for which child devices are retrieved.
      * @param maxDepth      The maximum depth to traverse when fetching child devices.
      * @param includeDevice Flag to indicate whether to include the parent device in the result.
+     * @param tenantID The ID of the tenant.
      * @return A list of child device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving child devices.
      */
@@ -46,6 +47,7 @@ public interface DeviceOrganizationDAO {
      * @param deviceId      The device ID for which parent devices are retrieved.
      * @param maxDepth      The maximum depth to traverse when fetching parent devices.
      * @param includeDevice Flag to indicate whether to include the current device node in the result.
+     * @param tenantID The ID of the tenant.
      * @return A list of parent device nodes.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving parent devices.
      */
@@ -89,16 +91,29 @@ public interface DeviceOrganizationDAO {
      *
      * @param deviceId       The ID of the device.
      * @param parentDeviceId The ID of the parent device.
+     * @param tenantID The ID of the tenant.
      * @return True if a record with the specified deviceId and parentDeviceId exists, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while checking the existence of the record.
      */
     boolean isDeviceOrganizationExist(int deviceId, Integer parentDeviceId, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
+     * Check whether there is a cyclic relationship upon creation of new organization
+     * @param deviceID       The ID of the target device.
+     * @param parentDeviceID       The ID of the source device.
+     * @param tenantID The ID of the tenant.
+     * @return True if a cyclic relationship get created.
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    boolean isCyclicRelationshipExist(int deviceID, Integer parentDeviceID, int tenantID)
+            throws DeviceOrganizationMgtDAOException;
+
+    /**
      * Get a device organization by the CHILD_PARENT_COMP_KEY unique key.
      *
      * @param deviceId       The ID of the child device.
      * @param parentDeviceId The ID of the parent device.
+     * @param tenantID The ID of the tenant.
      * @return The DeviceOrganization object if found, null otherwise.
      * @throws DeviceOrganizationMgtDAOException if an error occurs while accessing the database.
      */
@@ -119,15 +134,27 @@ public interface DeviceOrganizationDAO {
      * Retrieves a device organization record from the database based on the provided organization ID.
      *
      * @param organizationId The unique identifier of the device organization record to retrieve.
+     * @param tenantID The ID of the tenant.
      * @return The DeviceOrganization object representing the retrieved organization, or null if not found.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while retrieving the organization record.
      */
     DeviceOrganization getDeviceOrganizationByID(int organizationId, int tenantID) throws DeviceOrganizationMgtDAOException;
 
     /**
+     * Deletes a device organization record from the database based on the provided device ID and parent Device ID.
+     * @param deviceId
+     * @param parentDeviceId
+     * @param tenantID
+     * @return true if the organization record was successfully deleted, false otherwise.
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    boolean deleteDeviceOrganizationByUniqueKey(int deviceId, Integer parentDeviceId, int tenantID) throws DeviceOrganizationMgtDAOException;
+
+    /**
      * Deletes a device organization record from the database based on the provided organization ID.
      *
      * @param organizationId The unique identifier of the device organization record to delete.
+     * @param tenantID The ID of the tenant.
      * @return true if the organization record was successfully deleted, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while deleting the organization record.
      */
@@ -139,6 +166,7 @@ public interface DeviceOrganizationDAO {
      * parentDeviceID column in the device organization table.
      *
      * @param deviceId The unique identifier of the device for which associated records should be deleted.
+     * @param tenantID The ID of the tenant.
      * @return true if associated records were successfully deleted, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while deleting the associated records.
      */
@@ -149,6 +177,7 @@ public interface DeviceOrganizationDAO {
      * parentDeviceID column in the device organization table.
      *
      * @param deviceId The unique identifier of the device to check for existence.
+     * @param tenantID The ID of the tenant.
      * @return true if a record with the given device ID exists, false otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while querying the database.
      */
@@ -158,8 +187,22 @@ public interface DeviceOrganizationDAO {
      * Checks if a child device with the given `deviceId` exists in the database.
      *
      * @param deviceId The ID of the child device to check.
+     * @param tenantID The ID of the tenant.
      * @return `true` if the child device exists, `false` otherwise.
      * @throws DeviceOrganizationMgtDAOException If an error occurs while checking the existence.
      */
     boolean isChildDeviceIdExist(int deviceId, int tenantID) throws DeviceOrganizationMgtDAOException;
+
+    /**
+     * This method is only used for testing
+     * @param tenantID
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    void addAllDevices(int tenantID) throws DeviceOrganizationMgtDAOException;
+
+    /**
+     * This method is only used for testing
+     * @throws DeviceOrganizationMgtDAOException
+     */
+    void addOrganizations(int tenantID, int start, int end) throws DeviceOrganizationMgtDAOException;
 }

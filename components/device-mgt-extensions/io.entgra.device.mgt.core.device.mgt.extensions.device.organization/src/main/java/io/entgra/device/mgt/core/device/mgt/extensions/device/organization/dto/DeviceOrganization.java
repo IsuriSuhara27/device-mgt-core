@@ -37,6 +37,7 @@ public class DeviceOrganization {
     private String deviceOrganizationMeta;
     private Date updateTime;
     private int tenantID;
+    private boolean isCheckCyclicRelationship;
 
     public int getOrganizationId() {
         return organizationId;
@@ -91,6 +92,14 @@ public class DeviceOrganization {
 
     public void setTenantID(int tenantID) {
         this.tenantID = tenantID;
+    }
+
+    public boolean isCheckCyclicRelationship() {
+        return isCheckCyclicRelationship;
+    }
+
+    public void setCheckCyclicRelationship(boolean checkCyclicRelationship) {
+        isCheckCyclicRelationship = checkCyclicRelationship;
     }
 
     @Override
