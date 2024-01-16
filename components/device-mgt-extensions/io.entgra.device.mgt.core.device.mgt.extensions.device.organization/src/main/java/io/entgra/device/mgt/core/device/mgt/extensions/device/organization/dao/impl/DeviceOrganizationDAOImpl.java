@@ -570,7 +570,7 @@ public class DeviceOrganizationDAOImpl implements DeviceOrganizationDAO {
                         // Remove the special value if it was added due to a previous cyclic relationship
                         ancestors.remove(-1);
                     } else {
-                        // Detected cyclic relationship, you can handle it as needed
+                        // Detected cyclic relationship
                         ancestors.add(-1);  // Special value indicating a cyclic relationship
                         return ancestors;
                     }

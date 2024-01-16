@@ -531,7 +531,7 @@ public class DeviceOrganizationMysqlDAOImpl implements DeviceOrganizationDAO {
 
             // Check for indirect cyclic relationship
             if (hasCyclicRelationship(conn, deviceID, parentDeviceID)){
-                log.error("Indirect cyclic relationship detected. Insertion not allowed.");
+                log.error("cyclic relationship detected. Insertion not allowed.");
                 return true;
             }
             return false;
@@ -551,7 +551,7 @@ public class DeviceOrganizationMysqlDAOImpl implements DeviceOrganizationDAO {
     private boolean hasCyclicRelationship(Connection connection, int deviceID, Integer parentDeviceID) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(
                 "WITH RECURSIVE all_paths AS\n" +
-                        "(\n" +
+                        "(" +
                         "SELECT DEVICE_ID AS DEVICE_ID,\n" +
                         "CAST(DEVICE_ID AS CHAR(500)) AS path, 0 AS is_cycle\n" +
                         "FROM DM_DEVICE_ORGANIZATION\n" +
@@ -559,11 +559,11 @@ public class DeviceOrganizationMysqlDAOImpl implements DeviceOrganizationDAO {
                         "UNION ALL\n" +
                         "SELECT r.DEVICE_ID,\n" +
                         "CONCAT(d.path, ',', r.DEVICE_ID),\n" +
-                        "                              FIND_IN_SET(r.DEVICE_ID, d.path)!=0\n" +
+                        "FIND_IN_SET(r.DEVICE_ID, d.path)!=0\n" +
                         "FROM DM_DEVICE_ORGANIZATION r, all_paths d\n" +
                         "WHERE r.PARENT_DEVICE_ID=d.DEVICE_ID\n" +
-                        "AND is_cycle=0\n" +
-                        "    )\n" +
+                        "AND is_cycle=0" +
+                        ")\n" +
                         "SELECT\n" +
                         "  DEVICE_ID,\n" +
                         "  path,\n" +

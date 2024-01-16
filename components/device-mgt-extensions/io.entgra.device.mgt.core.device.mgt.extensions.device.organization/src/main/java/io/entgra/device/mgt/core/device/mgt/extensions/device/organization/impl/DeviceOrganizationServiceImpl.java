@@ -32,6 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 
+import java.sql.Connection;
 import java.util.List;
 
 public class DeviceOrganizationServiceImpl implements DeviceOrganizationService {

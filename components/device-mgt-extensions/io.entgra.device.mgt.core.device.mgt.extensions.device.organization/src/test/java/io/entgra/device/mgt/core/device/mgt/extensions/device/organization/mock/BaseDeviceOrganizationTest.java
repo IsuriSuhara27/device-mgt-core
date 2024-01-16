@@ -52,6 +52,10 @@ public abstract class BaseDeviceOrganizationTest {
     private static final String datasourceLocation = "src/test/resources/carbon-home/repository/conf/" +
             "datasources/data-source-config.xml";
 
+//    private static final String datasourceLocation = "src/test/resources/config/datasource/mysql/" +
+//            "data-source-config.xml";
+
+
     private static boolean mock;
 
     @BeforeSuite

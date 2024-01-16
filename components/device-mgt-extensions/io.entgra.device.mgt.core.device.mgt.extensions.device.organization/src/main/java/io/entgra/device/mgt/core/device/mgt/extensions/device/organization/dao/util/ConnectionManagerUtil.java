@@ -82,7 +82,7 @@ public class ConnectionManagerUtil {
      *
      * @throws DBConnectionException If an error occurs while starting the transaction.
      */
-    public static void beginDBTransaction() throws DBConnectionException {
+    public static Connection beginDBTransaction() throws DBConnectionException {
         Connection conn = currentConnection.get();
         if (conn == null) {
             conn = getDBConnection();
@@ -95,6 +95,8 @@ public class ConnectionManagerUtil {
         } catch (SQLException e) {
             throw new DBConnectionException("Error occurred while starting a database transaction.", e);
         }
+
+        return conn;
     }
 
     /**

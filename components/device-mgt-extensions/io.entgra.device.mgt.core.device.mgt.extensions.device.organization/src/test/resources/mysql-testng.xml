@@ -18,10 +18,10 @@
 
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 
-<suite name="MySQLDeviceManagementCore">
+<suite name="MySQLDeviceOrganization">
     <parameter name="useDefaultListeners" value="false"/>
     <parameter name="datasource" value="src/test/resources/config/datasource/mysql/data-source-config"/>
-    <parameter name="isMock" value="true"/>
+<!--    <parameter name="isMock" value="true"/>-->
 
     <test name="DAO Unit Tests" preserve-order="true">
         <parameter name="dbType" value="MySql"/>
