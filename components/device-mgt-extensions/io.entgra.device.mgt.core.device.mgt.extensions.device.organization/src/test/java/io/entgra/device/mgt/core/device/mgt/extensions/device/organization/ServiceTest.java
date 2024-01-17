@@ -18,6 +18,7 @@
 
 package io.entgra.device.mgt.core.device.mgt.extensions.device.organization;
 
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAO;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNodeResult;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.PaginationRequest;
@@ -31,6 +32,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.Date;
 import java.util.List;
 
 public class ServiceTest extends BaseDeviceOrganizationTest {
@@ -38,6 +40,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
     private static final Log log = LogFactory.getLog(ServiceTest.class);
 
     private DeviceOrganizationService deviceOrganizationService;
+    private DeviceOrganizationDAO deviceOrganizationDAO;
 
     @BeforeClass
     public void init() {
@@ -166,7 +169,7 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
 
         // Define specific combinations of deviceID and parentDeviceID
         int[][] combinations = {
-                {20, 19}, {19, 18}, {18, 17}, {20, 5}, {20, 17}, {19, 16}, {17, 16}, {16, 17}, {2, 1},{3, 2}
+                {20, 19}, {19, 18}, {18, 17}, {20, 5}, {20, 17}, {19, 16}, {17, 16}, {16, 17}, {2, 1}, {3, 2}
                 // Add more combinations as needed
         };
 
@@ -359,6 +362,128 @@ public class ServiceTest extends BaseDeviceOrganizationTest {
         Assert.assertNotNull(organization, "Organization should not be null");
         Assert.assertEquals(organization.getDeviceId(), deviceID, "Device ID should match");
         Assert.assertEquals(organization.getParentDeviceId().intValue(), parentDeviceID, "Parent Device ID should match");
+    }
+
+    @Test
+    public void testIsCyclicRelationshipExistWithoutCheck() throws DeviceOrganizationMgtPluginException {
+
+        // Add all devices
+        deviceOrganizationService.addAllDevices();
+
+        int start =52;
+        int end =100;
+        // Add organizations
+        deviceOrganizationService.addOrganizations(start, end);
+
+        // Test cyclic relationship check
+        int newSourceNode = 51;
+        int newTargetNode = 100;
+
+        DeviceOrganization deviceOrganization = new DeviceOrganization();
+        deviceOrganization.setDeviceId(newTargetNode);
+        deviceOrganization.setParentDeviceId(newSourceNode);
+        deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
+
+        try {
+            boolean isInserted = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+            Assert.assertTrue(isInserted, "Cyclic relationship not detected. Row Inserted.");
+        } catch (DeviceOrganizationMgtPluginException e) {
+            // Handle exceptions or log errors as needed
+            e.printStackTrace();
+            Assert.fail("Exception occurred during the test: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testIsCyclicRelationshipExistWithCheck() throws DeviceOrganizationMgtPluginException {
+
+        // Add all devices
+        deviceOrganizationService.addAllDevices();
+
+        int start =102;
+        int end =200;
+        // Add organizations
+        deviceOrganizationService.addOrganizations(start, end);
+
+        // Test cyclic relationship check
+        int newSourceNode = 101;
+        int newTargetNode = 200;
+
+        DeviceOrganization deviceOrganization = new DeviceOrganization();
+        deviceOrganization.setDeviceId(newTargetNode);
+        deviceOrganization.setParentDeviceId(newSourceNode);
+        deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
+        deviceOrganization.setCheckCyclicRelationship(true);
+
+        try {
+            boolean isInserted = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+            Assert.assertTrue(isInserted, "Cyclic relationship not detected. Row Inserted.");
+        } catch (DeviceOrganizationMgtPluginException e) {
+            // Handle exceptions or log errors as needed
+            e.printStackTrace();
+            Assert.fail("Exception occurred during the test: " + e.getMessage());
+        }
+    }
+
+
+    @Test
+    public void testIsCyclicRelationshipExistForDirectRelationships() throws DeviceOrganizationMgtPluginException {
+
+        // Add all devices
+        deviceOrganizationService.addAllDevices();
+
+        int start =202;
+        int end =300;
+        // Add organizations
+        deviceOrganizationService.addOrganizations(start, end);
+
+
+        // Test cyclic relationship check
+        int newSourceNode = 300;
+        int newTargetNode = 299;
+        DeviceOrganization deviceOrganization = new DeviceOrganization();
+        deviceOrganization.setDeviceId(newTargetNode);
+        deviceOrganization.setParentDeviceId(newSourceNode);
+        deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
+        deviceOrganization.setCheckCyclicRelationship(true);
+        try {
+            boolean isInserted = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+            Assert.assertFalse(isInserted, "Cyclic relationship detected. Insertion not allowed.");
+        } catch (DeviceOrganizationMgtPluginException e) {
+            // Handle exceptions or log errors as needed
+            e.printStackTrace();
+            Assert.fail("Exception occurred during the test: " + e.getMessage());
+        }
+    }
+
+    //
+    @Test
+    public void testIsCyclicRelationshipExistForIndirectRelationships() throws DeviceOrganizationMgtPluginException {
+
+        // Add all devices
+        deviceOrganizationService.addAllDevices();
+
+        int start =302;
+        int end =500;
+        // Add organizations
+        deviceOrganizationService.addOrganizations(start, end);
+
+        // Test cyclic relationship check
+        int newSourceNode = 500;
+        int newTargetNode = 301;
+        DeviceOrganization deviceOrganization = new DeviceOrganization();
+        deviceOrganization.setDeviceId(newTargetNode);
+        deviceOrganization.setParentDeviceId(newSourceNode);
+        deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
+        deviceOrganization.setCheckCyclicRelationship(true);
+        try {
+            boolean isInserted = deviceOrganizationService.addDeviceOrganization(deviceOrganization);
+            Assert.assertFalse(isInserted, "Cyclic relationship detected. Insertion not allowed.");
+        } catch (DeviceOrganizationMgtPluginException e) {
+            // Handle exceptions or log errors as needed
+            e.printStackTrace();
+            Assert.fail("Exception occurred during the test: " + e.getMessage());
+        }
     }
 
 }

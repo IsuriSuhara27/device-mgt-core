@@ -21,6 +21,7 @@ package io.entgra.device.mgt.core.device.mgt.extensions.device.organization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAO;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.DeviceOrganizationDAOFactory;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dao.util.ConnectionManagerUtil;
+import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.AdditionResult;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceNodeResult;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.dto.DeviceOrganization;
 import io.entgra.device.mgt.core.device.mgt.extensions.device.organization.exception.DBConnectionException;
@@ -89,7 +90,7 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         deviceOrganization.setParentDeviceId(null);
         deviceOrganization.setUpdateTime(new Date(System.currentTimeMillis()));
         ConnectionManagerUtil.beginDBTransaction();
-        boolean result = deviceOrganizationDAO.addDeviceOrganization(deviceOrganization);
+        AdditionResult result = deviceOrganizationDAO.addDeviceOrganization(deviceOrganization);
         ConnectionManagerUtil.commitDBTransaction();
         ConnectionManagerUtil.closeDBConnection();
         DeviceOrganization deviceOrganization1 = new DeviceOrganization();
@@ -97,7 +98,7 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         deviceOrganization1.setParentDeviceId(1);
         deviceOrganization1.setUpdateTime(new Date(System.currentTimeMillis()));
         ConnectionManagerUtil.beginDBTransaction();
-        boolean result1 = deviceOrganizationDAO.addDeviceOrganization(deviceOrganization1);
+        AdditionResult result1 = deviceOrganizationDAO.addDeviceOrganization(deviceOrganization1);
         ConnectionManagerUtil.commitDBTransaction();
         ConnectionManagerUtil.closeDBConnection();
 
@@ -106,7 +107,7 @@ public class DAOTest extends BaseDeviceOrganizationTest {
         deviceOrganization1.setParentDeviceId(1);
         deviceOrganization1.setUpdateTime(new Date(System.currentTimeMillis()));
         ConnectionManagerUtil.beginDBTransaction();
-        boolean result2 = deviceOrganizationDAO.addDeviceOrganization(deviceOrganization1);
+        AdditionResult result2 = deviceOrganizationDAO.addDeviceOrganization(deviceOrganization1);
         ConnectionManagerUtil.commitDBTransaction();
         ConnectionManagerUtil.closeDBConnection();
 
