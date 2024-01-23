@@ -21,6 +21,8 @@ package io.entgra.device.mgt.core.device.mgt.api.jaxrs.util;
 import io.entgra.device.mgt.core.apimgt.webapp.publisher.APIPublisherService;
 import io.entgra.device.mgt.core.application.mgt.common.services.ApplicationManager;
 import io.entgra.device.mgt.core.application.mgt.common.services.SubscriptionManager;
+import io.entgra.device.mgt.core.device.mgt.common.metadata.mgt.DeviceStatusManagementService;
+import io.entgra.device.mgt.core.cea.mgt.common.service.CEAManagementService;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.java.security.SSLProtocolSocketFactory;
@@ -153,12 +155,14 @@ public class DeviceMgtAPIUtils {
     //    private static IntegrationClientService integrationClientService;
     private static MetadataManagementService metadataManagementService;
     private static WhiteLabelManagementService whiteLabelManagementService;
-    private static OTPManagementService otpManagementService;
 
+    private static DeviceStatusManagementService deviceStatusManagementService;
+    private static OTPManagementService otpManagementService;
     private static volatile SubscriptionManager subscriptionManager;
     private static volatile ApplicationManager applicationManager;
 
     private static volatile APIPublisherService apiPublisher;
+    private static volatile CEAManagementService ceaManagementService;
 
     static {
         String keyStorePassword = ServerConfiguration.getInstance().getFirstProperty("Security.KeyStore.Password");
@@ -530,6 +534,28 @@ public class DeviceMgtAPIUtils {
             }
         }
         return whiteLabelManagementService;
+    }
+
+    /**
+     * Initializing and accessing method for DeviceStatusManagementService.
+     *
+     * @return WhiteLabelManagementService instance
+     * @throws IllegalStateException if DeviceStatusManagementService cannot be initialized
+     */
+    public static DeviceStatusManagementService getDeviceStatusManagmentService() {
+        if (deviceStatusManagementService == null) {
+            synchronized (DeviceMgtAPIUtils.class) {
+                if (deviceStatusManagementService == null) {
+                    PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                    deviceStatusManagementService = (DeviceStatusManagementService) ctx.getOSGiService(
+                            DeviceStatusManagementService.class, null);
+                    if (deviceStatusManagementService == null) {
+                        throw new IllegalStateException("DeviceStatusManagementService Management service not initialized.");
+                    }
+                }
+            }
+        }
+        return deviceStatusManagementService;
     }
 
     /**
@@ -1205,4 +1231,19 @@ public class DeviceMgtAPIUtils {
         return isPermitted;
     }
 
+    public static CEAManagementService getCEAManagementService() {
+        if (ceaManagementService == null) {
+            synchronized (DeviceMgtAPIUtils.class) {
+                if (ceaManagementService == null) {
+                    PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                    ceaManagementService = (CEAManagementService)
+                            ctx.getOSGiService(CEAManagementService.class, null);
+                    if (ceaManagementService == null) {
+                        throw new IllegalStateException("Conditional Email Access Management Service is not initialize");
+                    }
+                }
+            }
+        }
+        return ceaManagementService;
+    }
 }

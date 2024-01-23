@@ -17,18 +17,18 @@
  */
 package io.entgra.device.mgt.core.device.mgt.api.jaxrs.service.impl;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import io.entgra.device.mgt.core.device.mgt.common.Device;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import io.entgra.device.mgt.core.device.mgt.extensions.logger.spi.EntgraLogger;
+import io.entgra.device.mgt.core.notification.logger.UserMgtLogContext;
+import io.entgra.device.mgt.core.notification.logger.impl.EntgraUserMgtLoggerImpl;
 import org.apache.http.HttpStatus;
 import org.eclipse.wst.common.uriresolver.internal.util.URIEncoder;
 import org.wso2.carbon.context.CarbonContext;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
 import io.entgra.device.mgt.core.device.mgt.common.exceptions.DeviceManagementException;
-import io.entgra.device.mgt.core.device.mgt.common.EnrolmentInfo;
 import io.entgra.device.mgt.core.device.mgt.common.configuration.mgt.ConfigurationManagementException;
 import io.entgra.device.mgt.core.device.mgt.common.exceptions.OTPManagementException;
 import io.entgra.device.mgt.core.device.mgt.common.invitation.mgt.DeviceEnrollmentInvitation;
@@ -45,6 +45,8 @@ import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.BasicUserInfoWrapper
 import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.Credential;
 import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.EnrollmentInvitation;
 import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.ErrorResponse;
+import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.InvitationMailProfile;
+import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.JITEnrollmentInvitation;
 import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.OldPasswordResetWrapper;
 import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.PermissionList;
 import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.RoleList;
@@ -83,7 +85,6 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -92,6 +93,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.NoSuchFileException;
 import java.security.SecureRandom;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -113,7 +115,8 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     private static final String ROLE_EVERYONE = "Internal/everyone";
     private static final String API_BASE_PATH = "/users";
-    private static final Log log = LogFactory.getLog(UserManagementServiceImpl.class);
+    UserMgtLogContext.Builder userMgtContextBuilder = new UserMgtLogContext.Builder();
+    private static final EntgraLogger log = new EntgraUserMgtLoggerImpl(UserManagementServiceImpl.class);
 
     // Permissions that are given for a normal device user.
     private static final Permission[] PERMISSIONS_FOR_DEVICE_USER = {
@@ -158,7 +161,10 @@ public class UserManagementServiceImpl implements UserManagementService {
             if (log.isDebugEnabled()) {
                 log.debug("User '" + userInfo.getUsername() + "' has successfully been added.");
             }
-
+            String tenantId = String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantId());
+            String tenantDomain = String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            String loggeduserName = String.valueOf(CarbonContext.getThreadLocalCarbonContext().getUsername());
+            String stringRoles = new Gson().toJson(userInfo.getRoles());
             BasicUserInfo createdUserInfo = this.getBasicUserInfo(userInfo.getUsername());
             // Outputting debug message upon successful retrieval of user
             if (log.isDebugEnabled()) {
@@ -173,6 +179,20 @@ public class UserManagementServiceImpl implements UserManagementService {
             props.setProperty("last-name", userInfo.getLastname());
             props.setProperty("username", username);
             props.setProperty("password", initialUserPassword);
+            log.info(
+                    "User " + username + " created",
+                    userMgtContextBuilder
+                            .setActionTag("ADD_USER")
+                            .setUserStoreDomain(userInfo.getUsername().split("/")[0])
+                            .setFirstName(userInfo.getFirstname())
+                            .setLastName(userInfo.getLastname())
+                            .setEmail(userInfo.getEmailAddress())
+                            .setUserRoles(stringRoles)
+                            .setTenantID(tenantId)
+                            .setTenantDomain(tenantDomain)
+                            .setUserName(loggeduserName)
+                            .build()
+            );
 
             EmailMetaInfo metaInfo = new EmailMetaInfo(recipient, props);
             BasicUserInfoWrapper userInfoWrapper = new BasicUserInfoWrapper();
@@ -247,6 +267,9 @@ public class UserManagementServiceImpl implements UserManagementService {
             username = domain + '/' + username;
         }
         try {
+            String tenantId = String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantId());
+            String tenantDomain = String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
+            String loggeduserName = String.valueOf(CarbonContext.getThreadLocalCarbonContext().getUsername());
             UserStoreManager userStoreManager = DeviceMgtAPIUtils.getUserStoreManager();
             if (!userStoreManager.isExistingUser(username)) {
                 if (log.isDebugEnabled()) {
@@ -293,6 +316,21 @@ public class UserManagementServiceImpl implements UserManagementService {
             if (log.isDebugEnabled()) {
                 log.debug("User by username: " + username + " was successfully updated.");
             }
+            String stringRoles = new Gson().toJson(newRoles);
+            log.info(
+                    "User " + username + " updated",
+                    userMgtContextBuilder
+                            .setActionTag("UPDATE_USER")
+                            .setUserStoreDomain(username.split("/")[0])
+                            .setFirstName(userInfo.getFirstname())
+                            .setLastName(userInfo.getLastname())
+                            .setEmail(userInfo.getEmailAddress())
+                            .setUserRoles(stringRoles)
+                            .setTenantID(tenantId)
+                            .setTenantDomain(tenantDomain)
+                            .setUserName(loggeduserName)
+                            .build()
+            );
 
             BasicUserInfo updatedUserInfo = this.getBasicUserInfo(username);
             return Response.ok().entity(updatedUserInfo).build();
@@ -326,6 +364,8 @@ public class UserManagementServiceImpl implements UserManagementService {
             username = domain + '/' + username;
             nameWithDomain = true;
         }
+        String tenantId = String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantId());
+        String tenantDomain = String.valueOf(CarbonContext.getThreadLocalCarbonContext().getTenantDomain());
         try {
             int deviceCount;
             UserStoreManager userStoreManager = DeviceMgtAPIUtils.getUserStoreManager();
@@ -347,11 +387,21 @@ public class UserManagementServiceImpl implements UserManagementService {
                 if (log.isDebugEnabled()) {
                     log.debug("User '" + username + "' was successfully removed.");
                 }
+                log.info(
+                        "User " + username + " removed",
+                        userMgtContextBuilder
+                                .setActionTag("REMOVE_USER")
+                                .setUserStoreDomain(domain)
+                                .setTenantID(tenantId)
+                                .setTenantDomain(tenantDomain)
+                                .setUserName(username)
+                                .build()
+                );
                 return Response.status(Response.Status.OK).build();
             } else {
-                String msg = "There are enrolled devices for user: " + username + ". Please remove them before deleting the user.";
+                String msg = "Before deleting this user, ensure there are no devices assigned to the user. You can either remove the devices or change their owner through an update enrollment operation.";
                 log.error(msg);
-                return Response.status(400).entity(msg).build();
+                return Response.status(409).entity(msg).build();
             }
         } catch (DeviceManagementException | UserStoreException e) {
             String msg = "Exception in trying to remove user by user: " + username;
@@ -419,7 +469,8 @@ public class UserManagementServiceImpl implements UserManagementService {
             userList = new ArrayList<>(users.size());
             BasicUserInfo user;
             for (String username : users) {
-                if (Constants.APIM_RESERVED_USER.equals(username) || Constants.RESERVED_USER.equals(username)) {
+                if (Constants.APIM_RESERVED_USER.equals(username) || Constants.RESERVED_USER.equals(username) ||
+                        Constants.SCOPE_PUBLISH_RESERVED_USER.equals(username)) {
                     continue;
                 }
                 user = getBasicUserInfo(username);
@@ -485,6 +536,7 @@ public class UserManagementServiceImpl implements UserManagementService {
             if (commonUsers != null) {
                 commonUsers.remove(Constants.APIM_RESERVED_USER);
                 commonUsers.remove(Constants.RESERVED_USER);
+                commonUsers.remove(Constants.SCOPE_PUBLISH_RESERVED_USER);
             }
 
             if (!skipSearch(commonUsers) && StringUtils.isNotEmpty(firstName)) {
@@ -660,7 +712,8 @@ public class UserManagementServiceImpl implements UserManagementService {
             userList = new ArrayList<>();
             UserInfo user;
             for (String username : users) {
-                if (Constants.APIM_RESERVED_USER.equals(username) || Constants.RESERVED_USER.equals(username)) {
+                if (Constants.APIM_RESERVED_USER.equals(username) || Constants.RESERVED_USER.equals(username) ||
+                        Constants.SCOPE_PUBLISH_RESERVED_USER.equals(username)) {
                     continue;
                 }
                 user = new UserInfo();
@@ -751,6 +804,54 @@ public class UserManagementServiceImpl implements UserManagementService {
                     new ErrorResponse.ErrorResponseBuilder().setMessage(msg).build()).build();
         } catch (ConfigurationManagementException e) {
             String msg = "Error occurred while sending the email invitations. Mail server not configured.";
+            return Response.serverError().entity(
+                    new ErrorResponse.ErrorResponseBuilder().setMessage(msg).build()).build();
+        }
+        return Response.status(Response.Status.OK).entity("Invitation mails have been sent.").build();
+    }
+
+    @POST
+    @Path("jit-enrollment-invite")
+    @Override
+    public Response inviteExternalUsers(JITEnrollmentInvitation jitEnrollmentInvitation) {
+        if (jitEnrollmentInvitation.getMailProfiles() == null || jitEnrollmentInvitation.getMailProfiles().isEmpty()) {
+            String msg = "Error occurred while validating mail profiles. Mail profiles cannot be empty";
+            log.error(msg);
+            throw new BadRequestException(
+                    new ErrorResponse.ErrorResponseBuilder().setMessage(msg).setCode(HttpStatus.SC_BAD_REQUEST).
+                            build());
+        }
+        String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
+        String inviteBy = DeviceMgtAPIUtils.getAuthenticatedUser();
+        try {
+            DeviceManagementProviderService dms = DeviceMgtAPIUtils.getDeviceManagementService();
+            for (InvitationMailProfile mailProfile : jitEnrollmentInvitation.getMailProfiles()) {
+                Properties props = new Properties();
+                props.setProperty("username", mailProfile.getUsername());
+                props.setProperty("tenant-domain", tenantDomain);
+                props.setProperty("sp", jitEnrollmentInvitation.getSp());
+                props.setProperty("ownership-type", jitEnrollmentInvitation.getOwnershipType());
+                props.setProperty("device-type", jitEnrollmentInvitation.getDeviceType());
+                props.setProperty("invite-by", inviteBy);
+                Set<String> recipients = new HashSet<>();
+                recipients.add(mailProfile.getMail());
+                EmailMetaInfo metaInfo = new EmailMetaInfo(recipients, props);
+                dms.sendEnrolmentInvitation(getTemplateName(jitEnrollmentInvitation.getDeviceType(),
+                        "jit-enrollment-invitation", "-"), metaInfo);
+            }
+        } catch (DeviceManagementException ex) {
+            String msg = "Error occurred while inviting user to enroll their device";
+            log.error(msg, ex);
+            return Response.serverError().entity(
+                    new ErrorResponse.ErrorResponseBuilder().setMessage(msg).build()).build();
+        } catch (ConfigurationManagementException ex) {
+            String msg = "Error occurred while sending the email invitations. Mail server not configured.";
+            log.error(msg, ex);
+            return Response.serverError().entity(
+                    new ErrorResponse.ErrorResponseBuilder().setMessage(msg).build()).build();
+        } catch (NoSuchFileException ex) {
+            String msg = "Error occurred while retrieving email template";
+            log.error(msg, ex);
             return Response.serverError().entity(
                     new ErrorResponse.ErrorResponseBuilder().setMessage(msg).build()).build();
         }
@@ -1177,6 +1278,30 @@ public class UserManagementServiceImpl implements UserManagementService {
             }
         }
         return DeviceManagementConstants.EmailAttributes.DEFAULT_ENROLLMENT_TEMPLATE;
+    }
+
+    private String getTemplateName(String deviceType, String prefix, String separator) throws NoSuchFileException {
+        String templateName = deviceType + separator + prefix;
+        List<String> templatePathSegments =
+                Arrays.asList(CarbonUtils.getCarbonHome(), "repository", "resources", "email-templates", templateName + ".vm");
+        File template = new File(String.join(File.separator, templatePathSegments));
+        if (template.exists()) {
+            return templateName;
+        }
+
+        String defaultTemplateName = "default" + separator + prefix;
+        List<String> defaultTemplatePathSegments =
+                Arrays.asList(CarbonUtils.getCarbonHome(), "repository", "resources", "email-templates", defaultTemplateName + ".vm");
+        File defaultTemplate = new File(String.join(File.separator, defaultTemplatePathSegments));
+
+        if (defaultTemplate.exists()) {
+            if (log.isDebugEnabled()) {
+                log.debug("The template that is expected to use is not available. Therefore, using default template.");
+            }
+            return defaultTemplateName;
+        }
+
+        throw new NoSuchFileException("Didn't found template file for " + templateName);
     }
 
     /**
