@@ -19,7 +19,7 @@
     },
 #end
     {
-      "name": "ts",
+      "name": "meta_ts",
       "type": "LONG"
     }
   ]
