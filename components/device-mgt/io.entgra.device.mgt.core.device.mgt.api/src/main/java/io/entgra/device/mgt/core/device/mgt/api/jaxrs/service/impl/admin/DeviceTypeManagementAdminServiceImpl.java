@@ -29,10 +29,11 @@ import io.entgra.device.mgt.core.device.mgt.common.type.mgt.DeviceTypeMetaDefini
 import io.entgra.device.mgt.core.device.mgt.core.dto.DeviceType;
 import io.entgra.device.mgt.core.device.mgt.core.dto.DeviceTypeVersion;
 import io.entgra.device.mgt.core.device.mgt.core.service.DeviceManagementProviderService;
-import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.DeviceTypeVersionWrapper;
-import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.ErrorResponse;
-import io.entgra.device.mgt.core.device.mgt.api.jaxrs.service.api.admin.DeviceTypeManagementAdminService;
-import io.entgra.device.mgt.core.device.mgt.api.jaxrs.util.DeviceMgtAPIUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.base.MultitenantConstants;
+import org.wso2.carbon.context.PrivilegedCarbonContext;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -153,6 +154,25 @@ public class DeviceTypeManagementAdminServiceImpl implements DeviceTypeManagemen
                 String msg = "Error occurred at server side while updating the device type.";
                 log.error(msg, e);
                 return Response.serverError().entity(msg).build();
+            }
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+    }
+
+    @Override
+    @GET
+    @Path("/{type}/configs")
+    public Response getDeviceTypePlatformConfig(@PathParam("type") String type) {
+        if (!StringUtils.isEmpty(type)) {
+            try {
+                PlatformConfiguration platformConfiguration = DeviceMgtAPIUtils.getDeviceManagementService().getConfiguration(type);
+                return Response.status(Response.Status.OK).entity(platformConfiguration).build();
+            } catch (DeviceManagementException e) {
+                String msg = "Error occurred while retrieving the Device type platform configuration";
+                log.error(msg, e);
+                return Response.serverError().entity(
+                        new ErrorResponse.ErrorResponseBuilder().setMessage(msg).build()).build();
             }
         } else {
             return Response.status(Response.Status.BAD_REQUEST).build();
