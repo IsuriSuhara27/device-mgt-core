@@ -23,11 +23,15 @@ import io.entgra.device.mgt.core.apimgt.analytics.extension.dto.*;
 import io.entgra.device.mgt.core.apimgt.analytics.extension.exception.EventPublisherDeployerException;
 import io.entgra.device.mgt.core.apimgt.analytics.extension.exception.EventReceiverDeployerException;
 import io.entgra.device.mgt.core.apimgt.analytics.extension.exception.EventStreamDeployerException;
-import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.analytics.*;
 import io.entgra.device.mgt.core.device.mgt.api.jaxrs.service.api.DeviceEventManagementService;
 import io.entgra.device.mgt.core.device.mgt.api.jaxrs.util.Constants;
 import io.entgra.device.mgt.core.device.mgt.api.jaxrs.util.DeviceMgtAPIUtils;
 import io.entgra.device.mgt.core.device.mgt.common.exceptions.DeviceManagementException;
+import io.entgra.device.mgt.core.device.mgt.common.type.event.mgt.DeviceTypeEvent;
+import io.entgra.device.mgt.core.device.mgt.common.type.event.mgt.TransportType;
+import io.entgra.device.mgt.core.device.mgt.common.type.event.mgt.Attribute;
+import io.entgra.device.mgt.core.device.mgt.common.type.event.mgt.AttributeType;
+import io.entgra.device.mgt.core.device.mgt.common.type.event.mgt.EventAttributeList;
 import io.entgra.device.mgt.core.identity.jwt.client.extension.exception.JWTClientException;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Stub;
@@ -205,6 +209,35 @@ public class DeviceEventManagementServiceImpl implements DeviceEventManagementSe
             cleanup(eventReceiverAdminServiceStub);
         }
     }
+//
+//    @GET
+//    @Path("/{type}/event-definitions")
+//    public Response getDeviceTypeEventDefinitions(@PathParam("type") String deviceType) {
+//        String selectSQL = "SELECT DEVICE_TYPE_META FROM DM_DEVICE_TYPE WHERE NAME = ? AND PROVIDER_TENANT_ID = ?";
+//        try (Connection connection = dataSource.getConnection();
+//             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+//
+//            int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
+//            preparedStatement.setString(1, deviceType);
+//            preparedStatement.setInt(2, tenantId);
+//
+//            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+//                if (resultSet.next()) {
+//                    String metaJson = resultSet.getString("DEVICE_TYPE_META");
+//                    if (metaJson != null) {
+//                        Map<String, Object> meta = new Gson().fromJson(metaJson, new TypeToken<Map<String, Object>>() {}.getType());
+//                        Object eventDefinitions = meta.get("eventDefinitions");
+//                        return Response.ok(new Gson().toJson(eventDefinitions)).build();
+//                    }
+//                }
+//            }
+//            return Response.status(Response.Status.NOT_FOUND).build();
+//        } catch (SQLException e) {
+//            log.error("Failed to retrieve DEVICE_TYPE_META for device type: " + deviceType, e);
+//            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
+
 
     /**
      * Deploy Event Stream, Receiver, Publisher and Store Configuration.
@@ -317,6 +350,12 @@ public class DeviceEventManagementServiceImpl implements DeviceEventManagementSe
                 artifactsDeployer.deployEventPublisher(wsEventPublisherData, tenantId);
 
             }
+//            for (DeviceTypeEvent deviceTypeEvent : deviceTypeEvents) {
+//                // ... (existing code for deploying streams, receivers, and publishers)
+//
+//                // Update device type metadata with event definitions
+//                updateDeviceTypeMetaWithEvents(deviceType, tenantId, deviceTypeEvents);
+//            }
             return Response.ok().build();
         } catch (DeviceManagementException e) {
             log.error("Failed to access device management service, tenantDomain: " + tenantDomain, e);
