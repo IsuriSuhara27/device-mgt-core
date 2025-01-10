@@ -79,11 +79,10 @@ public class DeviceTypeEventDAOImpl implements DeviceTypeEventDAO {
    }
 
    @Override
-   public void updateDeviceTypeMetaWithEvents(String deviceType, int tenantId, List<DeviceTypeEvent> deviceTypeEvents)
+   public Response updateDeviceTypeMetaWithEvents(String deviceType, int tenantId, String existingEventDefinitionsJson,
+                                                  List<DeviceTypeEvent> deviceTypeEvents)
            throws DeviceManagementDAOException {
       try {
-         // Retrieve existing event definitions
-         String existingEventDefinitionsJson = getDeviceTypeEventDefinitionsAsJson(deviceType, tenantId);
          // Initialize ObjectMapper for Jackson processing
          ObjectMapper objectMapper = new ObjectMapper();
          // Parse existing event definitions
@@ -93,7 +92,7 @@ public class DeviceTypeEventDAOImpl implements DeviceTypeEventDAO {
          // Serialize updated event definitions
          String updatedEventDefinitionsJson = objectMapper.writeValueAsString(existingEvents);
          // Update the database with the new event definitions
-         updateEventDefinitionsInDB(deviceType, tenantId, updatedEventDefinitionsJson);
+         return updateEventDefinitionsInDB(deviceType, tenantId, updatedEventDefinitionsJson);
       } catch (SQLException e) {
          log.error("Error while updating EVENT_DEFINITIONS for device type: " + deviceType, e);
          throw new DeviceManagementDAOException("Error updating EVENT_DEFINITIONS in the database.", e);
@@ -103,7 +102,8 @@ public class DeviceTypeEventDAOImpl implements DeviceTypeEventDAO {
       }
    }
 
-   private String getDeviceTypeEventDefinitionsAsJson(String deviceType, int tenantId) throws SQLException {
+   @Override
+   public String getDeviceTypeEventDefinitionsAsJson(String deviceType, int tenantId) throws DeviceManagementDAOException {
       String selectSQL = "SELECT EVENT_DEFINITIONS FROM DM_DEVICE_TYPE_META WHERE TENANT_ID = ? AND ID = " +
               "(SELECT ID FROM DM_DEVICE_TYPE WHERE NAME = ? AND PROVIDER_TENANT_ID = ?)";
       try (Connection connection = this.getConnection();
@@ -118,15 +118,27 @@ public class DeviceTypeEventDAOImpl implements DeviceTypeEventDAO {
                return resultSet.getString("EVENT_DEFINITIONS");
             }
          }
+      } catch (SQLException e) {
+         log.error("Error retrieving device type event JSON for device type " + deviceType, e);
+         throw new DeviceManagementDAOException("Error retrieving EVENT_DEFINITIONS from the database.", e);
       }
       return null;
    }
 
-   private List<Map<String, Object>> parseExistingEventDefinitions(String existingEventDefinitionsJson, ObjectMapper objectMapper)
+   public List<Map<String, Object>> parseExistingEventDefinitions(String existingEventDefinitionsJson, ObjectMapper objectMapper)
            throws IOException {
       if (existingEventDefinitionsJson != null) {
          try {
-            return objectMapper.readValue(existingEventDefinitionsJson, new TypeReference<>() {});
+            // Parse the JSON as a Map first
+            Map<String, Object> parsedJson = objectMapper.readValue(existingEventDefinitionsJson, new TypeReference<Map<String, Object>>() {});
+            // Extract the "eventDefinitions" key as a list
+            Object eventDefinitions = parsedJson.get("eventDefinitions");
+            if (eventDefinitions instanceof List) {
+               return (List<Map<String, Object>>) eventDefinitions;
+            } else {
+               log.error("The 'eventDefinitions' key does not contain a list: " + existingEventDefinitionsJson);
+               return new ArrayList<>();
+            }
          } catch (JsonParseException | JsonMappingException e) {
             log.error("Error parsing JSON: " + existingEventDefinitionsJson, e);
             throw new IOException("Error parsing JSON", e);
@@ -148,7 +160,7 @@ public class DeviceTypeEventDAOImpl implements DeviceTypeEventDAO {
       }
    }
 
-   private void updateEventDefinitionsInDB(String deviceType, int tenantId, String updatedEventDefinitionsJson)
+   private Response updateEventDefinitionsInDB(String deviceType, int tenantId, String updatedEventDefinitionsJson)
            throws SQLException {
       String updateSQL = "UPDATE DM_DEVICE_TYPE_META " +
               "SET EVENT_DEFINITIONS = ?, LAST_UPDATED_TIMESTAMP = ? " +
@@ -166,6 +178,7 @@ public class DeviceTypeEventDAOImpl implements DeviceTypeEventDAO {
 
          // Execute the update
          updateStmt.executeUpdate();
+         return Response.ok().build();
       }
    }
 

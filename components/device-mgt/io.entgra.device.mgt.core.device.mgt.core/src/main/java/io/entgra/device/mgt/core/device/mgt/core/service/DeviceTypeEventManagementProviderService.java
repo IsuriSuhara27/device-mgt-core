@@ -1,3 +1,4 @@
+package io.entgra.device.mgt.core.device.mgt.core.service;
 /*
  * Copyright (C) 2018 - 2024 Entgra (Pvt) Ltd, Inc - All Rights Reserved.
  *
@@ -17,24 +18,18 @@
  * under the License.
  */
 
-package io.entgra.device.mgt.core.device.mgt.core.dao;
-
 import io.entgra.device.mgt.core.device.mgt.common.type.event.mgt.DeviceTypeEvent;
+import io.entgra.device.mgt.core.device.mgt.core.dao.DeviceManagementDAOException;
 
 import javax.ws.rs.core.Response;
-import java.sql.SQLException;
 import java.util.List;
 
-/**
- * This class represents the key dao operations associated with persisting and retrieving
- * device type event related information.
- */
-public interface DeviceTypeEventDAO {
+public interface DeviceTypeEventManagementProviderService {
 
-    Response getDeviceTypeEventDefinitions(String deviceType, int tenantId) throws DeviceManagementDAOException;
+    Response getDeviceTypeEventDefinitions(String deviceType) throws DeviceManagementDAOException;
 
-    Response updateDeviceTypeMetaWithEvents(String deviceType, int tenantId, String eventDefinitionsJson, List<DeviceTypeEvent> deviceTypeEvents)
+    String getDeviceTypeEventDefinitionsAsJson(String deviceType) throws DeviceManagementDAOException;
+
+    Response updateDeviceTypeMetaWithEvents(String deviceType, List<DeviceTypeEvent> deviceTypeEvents)
             throws DeviceManagementDAOException;
-
-    String getDeviceTypeEventDefinitionsAsJson(String deviceType, int tenantId) throws DeviceManagementDAOException, SQLException;
 }
