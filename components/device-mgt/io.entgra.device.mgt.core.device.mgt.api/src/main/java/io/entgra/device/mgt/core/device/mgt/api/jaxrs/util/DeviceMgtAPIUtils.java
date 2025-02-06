@@ -25,6 +25,7 @@ import io.entgra.device.mgt.core.device.mgt.common.authorization.GroupAccessAuth
 import io.entgra.device.mgt.core.device.mgt.common.metadata.mgt.DeviceStatusManagementService;
 import io.entgra.device.mgt.core.device.mgt.core.permission.mgt.PermissionManagerServiceImpl;
 import io.entgra.device.mgt.core.device.mgt.core.service.TagManagementProviderService;
+import io.entgra.device.mgt.core.device.mgt.core.service.DeviceTypeEventManagementProviderService;
 import io.entgra.device.mgt.core.tenant.mgt.common.spi.TenantManagerAdminService;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.client.Options;
@@ -166,6 +167,7 @@ public class DeviceMgtAPIUtils {
     private static volatile APIPublisherService apiPublisher;
     private static volatile TenantManagerAdminService tenantManagerAdminService;
     private static volatile TagManagementProviderService tagManagementService;
+    private static volatile DeviceTypeEventManagementProviderService deviceTypeEventManagementProviderService;
 
     static {
         String keyStorePassword = ServerConfiguration.getInstance().getFirstProperty("Security.KeyStore.Password");
@@ -526,6 +528,29 @@ public class DeviceMgtAPIUtils {
             }
         }
         return tagManagementService;
+    }
+
+
+    /**
+     * Initializing and accessing method for DeviceTypeEventManagementProviderService.
+     *
+     * @return DeviceTypeEventManagementProviderService instance
+     * @throws IllegalStateException if DeviceTypeEventManagementProviderService cannot be initialized
+     */
+    public static DeviceTypeEventManagementProviderService getDeviceTypeEventManagementProviderService() {
+        if (deviceTypeEventManagementProviderService == null) {
+            synchronized (DeviceMgtAPIUtils.class) {
+                if (deviceTypeEventManagementProviderService == null) {
+                    PrivilegedCarbonContext ctx = PrivilegedCarbonContext.getThreadLocalCarbonContext();
+                    deviceTypeEventManagementProviderService = (DeviceTypeEventManagementProviderService) ctx.getOSGiService(
+                            DeviceTypeEventManagementProviderService.class, null);
+                    if (deviceTypeEventManagementProviderService == null) {
+                        throw new IllegalStateException("Device Type Event Management service not initialized.");
+                    }
+                }
+            }
+        }
+        return deviceTypeEventManagementProviderService;
     }
 
     public static PlatformConfigurationManagementService getPlatformConfigurationManagementService() {

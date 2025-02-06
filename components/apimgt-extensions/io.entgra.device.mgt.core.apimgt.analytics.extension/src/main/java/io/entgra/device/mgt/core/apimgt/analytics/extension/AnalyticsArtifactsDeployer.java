@@ -24,10 +24,11 @@ import io.entgra.device.mgt.core.apimgt.analytics.extension.dto.MetaData;
 import io.entgra.device.mgt.core.apimgt.analytics.extension.exception.EventPublisherDeployerException;
 import io.entgra.device.mgt.core.apimgt.analytics.extension.exception.EventReceiverDeployerException;
 import io.entgra.device.mgt.core.apimgt.analytics.extension.exception.EventStreamDeployerException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.wso2.carbon.utils.CarbonUtils;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
@@ -40,6 +41,8 @@ import java.io.UnsupportedEncodingException;
 
 public class AnalyticsArtifactsDeployer {
 
+    private static final Log log = LogFactory.getLog(AnalyticsArtifactsDeployer.class);
+
     public static final String TEMPLATE_LOCATION = "repository" + File.separator + "resources" + File.separator + "iot-analytics-templates";
     public static final String EVENT_STREAM_LOCATION = "eventstreams";
     public static final String EVENT_PUBLISHER_LOCATION = "eventpublishers";
@@ -47,6 +50,7 @@ public class AnalyticsArtifactsDeployer {
     public static final String EVENT_STREAM_TEMPLATE = TEMPLATE_LOCATION + File.separator + "event_stream.json.template";
     public static final String EVENT_PUBLISHER_TEMPLATE = TEMPLATE_LOCATION + File.separator + "event_publisher.xml.template";
     public static final String EVENT_RECEIVER_TEMPLATE = TEMPLATE_LOCATION + File.separator + "event_receiver.xml.template";
+    public static final String DEFAULT_STREAM_VERSION = "1.0.0";
 
 
     public void deployEventStream(EventStreamData eventStreamData, int tenantId) throws EventStreamDeployerException {
@@ -173,4 +177,68 @@ public class AnalyticsArtifactsDeployer {
 
         return context;
     }
+
+    // Existing constants remain unchanged
+
+    public void undeployEventStream(String streamName, int tenantId) {
+        String fileName = streamName + "_" + DEFAULT_STREAM_VERSION + ".json";
+        String fileLocation = (MultitenantConstants.SUPER_TENANT_ID == tenantId)
+                ? CarbonUtils.getCarbonHome() + File.separator + "repository" + File.separator + "deployment"
+                + File.separator + "server" + File.separator + EVENT_STREAM_LOCATION + File.separator + fileName
+                : CarbonUtils.getCarbonTenantsDirPath() + File.separator + tenantId + File.separator
+                + EVENT_STREAM_LOCATION + File.separator + fileName;
+
+        try {
+            deleteFile(fileLocation, "event stream");
+        } catch (FileNotFoundException e) {
+            log.warn("Event stream file not found or could not be deleted: " + fileLocation, e);
+        }
+    }
+
+
+    public void undeployEventPublisher(String publisherName, int tenantId) {
+        String fileName = publisherName + ".xml";
+        String fileLocation = (MultitenantConstants.SUPER_TENANT_ID == tenantId)
+                ? CarbonUtils.getCarbonHome() + File.separator + "repository" + File.separator + "deployment"
+                + File.separator + "server" + File.separator + EVENT_PUBLISHER_LOCATION + File.separator + fileName
+                : CarbonUtils.getCarbonTenantsDirPath() + File.separator + tenantId + File.separator
+                + EVENT_PUBLISHER_LOCATION + File.separator + fileName;
+
+        try {
+            deleteFile(fileLocation, "event publisher");
+        } catch (FileNotFoundException e) {
+            log.warn("Event publisher file not found or could not be deleted: " + fileLocation, e);
+        }
+    }
+
+
+    public void undeployEventReceiver(String receiverName, int tenantId) {
+        String fileName = receiverName + ".xml";
+        String fileLocation = (MultitenantConstants.SUPER_TENANT_ID == tenantId)
+                ? CarbonUtils.getCarbonHome() + File.separator + "repository" + File.separator + "deployment"
+                + File.separator + "server" + File.separator + EVENT_RECEIVER_LOCATION + File.separator + fileName
+                : CarbonUtils.getCarbonTenantsDirPath() + File.separator + tenantId + File.separator
+                + EVENT_RECEIVER_LOCATION + File.separator + fileName;
+
+        try {
+            deleteFile(fileLocation, "event receiver");
+        } catch (FileNotFoundException e) {
+            log.warn("Event receiver file not found or could not be deleted: " + fileLocation, e);
+        }
+    }
+
+    private void deleteFile(String filePath, String artifactType) throws FileNotFoundException {
+        File file = new File(filePath);
+        if (file.exists()) {
+            if (file.delete()) {
+                log.info("Successfully deleted " + artifactType + " file: " + filePath);
+            } else {
+                throw new FileNotFoundException("Failed to delete " + artifactType + " file: " + filePath);
+            }
+        } else {
+            throw new FileNotFoundException(artifactType + " file not found for deletion: " + filePath);
+        }
+    }
+
+
 }

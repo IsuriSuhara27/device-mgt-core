@@ -18,6 +18,8 @@
 
 package io.entgra.device.mgt.core.device.mgt.api.jaxrs.service.impl.admin;
 
+import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.DeviceTypeVersionWrapper;
+import io.entgra.device.mgt.core.device.mgt.api.jaxrs.beans.ErrorResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
@@ -34,6 +36,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.base.MultitenantConstants;
 import org.wso2.carbon.context.PrivilegedCarbonContext;
+import io.entgra.device.mgt.core.device.mgt.api.jaxrs.util.DeviceMgtAPIUtils;
+import io.entgra.device.mgt.core.device.mgt.api.jaxrs.service.api.admin.DeviceTypeManagementAdminService;
+
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
