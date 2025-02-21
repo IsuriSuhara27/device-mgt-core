@@ -1,9 +1,27 @@
+/*
+ * Copyright (c) 2018 - 2025, Entgra (Pvt) Ltd. (http://www.entgra.io) All Rights Reserved.
+ *
+ * Entgra (Pvt) Ltd. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package io.entgra.device.mgt.core.device.mgt.core.service;
 
 import io.entgra.device.mgt.core.device.mgt.common.exceptions.DeviceManagementException;
-import io.entgra.device.mgt.core.device.mgt.core.common.BaseDeviceManagementTest;
 import io.entgra.device.mgt.core.device.mgt.common.type.event.mgt.DeviceTypeEvent;
 import io.entgra.device.mgt.core.device.mgt.core.TestUtils;
+import io.entgra.device.mgt.core.device.mgt.core.common.BaseDeviceManagementTest;
 import io.entgra.device.mgt.core.device.mgt.core.common.TestDataHolder;
 import io.entgra.device.mgt.core.device.mgt.core.dao.DeviceManagementDAOFactory;
 import org.apache.commons.logging.Log;
@@ -13,7 +31,7 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertNotNull;
 
 public class DeviceTypeEventProviderServiceTests extends BaseDeviceManagementTest {
 
@@ -34,7 +52,7 @@ public class DeviceTypeEventProviderServiceTests extends BaseDeviceManagementTes
                     "VALUES " +
                     "(1, 'air_quality', NULL, CURRENT_TIMESTAMP, " + TestDataHolder.ALTERNATE_TENANT_ID + ", FALSE)");
             DeviceManagementDAOFactory.commitTransaction();
-        }  finally {
+        } finally {
             DeviceManagementDAOFactory.closeConnection();
         }
 
@@ -73,8 +91,8 @@ public class DeviceTypeEventProviderServiceTests extends BaseDeviceManagementTes
         String deviceType = "air_quality";
         try {
             List<DeviceTypeEvent> response = deviceTypeEventManagementProviderService.getDeviceTypeEventDefinitions(deviceType);
-        // Assert
-        assertNotNull(response, "Response should not be null");
+            // Assert
+            assertNotNull(response, "Response should not be null");
         } catch (DeviceManagementException e) {
             throw new DeviceManagementException("Error occurred while retrieving the event definitions for a device type" + e);
         }

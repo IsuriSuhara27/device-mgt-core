@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - 2023, Entgra (Pvt) Ltd. (http://www.entgra.io) All Rights Reserved.
+ * Copyright (c) 2018 - 2025, Entgra (Pvt) Ltd. (http://www.entgra.io) All Rights Reserved.
  *
  * Entgra (Pvt) Ltd. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -135,7 +135,7 @@ public class DeviceEventManagementServiceImpl implements DeviceEventManagementSe
 //        return eventRecords;
 //    }
 
-//    private static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
+    //    private static List<String> getRecordIds(List<SearchResultEntry> searchResults) {
 //        List<String> ids = new ArrayList<>();
 //        for (SearchResultEntry searchResult : searchResults) {
 //            ids.add(searchResult.getId());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - 2023, Entgra (Pvt) Ltd. (http://www.entgra.io) All Rights Reserved.
+ * Copyright (c) 2018 - 2025, Entgra (Pvt) Ltd. (http://www.entgra.io) All Rights Reserved.
  *
  * Entgra (Pvt) Ltd. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -18,15 +18,18 @@
 
 package io.entgra.device.mgt.core.device.mgt.core.dao;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import io.entgra.device.mgt.core.device.mgt.common.DeviceManagementConstants;
 import io.entgra.device.mgt.core.device.mgt.common.exceptions.IllegalTransactionStateException;
 import io.entgra.device.mgt.core.device.mgt.common.exceptions.TransactionManagementException;
 import io.entgra.device.mgt.core.device.mgt.common.exceptions.UnsupportedDatabaseEngineException;
 import io.entgra.device.mgt.core.device.mgt.core.config.datasource.DataSourceConfig;
 import io.entgra.device.mgt.core.device.mgt.core.config.datasource.JNDILookupDefinition;
-import io.entgra.device.mgt.core.device.mgt.core.dao.impl.*;
+import io.entgra.device.mgt.core.device.mgt.core.dao.impl.ApplicationDAOImpl;
+import io.entgra.device.mgt.core.device.mgt.core.dao.impl.DeviceStatusDAOImpl;
+import io.entgra.device.mgt.core.device.mgt.core.dao.impl.DeviceTypeDAOImpl;
+import io.entgra.device.mgt.core.device.mgt.core.dao.impl.DeviceTypeEventDAOImpl;
+import io.entgra.device.mgt.core.device.mgt.core.dao.impl.TagDAOImpl;
+import io.entgra.device.mgt.core.device.mgt.core.dao.impl.TenantDAOImpl;
 import io.entgra.device.mgt.core.device.mgt.core.dao.impl.device.GenericDeviceDAOImpl;
 import io.entgra.device.mgt.core.device.mgt.core.dao.impl.device.OracleDeviceDAOImpl;
 import io.entgra.device.mgt.core.device.mgt.core.dao.impl.device.PostgreSQLDeviceDAOImpl;
@@ -39,6 +42,8 @@ import io.entgra.device.mgt.core.device.mgt.core.device.details.mgt.dao.DeviceDe
 import io.entgra.device.mgt.core.device.mgt.core.device.details.mgt.dao.impl.DeviceDetailsDAOImpl;
 import io.entgra.device.mgt.core.device.mgt.core.privacy.dao.PrivacyComplianceDAO;
 import io.entgra.device.mgt.core.device.mgt.core.privacy.dao.impl.PrivacyComplianceDAOImpl;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -194,6 +199,7 @@ public class DeviceManagementDAOFactory {
     public static DeviceStatusDAO getDeviceStatusDAO() {
         return new DeviceStatusDAOImpl();
     }
+
     public static ApplicationDAO getApplicationDAO() {
         if (databaseEngine != null) {
             switch (databaseEngine) {

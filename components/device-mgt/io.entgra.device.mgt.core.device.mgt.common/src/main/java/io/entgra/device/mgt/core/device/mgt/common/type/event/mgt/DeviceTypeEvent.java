@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - 2023, Entgra (Pvt) Ltd. (http://www.entgra.io) All Rights Reserved.
+ * Copyright (c) 2018 - 2025, Entgra (Pvt) Ltd. (http://www.entgra.io) All Rights Reserved.
  *
  * Entgra (Pvt) Ltd. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
@@ -20,8 +20,6 @@ package io.entgra.device.mgt.core.device.mgt.common.type.event.mgt;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.List;
-
 /**
  * This hold stats data record
  */
@@ -32,6 +30,7 @@ public class DeviceTypeEvent {
     private TransportType transport;
 
     private String eventTopicStructure;
+
     @ApiModelProperty(value = "Attributes related to device type event")
     @JsonProperty("eventAttributes")
     public EventAttributeList getEventAttributeList() {
