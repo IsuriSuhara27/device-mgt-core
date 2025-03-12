@@ -867,10 +867,17 @@ public final class DeviceManagerUtil {
         applicationRegistration.setApplicationName("MyApp");
         applicationRegistration.setAllowedToAllDomains(false);
         List<String> tags = new ArrayList<>();
-        tags.add("windows");
+//        tags.add("windows");
         tags.add("device_management");
         applicationRegistration.setTags(tags);
         applicationRegistration.setValidityPeriod(3600);
+        applicationRegistration.setCallbackUrl(null);
+        ArrayList<String> grantTypes = new ArrayList<>();
+        grantTypes.add("refresh_token");
+        grantTypes.add("client_credentials");
+        grantTypes.add("password");
+        applicationRegistration.setSupportedGrantTypes(grantTypes);
+        applicationRegistration.setTokenType("DEFAULT");
         Gson gson = new Gson();
         String payload = gson.toJson(applicationRegistration);
         return new StringEntity(payload, ContentType.APPLICATION_JSON);
