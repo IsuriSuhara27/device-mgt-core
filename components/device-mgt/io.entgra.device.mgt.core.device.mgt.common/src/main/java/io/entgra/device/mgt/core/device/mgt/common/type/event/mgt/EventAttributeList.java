@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This holds event attributes
@@ -38,6 +39,19 @@ public class EventAttributeList {
 
     public void setList(List<Attribute> attributes) {
         this.attributes = attributes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EventAttributeList that = (EventAttributeList) o;
+        return Objects.equals(attributes, that.attributes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(attributes);
     }
 
 }

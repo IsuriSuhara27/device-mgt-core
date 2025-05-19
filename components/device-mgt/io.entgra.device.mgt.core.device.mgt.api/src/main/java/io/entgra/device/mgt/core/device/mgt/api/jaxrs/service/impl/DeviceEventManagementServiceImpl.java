@@ -74,6 +74,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This is used for device type integration with DAS, to create streams and receiver dynamically and a common endpoint
@@ -201,7 +203,8 @@ public class DeviceEventManagementServiceImpl implements DeviceEventManagementSe
             }
             return Response.ok().entity("Device type event definitions updated and metadata created successfully.").build();
         } catch (DeviceManagementException e) {
-            log.error("Error while updating device type metadata with events for device type: " + deviceType, e);
+            String msg = "Error while updating device type metadata with events for device type: "+ deviceType;
+            log.error(msg, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Failed to update device type metadata with events").build();
         }
@@ -215,24 +218,72 @@ public class DeviceEventManagementServiceImpl implements DeviceEventManagementSe
                                                      @QueryParam("isSharedWithAllTenants") boolean isSharedWithAllTenants,
                                                      @Valid List<DeviceTypeEvent> deviceTypeEvents) {
         try {
+            // Check if any devices are enrolled for this device type
             PaginationRequest request = new PaginationRequest(0, 1);
             request.setDeviceType(deviceType);
             PaginationResult result = DeviceMgtAPIUtils.getDeviceManagementService().getDevicesByType(request);
-            if (result.getRecordsTotal() == 0) {
-                removeDeviceTypeEventFiles(deviceType);
-                if (DeviceMgtAPIUtils.getDeviceTypeEventManagementProviderService()
-                        .updateDeviceTypeMetaWithEvents(deviceType, deviceTypeEvents)) {
-                    log.info("Device type event definitions updated and metadata created successfully in the database.");
-                    processDeviceTypeEventDefinitions(deviceType, skipPersist, isSharedWithAllTenants, deviceTypeEvents);
+            //if devices are enrolled
+            if (result.getRecordsTotal() > 0) {
+                // Fetch existing events
+                List<DeviceTypeEvent> existingEvents = DeviceMgtAPIUtils.getDeviceTypeEventManagementProviderService()
+                        .getDeviceTypeEventDefinitions(deviceType);
+
+                Map<String, DeviceTypeEvent> existingEventMap = existingEvents.stream()
+                        .collect(Collectors.toMap(DeviceTypeEvent::getEventName, e -> e));
+
+                List<DeviceTypeEvent> updatedEvents = new ArrayList<>();
+                List<DeviceTypeEvent> unchangedEvents = new ArrayList<>();
+
+                Set<String> incomingNames = deviceTypeEvents.stream()
+                        .map(DeviceTypeEvent::getEventName)
+                        .collect(Collectors.toSet());
+
+                // Compare incoming events with existing
+                for (DeviceTypeEvent incoming : deviceTypeEvents) {
+                    DeviceTypeEvent existing = existingEventMap.get(incoming.getEventName());
+                    if (existing == null || !incoming.equals(existing)) {
+                        updatedEvents.add(incoming);
+                    }
+                }
+
+                // Retain events not mentioned in the incoming list
+                for (DeviceTypeEvent existing : existingEvents) {
+                    if (!incomingNames.contains(existing.getEventName())) {
+                        unchangedEvents.add(existing);
+                    }
+                }
+
+                // Merge unchanged and updated events for full metadata persistence
+                List<DeviceTypeEvent> mergedEvents = new ArrayList<>();
+                mergedEvents.addAll(updatedEvents);
+                mergedEvents.addAll(unchangedEvents);
+
+                // Proceed only if something changed
+                if (!updatedEvents.isEmpty()) {
+                    removeDeviceTypeEventFiles(deviceType, updatedEvents);
+                    boolean updated = DeviceMgtAPIUtils.getDeviceTypeEventManagementProviderService()
+                            .updateDeviceTypeMetaWithEvents(deviceType, mergedEvents);
+                    if (updated) {
+                        log.info("Device type event definitions updated successfully in metadata.");
+                        processDeviceTypeEventDefinitions(deviceType, skipPersist, isSharedWithAllTenants, updatedEvents);
+                    }
+                } else {
+                    log.info("No new or updated event definitions found. Skipping update.");
                 }
             } else {
-                return Response.status(Response.Status.CONFLICT)
-                        .entity("Device type event definitions are not updated due to devices that are already enrolled.")
-                        .build();
+                // No devices enrolled — accept and persist everything (even renamed events)
+                removeDeviceTypeEventFiles(deviceType);
+                boolean updated = DeviceMgtAPIUtils.getDeviceTypeEventManagementProviderService()
+                        .updateDeviceTypeMetaWithEvents(deviceType, deviceTypeEvents);
+                if (updated) {
+                    log.info("All device type events replaced as no devices are enrolled.");
+                    processDeviceTypeEventDefinitions(deviceType, skipPersist, isSharedWithAllTenants, deviceTypeEvents);
+                }
             }
             return Response.ok().entity("Device type event definitions updated and metadata updated successfully.").build();
         } catch (DeviceManagementException e) {
-            log.error("Error while updating device type metadata with events for device type: " + deviceType, e);
+            String msg = "Error while updating device type metadata with events for device type: " + deviceType;
+            log.error(msg, e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Failed to update device type metadata with events").build();
         }
@@ -435,65 +486,74 @@ public class DeviceEventManagementServiceImpl implements DeviceEventManagementSe
     }
 
     /**
-     * Removes all event-related artifacts (event streams, receivers, and publishers) associated with a given device type.
+     * Removes analytics artifacts for a specified device type and a specific list of event definitions.
      *
-     * <p>This includes undeploying:
-     * <ul>
-     *     <li>WebSocket event publishers</li>
-     *     <li>RDBMS event publishers</li>
-     *     <li>Event receivers (based on the transport type)</li>
-     *     <li>Event streams</li>
-     * </ul>
-     *
-     * <p>If no events are defined for the device type, a {@code 404 Not Found} response is returned.</p>
-     *
-     * @param deviceType The device type for which the event artifacts should be removed.
-     * @return A JAX-RS {@link Response} indicating the result of the operation:
-     *         <ul>
-     *             <li>{@code 200 OK} if all artifacts were successfully removed.</li>
-     *             <li>{@code 404 Not Found} if no events are defined for the given device type.</li>
-     *         </ul>
-     * @throws DeviceManagementException If an error occurs while accessing the event definitions or during undeployment.
+     * @param deviceType       the device type whose artifacts should be removed
+     * @param eventsToRemove   the list of specific event definitions to remove artifacts for
+     * @throws DeviceManagementException if there is an error during artifact undeployment
      */
-
-    private Response removeDeviceTypeEventFiles(String deviceType) throws
-            DeviceManagementException {
+    private void removeDeviceTypeEventFiles(String deviceType, List<DeviceTypeEvent> eventsToRemove)
+            throws DeviceManagementException {
         String tenantDomain = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantDomain();
         int tenantId = PrivilegedCarbonContext.getThreadLocalCarbonContext().getTenantId();
-        // Fetch existing events for the device type
-        List<DeviceTypeEvent> eventDefinitions = DeviceMgtAPIUtils.getDeviceTypeEventManagementProviderService()
-                .getDeviceTypeEventDefinitions(deviceType);
-        if (eventDefinitions.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("No events found for the given device type").build();
-        }
         AnalyticsArtifactsDeployer artifactsDeployer = new AnalyticsArtifactsDeployer();
 
-        // Loop through the events to remove associated artifacts
-        for (DeviceTypeEvent eventDefinition : eventDefinitions) {
-            String eventName = eventDefinition.getEventName();
-            TransportType transportType = eventDefinition.getTransportType();
-
-            String streamName = DeviceMgtAPIUtils.getStreamDefinition(deviceType, tenantDomain, eventName);
-
-            // Remove event publishers
-            String wsPublisherName = getPublisherName(deviceType, tenantDomain, eventName) + WS_PUBLISHER_SUFFIX;
-            artifactsDeployer.undeployEventPublisher(wsPublisherName, tenantId);
-            log.info("Removed event publisher: " + wsPublisherName);
-
-            String rdbmsPublisherName = getPublisherName(deviceType, tenantDomain, eventName) + RDBMS_PUBLISHER_SUFFIX;
-            artifactsDeployer.undeployEventPublisher(rdbmsPublisherName, tenantId);
-            log.info("Removed event publisher: " + rdbmsPublisherName);
-
-            // Remove event receiver
-            String receiverName = getReceiverName(deviceType, tenantDomain, transportType, eventName);
-            artifactsDeployer.undeployEventReceiver(receiverName, tenantId);
-            log.info("Removed event receiver: " + receiverName);
-
-            // Remove event stream
-            artifactsDeployer.undeployEventStream(streamName, tenantId);
-            log.info("Removed event stream: " + streamName);
+        for (DeviceTypeEvent eventDefinition : eventsToRemove) {
+            undeployArtifactsForEvent(deviceType, tenantDomain, tenantId, eventDefinition, artifactsDeployer);
         }
+    }
+
+    /**
+     * Removes all analytics artifacts for a given device type.
+     * If no events are found for the device type, artifact removal is skipped.
+     *
+     * @param deviceType the device type whose artifacts should be removed
+     * @throws DeviceManagementException if an error occurs while retrieving or undeploying artifacts
+     */
+    private void removeDeviceTypeEventFiles(String deviceType) throws DeviceManagementException {
+        List<DeviceTypeEvent> allEvents = DeviceMgtAPIUtils.getDeviceTypeEventManagementProviderService()
+                .getDeviceTypeEventDefinitions(deviceType);
+
+        if (!allEvents.isEmpty()) {
+            log.info("No events found for device type: " + deviceType + ". Skipping artifact removal.");
+            return;
+        }
+        removeDeviceTypeEventFiles(deviceType, allEvents);
+    }
+
+    /**
+     * Undeploys all analytics artifacts (event publishers, receivers, and stream) for a specific event definition.
+     *
+     * @param deviceType   the device type of the event
+     * @param tenantDomain the tenant domain under which the artifacts are deployed
+     * @param tenantId     the tenant ID under which the artifacts are deployed
+     * @param event        the event definition for which artifacts need to be removed
+     * @param deployer     the artifact deployer responsible for undeployment
+     * @return a successful {@link Response} if artifacts are removed; not typically used by caller
+     * @throws DeviceManagementException if an error occurs during undeployment
+     */
+    private Response undeployArtifactsForEvent(String deviceType, String tenantDomain, int tenantId,
+                                           DeviceTypeEvent event, AnalyticsArtifactsDeployer deployer)
+            throws DeviceManagementException {
+        String eventName = event.getEventName();
+        TransportType transportType = event.getTransportType();
+
+        String streamName = DeviceMgtAPIUtils.getStreamDefinition(deviceType, tenantDomain, eventName);
+
+        String wsPublisherName = getPublisherName(deviceType, tenantDomain, eventName) + WS_PUBLISHER_SUFFIX;
+        deployer.undeployEventPublisher(wsPublisherName, tenantId);
+        log.info("Removed event publisher: " + wsPublisherName);
+
+        String rdbmsPublisherName = getPublisherName(deviceType, tenantDomain, eventName) + RDBMS_PUBLISHER_SUFFIX;
+        deployer.undeployEventPublisher(rdbmsPublisherName, tenantId);
+        log.info("Removed event publisher: " + rdbmsPublisherName);
+
+        String receiverName = getReceiverName(deviceType, tenantDomain, transportType, eventName);
+        deployer.undeployEventReceiver(receiverName, tenantId);
+        log.info("Removed event receiver: " + receiverName);
+
+        deployer.undeployEventStream(streamName, tenantId);
+        log.info("Removed event stream: " + streamName);
         return Response.ok().build();
     }
 
