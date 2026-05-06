@@ -306,7 +306,9 @@ public class OperationManagementTests extends BaseDeviceManagementTest {
         DeviceIdentifier deviceIdentifier = this.deviceIds.get(0);
         List operations = this.operationMgtService.getPendingOperations(deviceIdentifier);
         Assert.assertTrue(operations != null && operations.size() == 4);
-        Operation operation = (Operation) operations.get(0);
+        Operation pendingOperation = (Operation) operations.get(0);
+        Operation operation = new Operation();
+        operation.setId(pendingOperation.getId());
         operation.setStatus(Operation.Status.COMPLETED);
         operation.setOperationResponse("The operation is successfully completed");
         this.operationMgtService.updateOperation(deviceIdentifier, operation);
