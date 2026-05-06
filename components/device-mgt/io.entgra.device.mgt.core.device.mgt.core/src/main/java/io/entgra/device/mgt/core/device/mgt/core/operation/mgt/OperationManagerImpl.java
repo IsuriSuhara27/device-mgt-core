@@ -958,7 +958,8 @@ public class OperationManagerImpl implements OperationManager {
                         }
                     }
                 }
-                if (operation.getCode().equals("POLICY_REVOKE") && operation.getStatus().equals(Operation.Status.COMPLETED)){
+                if (OperationMgtConstants.OperationCodes.POLICY_REVOKE.equals(operation.getCode())
+                        && Operation.Status.COMPLETED.equals(operation.getStatus())) {
                     if (this.getDevice(deviceId).getEnrolmentInfo().getStatus().equals(EnrolmentInfo.Status.DISENROLLMENT_REQUESTED)) {
                         DeviceManagementProviderService deviceManagementProviderService = DeviceManagementDataHolder.getInstance().
                                 getDeviceManagementProvider();
@@ -972,12 +973,17 @@ public class OperationManagerImpl implements OperationManager {
             if (isOperationUpdated && operation.getOperationResponse() != null) {
                 OperationMonitoringTaskConfig operationMonitoringTaskConfig = DeviceManagementDataHolder
                         .getInstance().getDeviceManagementProvider().getDeviceMonitoringConfig(deviceId.getType());
-                List<MonitoringOperation> monitoringOperations = operationMonitoringTaskConfig.getMonitoringOperation();
                 MonitoringOperation currentMonitoringOperation = null;
-                for (MonitoringOperation monitoringOperation : monitoringOperations) {
-                    if (monitoringOperation.getTaskName().equals(operation.getCode())) {
-                        currentMonitoringOperation = monitoringOperation;
-                        break;
+                if (operationMonitoringTaskConfig != null) {
+                    List<MonitoringOperation> monitoringOperations = operationMonitoringTaskConfig
+                            .getMonitoringOperation();
+                    if (monitoringOperations != null) {
+                        for (MonitoringOperation monitoringOperation : monitoringOperations) {
+                            if (monitoringOperation.getTaskName().equals(operation.getCode())) {
+                                currentMonitoringOperation = monitoringOperation;
+                                break;
+                            }
+                        }
                     }
                 }
                 if (currentMonitoringOperation != null && !currentMonitoringOperation.hasResponsePersistence()) {
